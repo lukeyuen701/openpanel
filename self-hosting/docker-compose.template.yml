@@ -21,7 +21,7 @@ services:
         max-file: "3"
 
   op-db:
-    image: postgres:14-alpine
+    image: postgres:17-alpine
     restart: always
     volumes:
       - op-db-data:/var/lib/postgresql/data

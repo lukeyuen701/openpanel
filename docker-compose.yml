@@ -2,7 +2,7 @@ version: "3"
 
 services:
   op-db:
-    image: postgres:14-alpine
+    image: postgres:17-alpine
     restart: always
     volumes:
       - ./docker/data/op-db-data:/var/lib/postgresql/data

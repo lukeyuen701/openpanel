@@ -111,7 +111,7 @@ jobs:
             migrate: true
     services:
       postgres:
-        image: postgres:16-alpine
+        image: postgres:17-alpine
         ports:
           # The host port is what test/databases.ts pins, not a free choice.
           - 23432:5432
