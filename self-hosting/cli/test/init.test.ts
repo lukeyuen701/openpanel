@@ -12,6 +12,7 @@ import {
   generateSecrets,
 } from '../src/init/generate';
 import { loadInstall, writeFiles } from '../src/install';
+import { templates } from '../src/templates';
 
 // Compose interpolation syntax, spelled so the linter does not mistake it for a typo'd template.
 const DOLLAR = '$';
@@ -68,6 +69,37 @@ describe('init output', () => {
     expect(compose.volumes).not.toHaveProperty('op-db-data');
     expect(files.get('.env')).toContain(`DATABASE_URL="${url}"`);
     expect(files.get('.env')).toContain(`DATABASE_URL_DIRECT="${url}"`);
+  });
+
+  test('a regenerated install keeps the postgres image its data was created with', async () => {
+    const files = await generateInstall(
+      defaultAnswers(DOMAIN),
+      secrets,
+      'postgres:14-alpine'
+    );
+
+    expect(composeOf(files).services['op-db'].image).toBe('postgres:14-alpine');
+  });
+
+  test('a fresh install takes the template postgres image', async () => {
+    const template = parseDocument(templates.compose).toJS();
+
+    expect(composeOf(await generate()).services['op-db'].image).toBe(
+      template.services['op-db'].image
+    );
+  });
+
+  test('an external postgres ignores the kept image', async () => {
+    const files = await generateInstall(
+      {
+        ...defaultAnswers(DOMAIN),
+        external: { postgres: 'postgresql://u:p@db.internal:5432/op' },
+      },
+      secrets,
+      'postgres:14-alpine'
+    );
+
+    expect(composeOf(files).services).not.toHaveProperty('op-db');
   });
 
   test('placeholder text inside an external url is kept literally', async () => {

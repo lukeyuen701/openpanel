@@ -32,7 +32,7 @@ export const BUNDLED_URLS = {
 type DataService = keyof typeof BUNDLED_URLS;
 
 // The compose service (and its volume prefix) behind each data service.
-const COMPOSE_SERVICE: Record<DataService, string> = {
+export const COMPOSE_SERVICE: Record<DataService, string> = {
   clickhouse: 'op-ch',
   redis: 'op-kv',
   postgres: 'op-db',
@@ -140,10 +140,19 @@ const removeService = (
   }
 };
 
-const renderCompose = (answers: InitAnswers): string => {
+const renderCompose = (
+  answers: InitAnswers,
+  postgresImage: string | null
+): string => {
   const compose = parseDocument(templates.compose);
   for (const service of Object.keys(answers.external) as DataService[]) {
     removeService(compose, COMPOSE_SERVICE[service]);
+  }
+  // A Postgres data directory only opens with the major version that created
+  // it, so a regenerated install keeps the image its op-db already runs.
+  const postgresService = ['services', COMPOSE_SERVICE.postgres];
+  if (postgresImage && compose.hasIn(postgresService)) {
+    compose.setIn([...postgresService, 'image'], postgresImage);
   }
   if (answers.proxy === 'external') {
     removeService(compose, 'op-proxy');
@@ -188,11 +197,12 @@ const renderCaddyfile = async (
 // Everything `init` writes, keyed by path relative to the install dir.
 export const generateInstall = async (
   answers: InitAnswers,
-  secrets: Secrets
+  secrets: Secrets,
+  postgresImage: string | null = null
 ): Promise<Map<string, string>> => {
   const files = new Map<string, string>([
     ['.env', renderEnv(answers, secrets)],
-    ['docker-compose.yml', renderCompose(answers)],
+    ['docker-compose.yml', renderCompose(answers, postgresImage)],
     ['redpanda/bootstrap.yaml', renderRedpandaBootstrap(answers.partitions)],
   ]);
   if (!answers.external.clickhouse) {

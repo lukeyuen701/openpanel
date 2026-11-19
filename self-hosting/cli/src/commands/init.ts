@@ -15,13 +15,14 @@ import {
 import { EnvFile } from '../env-file';
 import { checkHost, DOCKER_INSTALL_COMMAND, type HostCheck } from '../host';
 import {
+  COMPOSE_SERVICE,
   defaultAnswers,
   generateInstall,
   generateSecrets,
   hostOf,
   type InitAnswers,
 } from '../init/generate';
-import { isInstallDir, writeFiles } from '../install';
+import { isInstallDir, loadInstall, writeFiles } from '../install';
 import { discoverInstall, isEmptyOrMissing, rememberDir } from '../install-dir';
 import { run } from '../run';
 import { showSupportBanner } from '../support-banner';
@@ -252,6 +253,18 @@ const readExistingEnv = (dir: string): EnvFile | null => {
   }
 };
 
+const readExistingPostgresImage = (dir: string): string | null => {
+  if (!isInstallDir(dir)) {
+    return null;
+  }
+  const image = loadInstall(dir).compose.getIn([
+    'services',
+    COMPOSE_SERVICE.postgres,
+    'image',
+  ]);
+  return typeof image === 'string' ? image : null;
+};
+
 // Why init should not write here, or null when it may.
 const targetProblem = async (flags: InitFlags): Promise<string | null> => {
   if (isInstallDir(flags.dir)) {
@@ -291,7 +304,11 @@ export const init = async (flags: InitFlags): Promise<number> => {
   const secrets = generateSecrets(readExistingEnv(flags.dir));
   const written = await writeFiles(
     flags.dir,
-    await generateInstall(answers, secrets)
+    await generateInstall(
+      answers,
+      secrets,
+      readExistingPostgresImage(flags.dir)
+    )
   );
 
   await rememberDir(flags.dir);
