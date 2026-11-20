@@ -20,7 +20,7 @@
     "@openpanel/core": "workspace:*",
     "@openpanel/db": "workspace:*",
     "@openpanel/redis": "workspace:*",
-    "elysia": "1.4.30",
+    "elysia": "1.4.32",
     "pino": "catalog:",
     "pino-pretty": "catalog:",
     "uuid": "9.0.1",
@@ -30,7 +30,7 @@
     "@faker-js/faker": "9.9.0",
     "@openpanel/tsconfig": "workspace:*",
     "@types/uuid": "10.0.0",
-    "bun-types": "1.4.4",
+    "bun-types": "1.4.5",
     "typescript": "catalog:"
   }
 }

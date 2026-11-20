@@ -96,7 +96,7 @@ RUN find /app/node_modules/.bun -maxdepth 1 -name '*musl*' -prune -exec rm -rf {
 # client; the build fails if they drift. `prisma --version` proves the CLI runs and its engines are present.
 FROM base AS prisma-cli
 
-ARG PRISMA_VERSION=6.14.0
+ARG PRISMA_VERSION=6.19.3
 
 WORKDIR /opt/prisma
 

@@ -219,9 +219,11 @@ async function getSSLInfo(
           return;
         }
 
+        // A certificate can carry several CNs; the first is the one shown.
+        const [issuerName] = [cert.issuer?.CN ?? []].flat();
         resolve({
           valid: new Date(cert.valid_to) > new Date(),
-          issuer: cert.issuer?.CN || 'Unknown',
+          issuer: issuerName || 'Unknown',
           expires: cert.valid_to,
         });
       }
