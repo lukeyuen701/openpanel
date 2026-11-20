@@ -473,6 +473,24 @@ export const kafkaPartitions: Check = (install) => {
   };
 };
 
+// The api's Kafka client speaks the protocol of Apache Kafka 3.5 to 4.2 (and
+// brokers compatible with it, such as the bundled Redpanda). An external
+// broker's version cannot be read from here, so the operator confirms it.
+export const externalKafkaVersion: Check = (install) => {
+  if (usesBundledKafka(install)) {
+    return null;
+  }
+  return {
+    id: 'env/external-kafka-version',
+    severity: 'warn',
+    title: 'KAFKA_BROKERS points at your own Kafka',
+    detail:
+      'The api supports Apache Kafka 3.5 through 4.2, or a broker compatible with them. An older broker refuses its consumer group or produce requests.',
+    manual:
+      'Confirm the broker runs Apache Kafka 3.5 or newer (or a compatible release) before upgrading.',
+  };
+};
+
 export const encryptionKey: Check = (install) => {
   const value = install.env.get('ENCRYPTION_KEY');
   if (value && ENCRYPTION_KEY_PATTERN.test(value)) {
@@ -807,6 +825,7 @@ export const checks: Check[] = [
   apiMigrations,
   kafkaBrokers,
   kafkaPartitions,
+  externalKafkaVersion,
   encryptionKey,
   cookieSecret,
   authSecret,

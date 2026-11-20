@@ -9,17 +9,20 @@
  */
 
 import { describe, expect, mock, test } from 'bun:test';
+import { EventEmitter } from 'node:events';
 import {
   createDeadLetterRecorder,
   type DeadLetterMulti,
   type DeadLetterRecord,
   type DeadLetterRedisClient,
 } from '@openpanel/redis';
-import type { Consumer, EachBatchPayload, KafkaMessage } from 'kafkajs';
+import type { Consumer } from '@platformatic/kafka';
 import {
+  type ConsumedMessage,
   createEventsBatchHandler,
   type DeadLetterMessage,
   type EventsBatchHandlerDeps,
+  type EventsBatchPayload,
   startKafkaEventsConsumer,
 } from './consumer';
 
@@ -35,31 +38,25 @@ const message = (
   offset: number,
   key: string | null,
   value: string = JSON.stringify(payloadFor(offset))
-): KafkaMessage =>
-  ({
-    key: key === null ? null : Buffer.from(key),
-    value: value === '' ? null : Buffer.from(value),
-    offset: String(offset),
-    timestamp: '0',
-    attributes: 0,
-    headers: {},
-    size: 0,
-  }) as unknown as KafkaMessage;
+): ConsumedMessage => ({
+  key: key === null ? null : Buffer.from(key),
+  value: value === '' ? null : Buffer.from(value),
+  headers: {},
+  offset: String(offset),
+});
 
 function makeBatch(
-  messages: KafkaMessage[],
+  messages: ConsumedMessage[],
   options: { isRunning?: () => boolean; isStale?: () => boolean } = {}
 ) {
   const resolveOffset = mock((_offset: string) => undefined);
-  const heartbeat = mock(async () => undefined);
-  const payload = {
+  const payload: EventsBatchPayload = {
     batch: { topic: TOPIC, partition: PARTITION, messages },
     resolveOffset,
-    heartbeat,
     isRunning: options.isRunning ?? (() => true),
     isStale: options.isStale ?? (() => false),
-  } as unknown as EachBatchPayload;
-  return { payload, resolveOffset, heartbeat };
+  };
+  return { payload, resolveOffset };
 }
 
 interface MockCalls {
@@ -439,9 +436,9 @@ describe('a redelivery after the watermark was deleted', () => {
  * 2 of 44,075 events.
  *
  * The event a handler accepted lives in an in-process array until the buffer
- * pushes it to Redis, and kafkajs commits whatever `resolveOffset` marked the
- * moment `eachBatch` returns — `autoCommit` is on and this consumer never turns
- * it off, so `consumer.stop` is NOT the commit point. Resolving an offset for
+ * pushes it to Redis, and the consumer commits whatever `resolveOffset` marked
+ * the moment `eachBatch` returns, so `stopConsuming` is NOT the commit point.
+ * Resolving an offset for
  * an event that is still only in memory is exactly how those events were
  * lost: the offsets were committed, the process exited, and nothing was
  * redelivered.
@@ -495,20 +492,21 @@ describe('durability before commit', () => {
       onActivity,
     });
     const handler = createEventsBatchHandler(deps);
-    const { payload, resolveOffset, heartbeat } = makeBatch([
+    const { payload, resolveOffset } = makeBatch([
       message(0, 'a'),
       message(1, 'b'),
     ]);
 
-    await handler.eachBatch(payload);
+    const outcome = await handler.eachBatch(payload);
 
-    // The whole batch stays uncommitted, so the broker redelivers it. A
-    // duplicate is recoverable; a loss is not.
+    // The whole batch stays uncommitted and is asked for again. A duplicate
+    // is recoverable; a loss is not.
+    expect(outcome).toBe('redeliver');
     expect(resolvedOffsets(resolveOffset)).toEqual([]);
     expect(logger.error).toHaveBeenCalledTimes(1);
-    // Still a member of the group, and still visibly alive.
-    expect(heartbeat).toHaveBeenCalled();
-    expect(onActivity).toHaveBeenCalledTimes(1);
+    // Still visibly alive while it waits: readiness must not read a Redis
+    // outage as a wedged consumer.
+    expect(onActivity).toHaveBeenCalled();
   });
 
   test('redelivery after a failed flush commits', async () => {
@@ -880,43 +878,310 @@ describe('dead letter to a capped redis list', () => {
   });
 });
 
+/**
+ * The consumer wired to a stand-in for the client: a stream of messages, the
+ * group events, and `commit`. What is asserted is what reaches the broker.
+ */
 describe('startKafkaEventsConsumer', () => {
-  test('a partition with no committed offset starts at its oldest message', async () => {
-    const subscribe = mock(
-      async (_options: { topic: string; fromBeginning?: boolean }) => undefined
-    );
-    const consumer = {
-      connect: mock(async () => undefined),
-      subscribe,
-      on: mock(() => () => undefined),
-      run: mock(async () => undefined),
-      stop: mock(async () => undefined),
-      disconnect: mock(async () => undefined),
-      events: {
-        HEARTBEAT: 'consumer.heartbeat',
-        GROUP_JOIN: 'consumer.group_join',
-        REBALANCING: 'consumer.rebalancing',
-        CRASH: 'consumer.crash',
-        DISCONNECT: 'consumer.disconnect',
-        REQUEST_TIMEOUT: 'consumer.network.request_timeout',
-      },
-    };
-    const { deps } = makeDeps();
-    const { topic: _topic, ...batch } = deps;
+  const LEADER_EPOCH = 1;
 
-    await startKafkaEventsConsumer({
-      createConsumer: () => consumer as unknown as Consumer,
-      logger: deps.logger,
-      kafkaLogger: deps.logger,
+  class FakeStream extends EventEmitter {
+    pause = mock(() => this);
+    resume = mock(() => this);
+    close = mock(async () => undefined);
+  }
+
+  function fakeClient() {
+    const streams: FakeStream[] = [];
+    const client = Object.assign(new EventEmitter(), {
+      groupId: 'openpanel-events',
+      memberId: 'member-1',
+      assignments: [{ topic: TOPIC, partitions: [0, 1] }],
+      consume: mock(async (_options: Record<string, unknown>) => {
+        const stream = new FakeStream();
+        streams.push(stream);
+        return stream;
+      }),
+      commit: mock(async (_options: unknown) => undefined),
+      close: mock(async (_force?: boolean) => undefined),
+      isActive: mock(() => true),
+      joinGroup: mock(async () => 'member-1'),
+    });
+    return { client, streams };
+  }
+
+  const streamed = (partition: number, offset: number, key = 'a') => ({
+    topic: TOPIC,
+    partition,
+    offset: BigInt(offset),
+    leaderEpoch: LEADER_EPOCH,
+    key: Buffer.from(key),
+    value: Buffer.from(JSON.stringify(payloadFor(offset))),
+    headers: new Map([[Buffer.from('source'), Buffer.from('sdk')]]),
+  });
+
+  const settle = async (rounds = 30): Promise<void> => {
+    for (let i = 0; i < rounds; i++) {
+      await Promise.resolve();
+    }
+  };
+
+  async function start(overrides: DepOverrides = {}) {
+    const { client, streams } = fakeClient();
+    const built = makeDeps(overrides);
+    const { topic: _topic, ...batch } = built.deps;
+    const sleep = mock(async (_ms: number) => undefined);
+    const handle = await startKafkaEventsConsumer({
+      createConsumer: () => client as unknown as Consumer,
+      logger: built.deps.logger,
+      kafkaLogger: built.deps.logger,
       topic: TOPIC,
-      partitionsConsumedConcurrently: 1,
+      partitionsConsumedConcurrently: 2,
+      maxMessagesPerBatch: 10,
       batch,
+      sleep,
     });
+    return { ...built, client, streams, handle, sleep };
+  }
 
-    expect(subscribe).toHaveBeenCalledTimes(1);
-    expect(subscribe).toHaveBeenCalledWith({
-      topic: TOPIC,
-      fromBeginning: true,
+  const committed = (commit: { mock: { calls: unknown[][] } }) =>
+    commit.mock.calls.map(([options]) => options);
+
+  test('reads from the committed offsets, the oldest when there are none, and commits itself', async () => {
+    const { client } = await start();
+    expect(client.consume).toHaveBeenCalledTimes(1);
+    expect(client.consume.mock.calls[0]?.[0]).toEqual({
+      topics: [TOPIC],
+      mode: 'committed',
+      fallbackMode: 'earliest',
+      autocommit: false,
     });
+  });
+
+  test("hands a partition's messages to the handler and commits past the last", async () => {
+    const handleEvent = mock(async (p: { projectId: string }) => {
+      if (p.projectId === 'project-1') {
+        throw new Error('poison');
+      }
+    });
+    const { client, streams, sendToDeadLetter } = await start({ handleEvent });
+    streams[0]?.emit('data', streamed(0, 0));
+    streams[0]?.emit('data', streamed(0, 1));
+    await settle();
+
+    // Offset 0 handled; offset 1 failed every attempt and was dead-lettered.
+    expect(handleEvent).toHaveBeenCalledTimes(4);
+    expect(committed(client.commit)).toEqual([
+      { offsets: [{ topic: TOPIC, partition: 0, offset: 2n, leaderEpoch: 1 }] },
+    ]);
+    // Headers reach the dead letter as name -> bytes.
+    const dlq = sendToDeadLetter.mock.calls[0]?.[0] as DeadLetterMessage;
+    expect(dlq.offset).toBe('1');
+    expect(dlq.headers?.source?.toString()).toBe('sdk');
+  });
+
+  test('a failed flush runs the batch again, and commits only once it is durable', async () => {
+    let failures = 2;
+    const onActivity = mock(() => undefined);
+    const { client, streams, handleEvent } = await start({
+      onActivity,
+      flushBufferedEvents: mock(async () => {
+        if (failures > 0) {
+          failures -= 1;
+          throw new Error('redis is unreachable');
+        }
+      }),
+    });
+    streams[0]?.emit('data', streamed(0, 0));
+    await settle(60);
+
+    expect(handleEvent).toHaveBeenCalledTimes(3);
+    expect(committed(client.commit)).toEqual([
+      { offsets: [{ topic: TOPIC, partition: 0, offset: 1n, leaderEpoch: 1 }] },
+    ]);
+    // Every attempt, failed or not, counts as the loop being alive.
+    expect(onActivity.mock.calls.length).toBeGreaterThanOrEqual(3);
+  });
+
+  test('a rebalance that takes a partition away stops handing over its messages', async () => {
+    const { client, streams, handleEvent } = await start();
+    client.emit('consumer:group:join', {
+      groupId: 'openpanel-events',
+      memberId: 'member-1',
+      generationId: 2,
+      assignments: [{ topic: TOPIC, partitions: [1] }],
+    });
+    streams[0]?.emit('data', streamed(0, 0));
+    streams[0]?.emit('data', streamed(1, 0));
+    await settle();
+
+    expect(handleEvent).toHaveBeenCalledTimes(1);
+    expect(committed(client.commit)).toEqual([
+      { offsets: [{ topic: TOPIC, partition: 1, offset: 1n, leaderEpoch: 1 }] },
+    ]);
+  });
+
+  test('a stream that dies is reopened from the committed offsets', async () => {
+    const { client, streams, sleep, deps } = await start();
+    streams[0]?.emit('error', new Error('broker went away'));
+    await settle();
+
+    expect(deps.logger.error).toHaveBeenCalled();
+    expect(streams[0]?.close).toHaveBeenCalledTimes(1);
+    expect(sleep).toHaveBeenCalledTimes(1);
+    expect(client.consume).toHaveBeenCalledTimes(2);
+
+    // The new stream is the live one.
+    streams[1]?.emit('data', streamed(0, 5));
+    await settle();
+    expect(committed(client.commit)).toEqual([
+      { offsets: [{ topic: TOPIC, partition: 0, offset: 6n, leaderEpoch: 1 }] },
+    ]);
+  });
+
+  test('a failed rejoin is logged and reopens the stream instead of crashing', async () => {
+    const { client, streams, deps } = await start();
+    client.emit('error', new Error('JoinGroup timed out'));
+    await settle();
+    expect(deps.logger.error).toHaveBeenCalled();
+    expect(streams[0]?.close).toHaveBeenCalledTimes(1);
+    expect(client.consume).toHaveBeenCalledTimes(2);
+  });
+
+  test('a stream that cannot open at boot fails the start', async () => {
+    const { client } = fakeClient();
+    client.consume = mock(async (_options: Record<string, unknown>) => {
+      throw new Error('SASL authentication failed');
+    });
+    const built = makeDeps();
+    const { topic: _topic, ...batch } = built.deps;
+    await expect(
+      startKafkaEventsConsumer({
+        createConsumer: () => client as unknown as Consumer,
+        logger: built.deps.logger,
+        kafkaLogger: built.deps.logger,
+        topic: TOPIC,
+        partitionsConsumedConcurrently: 2,
+        maxMessagesPerBatch: 10,
+        batch,
+      })
+    ).rejects.toThrow('SASL authentication failed');
+  });
+
+  test('a stream reopened after the membership was lost rejoins the group first', async () => {
+    const { client, streams } = await start();
+    client.isActive.mockImplementation(() => false);
+    client.emit('consumer:group:lost', {
+      groupId: 'openpanel-events',
+      memberId: 'member-1',
+      generationId: 2,
+      error: new Error('joinGroup failed 4 times.'),
+      operation: 'joinGroup',
+    });
+    await settle();
+    expect(streams[0]?.close).toHaveBeenCalledTimes(1);
+    expect(client.consume).toHaveBeenCalledTimes(2);
+    expect(client.joinGroup).toHaveBeenCalledTimes(1);
+  });
+
+  test('a rejoin that fails closes the new stream and tries again', async () => {
+    const { client, streams, deps } = await start();
+    let failures = 1;
+    client.isActive.mockImplementation(() => false);
+    client.joinGroup.mockImplementation(async () => {
+      if (failures > 0) {
+        failures -= 1;
+        throw new Error('coordinator not available');
+      }
+      return 'member-2';
+    });
+    streams[0]?.emit('error', new Error('fetch failed 4 times.'));
+    await settle(60);
+    expect(deps.logger.error).toHaveBeenCalled();
+    expect(streams[1]?.close).toHaveBeenCalledTimes(1);
+    expect(client.consume).toHaveBeenCalledTimes(3);
+    expect(client.joinGroup).toHaveBeenCalledTimes(2);
+  });
+
+  test('a stream that fails while the reopen is still rejoining is reopened again', async () => {
+    const { client, streams } = await start();
+    client.isActive.mockImplementation(() => false);
+    let joins = 0;
+    client.joinGroup.mockImplementation(async () => {
+      joins += 1;
+      if (joins === 1) {
+        // The stream the reopen just opened dies before the join answers.
+        streams[1]?.emit('error', new Error('fetch failed 4 times.'));
+      }
+      return 'member-2';
+    });
+    streams[0]?.emit('error', new Error('fetch failed 4 times.'));
+    await settle(80);
+    expect(streams[1]?.close).toHaveBeenCalledTimes(1);
+    expect(client.consume).toHaveBeenCalledTimes(3);
+  });
+
+  test('an idle fetch outside the group does not mark the loop alive', async () => {
+    const onActivity = mock(() => undefined);
+    const { client, streams } = await start({ onActivity });
+    client.isActive.mockImplementation(() => false);
+    streams[0]?.emit('fetch');
+    expect(onActivity).not.toHaveBeenCalled();
+  });
+
+  test('an idle fetch marks the loop alive', async () => {
+    const onActivity = mock(() => undefined);
+    const { streams } = await start({ onActivity });
+    streams[0]?.emit('fetch');
+    expect(onActivity).toHaveBeenCalledTimes(1);
+  });
+
+  test('a fetch while a batch is running does not cover for it', async () => {
+    let release = (): void => undefined;
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const onActivity = mock(() => undefined);
+    const { streams } = await start({
+      onActivity,
+      handleEvent: mock(() => held),
+    });
+    streams[0]?.emit('data', streamed(0, 0));
+    await settle();
+    streams[0]?.emit('fetch');
+    expect(onActivity).not.toHaveBeenCalled();
+    release();
+    await settle();
+  });
+
+  test('stopConsuming waits for the running batch; stop then leaves the group', async () => {
+    let release = (): void => undefined;
+    const held = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    const { client, streams, handle } = await start({
+      handleEvent: mock(() => held),
+    });
+    streams[0]?.emit('data', streamed(0, 0));
+    await settle();
+
+    let stopped = false;
+    const stopping = handle.stopConsuming().then(() => {
+      stopped = true;
+    });
+    await settle();
+    expect(stopped).toBe(false);
+    expect(streams[0]?.pause).toHaveBeenCalled();
+
+    release();
+    await stopping;
+    expect(streams[0]?.close).toHaveBeenCalledTimes(1);
+    // The message finished before the stop, so it is committed.
+    expect(committed(client.commit)).toEqual([
+      { offsets: [{ topic: TOPIC, partition: 0, offset: 1n, leaderEpoch: 1 }] },
+    ]);
+
+    await handle.stop();
+    expect(client.close).toHaveBeenCalledWith(true);
   });
 });

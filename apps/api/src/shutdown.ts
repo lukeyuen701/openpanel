@@ -4,7 +4,7 @@
 // was never flushed to Redis and the offsets for those events were already committed, so nothing was
 // redelivered. A crash commits nothing, so Kafka replays the window.
 //
-// kafkajs commits a batch's offsets as soon as `eachBatch` returns, so events buffered inside a batch are made
+// The consumer commits a batch's offsets as soon as `eachBatch` returns, so events buffered inside a batch are made
 // durable in the batch handler (`flushBufferedEvents`). What is left here is everything buffered OUTSIDE a
 // Kafka batch (a session-end job's event, an import): one rpush of at most `microBatchMaxSize` events,
 // well inside `SHUTDOWN_FORCE_EXIT_MS`. It is not a Redis -> ClickHouse drain; the next process drains the list.

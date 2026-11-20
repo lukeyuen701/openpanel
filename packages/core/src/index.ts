@@ -219,16 +219,12 @@ export type {
 } from './modules/ingest/src/incoming-event-handler';
 export { incomingEvent } from './modules/ingest/src/incoming-event-handler';
 export { ingestConsumerMetrics } from './modules/ingest/src/ingest.metrics';
-export type {
-  Admin,
-  ConsumerGroupLag,
-  EachBatchPayload,
-  KafkaMessage,
-} from './modules/ingest/src/kafka';
+export type { Admin, ConsumerGroupLag } from './modules/ingest/src/kafka';
 export {
   assertKafkaConfigured,
   createKafkaAdmin,
   createKafkaEventsConsumer,
+  describeConsumerGroup,
   disconnectKafka,
   kafkaLogger,
   produceDeadLetterEvent,

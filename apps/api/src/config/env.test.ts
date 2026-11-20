@@ -447,7 +447,7 @@ describe('cross-field invariants, checked before the transform', () => {
     ).toThrow(/must be below KAFKA_SESSION_TIMEOUT_MS/);
   });
 
-  it('passes KAFKA_REBALANCE_TIMEOUT_MS to the consumer, defaulting to kafkajs', () => {
+  it('passes KAFKA_REBALANCE_TIMEOUT_MS to the consumer, defaulting to 60s', () => {
     expect(loadConfig(base).core.kafka.rebalanceTimeoutMs).toBe(60_000);
     expect(
       loadConfig({ ...base, KAFKA_REBALANCE_TIMEOUT_MS: '30000' }).core.kafka

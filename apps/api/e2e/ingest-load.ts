@@ -36,7 +36,11 @@ import {
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { parseArgs } from 'node:util';
-import { createKafkaAdmin, sampleConsumerGroupLag } from '@openpanel/core';
+import {
+  createKafkaAdmin,
+  describeConsumerGroup,
+  sampleConsumerGroupLag,
+} from '@openpanel/core';
 import { getRedisCache } from '@openpanel/redis';
 import { loadConfig } from '../src/config/env';
 
@@ -162,20 +166,15 @@ const countBusinessEvents = async () =>
   );
 
 async function kafkaState() {
-  const [lag, groups] = await Promise.all([
+  const [lag, group] = await Promise.all([
     sampleConsumerGroupLag(
       admin,
       kafkaConfig.kafka.eventsTopic,
       kafkaConfig.kafka.consumerGroup
     ),
-    admin.describeGroups([kafkaConfig.kafka.consumerGroup]),
+    describeConsumerGroup(admin, kafkaConfig.kafka.consumerGroup),
   ]);
-  const group = groups.groups[0];
-  return {
-    lag: lag.totalLag,
-    state: group?.state ?? 'Unknown',
-    members: group?.members.length ?? 0,
-  };
+  return { lag: lag.totalLag, state: group.state, members: group.members };
 }
 
 async function bufferSizes() {
@@ -474,7 +473,7 @@ const summary = {
 };
 log(JSON.stringify(summary));
 await Bun.write(`${outPrefix}.json`, JSON.stringify(summary, null, 2));
-await admin.disconnect();
+await admin.close();
 redis.disconnect();
 if (!completed || failed > 0) {
   process.exit(1);

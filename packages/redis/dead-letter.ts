@@ -8,8 +8,8 @@
  * The volume lives in `kafka_events_dead_lettered_total` / `_dead_letter_failed_total`, because a capped list makes
  * 50,000 drops look exactly like 12.
  *
- * The input type is structural, so kafkajs `Buffer`s and `IHeaders` satisfy it without this package depending on
- * kafkajs or core.
+ * The input type is structural, so the consumer's `Buffer`s and headers satisfy it without this package depending
+ * on a Kafka client or core.
  */
 
 /** The one list. Not configurable: an operator has to be able to find it. */

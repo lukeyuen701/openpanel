@@ -40,9 +40,9 @@ type StatusFn = (code: number, body?: unknown) => unknown;
 const PAYLOAD_TOO_LARGE = 413;
 
 /**
- * kafkajs answers a body over the broker's `max.message.bytes` with a raw
- * protocol error, which surfaced as a 500 carrying "The request included a
- * message larger than the max message size the server will accept". The
+ * The broker refuses a body over its `max.message.bytes` with a raw protocol
+ * error, which surfaced as a 500 carrying "The request included a message
+ * larger than the max message size the server will accept". The
  * threshold is the broker's, so it is configuration rather than a constant —
  * a deployment that raises `max.message.bytes` raises this with it.
  */

@@ -15,6 +15,7 @@
  */
 
 import { describe, expect, mock, test } from 'bun:test';
+import { ProtocolError } from '@platformatic/kafka';
 import { createProducerBatcher } from './producer-batcher';
 import { sendWithFatalRecovery } from './producer-errors';
 
@@ -167,10 +168,7 @@ describe('createProducerBatcher', () => {
 
   test('(iv) a failed batch still runs the fatal-producer recovery', async () => {
     const onFatal = mock((_err: unknown) => undefined);
-    const fatal = Object.assign(new Error('out of order'), {
-      name: 'KafkaJSProtocolError',
-      code: 45,
-    });
+    const fatal = new ProtocolError('OUT_OF_ORDER_SEQUENCE_NUMBER');
     const batcher = createProducerBatcher<string>({
       batchSize: 2,
       lingerMs: LINGER_MS,

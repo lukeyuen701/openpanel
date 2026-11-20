@@ -64,7 +64,7 @@ describe('resolveProducerTuning', () => {
     expect(tuning.batchingEnabled).toBe(false);
   });
 
-  test('the knobs pass through to kafkajs untouched', () => {
+  test('the knobs pass through to the producer untouched', () => {
     const tuning = resolveProducerTuning(
       kafkaConfig({
         producerMaxInFlight: 5,

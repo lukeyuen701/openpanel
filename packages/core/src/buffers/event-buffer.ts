@@ -109,7 +109,7 @@ export class EventBuffer extends BaseBuffer {
   /** Built once, on first use; see `asRedeliverable`. */
   private redeliverableView: EventBuffer | null = null;
 
-  private queueKey = 'event_buffer:queue';
+  private readonly queueKey = 'event_buffer:queue';
 
   constructor(deps: BufferDeps) {
     super(deps, {
@@ -171,7 +171,7 @@ export class EventBuffer extends BaseBuffer {
    *
    * `flush` swallows a Redis failure on purpose. The two callers here have no
    * next attempt: the Kafka batch handler is about to resolve offsets that
-   * kafkajs commits as soon as it returns, and shutdown is about to exit. Both
+   * are committed as soon as it returns, and shutdown is about to exit. Both
    * must be able to SEE the failure and decline to commit — a redelivered
    * duplicate is recoverable, a dropped `pendingEvents` array is not.
    */

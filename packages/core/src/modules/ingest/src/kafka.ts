@@ -1,26 +1,28 @@
-// NOTHING here constructs a Kafka client at import time: `getKafka` is lazy and
-// only `assertKafkaConfigured` reads the broker list eagerly, so core stays
+// NOTHING here constructs a Kafka client at import time: the clients are lazy
+// and only `assertKafkaConfigured` reads the broker list eagerly, so core stays
 // importable with no broker and `bun test` still runs offline.
 
 import {
-  type Admin,
-  type Consumer,
-  type IHeaders,
-  Kafka,
-  logLevel,
-  type Producer,
-} from 'kafkajs';
+  Admin,
+  type BaseOptions,
+  Consumer,
+  ListOffsetTimestamps,
+  type MessageToProduce,
+  Producer,
+  type RetryDelayGetter,
+} from '@platformatic/kafka';
 import type { CoreConfig, KafkaConfig } from '../../../config';
 import { createLogger, type ILogger } from '../../../pino-logger';
 // One definition, not two: the consumer already declares the dead-letter
 // message shape it hands to this producer.
-import type { DeadLetterMessage } from './consumer';
+import type { DeadLetterMessage, KafkaHeaders } from './consumer';
 import type { IncomingEventPayload } from './incoming-event';
 import {
   describeKafkaSecurity,
   type ResolvedKafkaSecurity,
   resolveKafkaSecurity,
 } from './kafka-security';
+import { eventsPartitioner } from './partitioner';
 import {
   createProducerBatcher,
   type ProducerBatcher,
@@ -31,15 +33,37 @@ import {
   resolveProducerTuning,
 } from './producer-tuning';
 
-export type { Admin, EachBatchPayload, KafkaMessage } from 'kafkajs';
+export type { Admin } from '@platformatic/kafka';
 
 // Approx size of one event payload (observed range ~0.9–1.3 KiB).
 // We size fetch knobs in messages and convert to bytes via this constant.
 const KAFKA_BYTES_PER_MESSAGE = 1024;
 
-// One logger and one client per process, built on first use from the config
-// the caller was handed. `loadConfig` runs once at boot, so the memo cannot
-// serve one caller another caller's brokers.
+/**
+ * A JoinGroup is held by the broker until every member has rejoined, for up to
+ * the rebalance timeout — and a member that died without leaving never does.
+ * Every consumer request therefore waits that long plus the usual request
+ * timeout; a shorter wait abandons a join the broker was about to answer.
+ */
+const consumerRequestTimeoutMs = (kafka: KafkaConfig): number =>
+  kafka.rebalanceTimeoutMs + kafka.requestTimeoutMs;
+
+const PRODUCER_RETRY_BACKOFF_FACTOR = 2;
+
+/**
+ * The group protocol kafkajs advertised. Members of one consumer group must
+ * share a protocol name, so a member that advertised the client's own
+ * `roundrobin` could not join a group that still holds a kafkajs member — a
+ * rolling upgrade, or a rollback, would stall on `INCONSISTENT_GROUP_PROTOCOL`.
+ * The name is only a label; the assignment is round robin either way.
+ */
+export const EVENTS_GROUP_PROTOCOLS = [
+  { name: 'RoundRobinAssigner', version: 0 },
+];
+
+// One logger per process, built on first use from the config the caller was
+// handed. `loadConfig` runs once at boot, so the memo cannot serve one caller
+// another caller's brokers.
 let kafkaLoggerInstance: ILogger | null = null;
 export const kafkaLogger = (config: CoreConfig): ILogger => {
   kafkaLoggerInstance ??= createLogger({ name: 'kafka', config });
@@ -60,30 +84,35 @@ export const assertKafkaConfigured = (config: KafkaConfig): void => {
   getKafkaSecurity(config);
 };
 
-// Memoised like the client below: the CA file is read once per process.
+// Memoised: the CA file is read once per process.
 let kafkaSecurity: ResolvedKafkaSecurity | null = null;
 const getKafkaSecurity = (config: KafkaConfig): ResolvedKafkaSecurity => {
   kafkaSecurity ??= resolveKafkaSecurity(config.security);
   return kafkaSecurity;
 };
 
-let kafka: Kafka | null = null;
-const getKafka = (config: CoreConfig): Kafka => {
+/** What every client — producer, consumer, admin — connects with. */
+const clientOptions = (config: CoreConfig): BaseOptions => {
   assertKafkaConfigured(config.kafka);
-  if (!kafka) {
-    const security = getKafkaSecurity(config.kafka);
-    kafka = new Kafka({
-      clientId: config.kafka.clientId,
-      brokers: config.kafka.brokers,
-      logLevel: logLevel.WARN,
-      requestTimeout: config.kafka.requestTimeoutMs,
-      connectionTimeout: config.kafka.connectionTimeoutMs,
-      ssl: security.ssl,
-      sasl: security.sasl,
-    });
-  }
-  return kafka;
+  const security = getKafkaSecurity(config.kafka);
+  return {
+    clientId: config.kafka.clientId,
+    bootstrapBrokers: config.kafka.brokers,
+    connectTimeout: config.kafka.connectionTimeoutMs,
+    // Both: `requestTimeout` is how long we wait for a reply, `timeout` the
+    // budget a request hands the broker (a produce's ack wait).
+    requestTimeout: config.kafka.requestTimeoutMs,
+    timeout: config.kafka.requestTimeoutMs,
+    tls: security.tls,
+    sasl: security.sasl,
+  };
 };
+
+/** Exponential from `initialMs`, capped at `maxMs`. */
+const exponentialRetryDelay =
+  (initialMs: number, maxMs: number): RetryDelayGetter =>
+  (_client, _operationId, attempt) =>
+    Math.min(initialMs * PRODUCER_RETRY_BACKOFF_FACTOR ** (attempt - 1), maxMs);
 
 let producer: Producer | null = null;
 let producerConnectPromise: Promise<Producer> | null = null;
@@ -93,9 +122,9 @@ const getProducer = async (config: CoreConfig): Promise<Producer> => {
     return producer;
   }
   if (!producerConnectPromise) {
-    const client = getKafka(config);
     const tuning = resolveProducerTuning(config.kafka);
-    const p = client.producer({
+    const p = new Producer({
+      ...clientOptions(config),
       idempotent: true,
       // Stays 1 (not 5) to avoid in-flight reordering after a transient broker
       // hiccup: with idempotency on and low retries, reordered batches trip
@@ -104,17 +133,17 @@ const getProducer = async (config: CoreConfig): Promise<Producer> => {
       // rejected; batching is what amortises the round-trip.
       // KAFKA_PRODUCER_MAX_IN_FLIGHT still raises it for a measurement run, but it
       // is coupled to the retry policy.
-      maxInFlightRequests: tuning.maxInFlight,
-      allowAutoTopicCreation: true,
-      retry: {
-        retries: config.kafka.producerRetries,
-        initialRetryTime: config.kafka.producerInitialRetryMs,
-        maxRetryTime: config.kafka.producerMaxRetryMs,
-        factor: 2,
-      },
+      maxInflights: tuning.maxInFlight,
+      autocreateTopics: true,
+      partitioner: eventsPartitioner,
+      retries: config.kafka.producerRetries,
+      retryDelay: exponentialRetryDelay(
+        config.kafka.producerInitialRetryMs,
+        config.kafka.producerMaxRetryMs
+      ),
     });
     producerConnectPromise = p
-      .connect()
+      .connectToBrokers()
       .then(() => {
         producer = p;
         kafkaLogger(config).info(
@@ -136,6 +165,7 @@ const getProducer = async (config: CoreConfig): Promise<Producer> => {
       })
       .catch((err) => {
         producerConnectPromise = null;
+        p.close().catch(() => undefined);
         throw err;
       });
   }
@@ -148,10 +178,10 @@ const resetProducer = (config: CoreConfig, broken: Producer): void => {
   }
   producer = null;
   producerConnectPromise = null;
-  broken.disconnect().catch((err) => {
+  broken.close().catch((err) => {
     kafkaLogger(config).warn(
       { err },
-      'kafka producer disconnect after fatal error failed'
+      'kafka producer close after fatal error failed'
     );
   });
 };
@@ -159,8 +189,18 @@ const resetProducer = (config: CoreConfig, broken: Producer): void => {
 interface OutgoingMessage {
   key: Buffer | null;
   value: Buffer | null;
-  headers?: IHeaders;
+  headers?: KafkaHeaders;
 }
+
+const toProducedMessage = (
+  topic: string,
+  message: OutgoingMessage
+): MessageToProduce => ({
+  topic,
+  key: message.key ?? undefined,
+  value: message.value ?? undefined,
+  headers: message.headers,
+});
 
 // One send, one or many messages. The batching path (below) and the
 // unbatched path are the same call, so a batch that fails resets the producer
@@ -174,9 +214,9 @@ const sendMessages = (
     sendWithFatalRecovery(
       async () => {
         await p.send({
-          topic,
-          timeout: config.kafka.requestTimeoutMs,
-          messages,
+          messages: messages.map((message) =>
+            toProducedMessage(topic, message)
+          ),
         });
       },
       (err) => {
@@ -238,12 +278,12 @@ export const produceDeadLetterEvent = async (
       value: message.value,
       headers: {
         ...message.headers,
-        'dlq-source-topic': message.topic,
-        'dlq-source-partition': String(message.partition),
-        'dlq-source-offset': message.offset,
-        'dlq-reason': message.reason,
-        'dlq-error': message.error,
-        'dlq-at': new Date().toISOString(),
+        'dlq-source-topic': Buffer.from(message.topic),
+        'dlq-source-partition': Buffer.from(String(message.partition)),
+        'dlq-source-offset': Buffer.from(message.offset),
+        'dlq-reason': Buffer.from(message.reason),
+        'dlq-error': Buffer.from(message.error),
+        'dlq-at': Buffer.from(new Date().toISOString()),
       },
     },
   ]);
@@ -256,22 +296,28 @@ export const createKafkaEventsConsumer = (
     groupId?: string;
   }
 ): Consumer => {
-  const client = getKafka(config);
-  const consumer = client.consumer({
+  const consumer = new Consumer({
+    ...clientOptions(config),
+    requestTimeout: consumerRequestTimeoutMs(config.kafka),
     groupId: options?.groupId || config.kafka.consumerGroup,
+    protocols: EVENTS_GROUP_PROTOCOLS,
+    // A worker may start before the first event has created the topic.
+    autocreateTopics: true,
     sessionTimeout: config.kafka.sessionTimeoutMs,
     heartbeatInterval: config.kafka.heartbeatIntervalMs,
     rebalanceTimeout: config.kafka.rebalanceTimeoutMs,
     minBytes: config.kafka.minMessages * KAFKA_BYTES_PER_MESSAGE,
-    maxWaitTimeInMs: config.kafka.maxWaitMs,
+    maxWaitTime: config.kafka.maxWaitMs,
     maxBytesPerPartition:
       config.kafka.maxMessagesPerPartition * KAFKA_BYTES_PER_MESSAGE,
+    // The consumer commits each partition's handled prefix itself.
+    autocommit: false,
   });
   consumers.add(consumer);
-  // Whoever opens closes: a consumer that disconnected on its own (the events
-  // handle's `stop()`) drops out of the set so shutdown never disconnects it
-  // twice and the set never retains a dead consumer.
-  consumer.on(consumer.events.DISCONNECT, () => {
+  // Whoever opens closes: a consumer that closed on its own (the events
+  // handle's `stop()`) drops out of the set so shutdown never closes it twice
+  // and the set never retains a dead consumer.
+  consumer.once('client:close', () => {
     consumers.delete(consumer);
   });
   return consumer;
@@ -297,25 +343,66 @@ export interface ConsumerGroupLag {
 }
 
 export const createKafkaAdmin = (config: CoreConfig): Admin =>
-  getKafka(config).admin();
+  new Admin(clientOptions(config));
+
+const listPartitionOffsets = async (
+  admin: Admin,
+  topic: string,
+  partitionIndexes: number[],
+  timestamp: bigint
+): Promise<Map<number, number>> => {
+  const [listed] = await admin.listOffsets({
+    topics: [
+      {
+        name: topic,
+        partitions: partitionIndexes.map((partitionIndex) => ({
+          partitionIndex,
+          timestamp,
+        })),
+      },
+    ],
+  });
+  return new Map(
+    (listed?.partitions ?? []).map((p) => [p.partitionIndex, Number(p.offset)])
+  );
+};
 
 export const sampleConsumerGroupLag = async (
   admin: Admin,
   topic: string,
   groupId: string
 ): Promise<ConsumerGroupLag> => {
-  const [endOffsets, committedByTopic] = await Promise.all([
-    admin.fetchTopicOffsets(topic),
-    admin.fetchOffsets({ groupId, topics: [topic] }),
+  const metadata = await admin.metadata({ topics: [topic] });
+  const partitionCount = metadata.topics.get(topic)?.partitionsCount ?? 0;
+  const partitionIndexes = Array.from({ length: partitionCount }, (_, i) => i);
+  const [endOffsets, lowWatermarks, committedByGroup] = await Promise.all([
+    listPartitionOffsets(
+      admin,
+      topic,
+      partitionIndexes,
+      ListOffsetTimestamps.LATEST
+    ),
+    listPartitionOffsets(
+      admin,
+      topic,
+      partitionIndexes,
+      ListOffsetTimestamps.EARLIEST
+    ),
+    admin.listConsumerGroupOffsets({
+      groups: [{ groupId, topics: [{ name: topic, partitionIndexes }] }],
+    }),
   ]);
   const committed = new Map<number, number>();
-  for (const p of committedByTopic[0]?.partitions ?? []) {
-    committed.set(p.partition, Number(p.offset));
+  const committedTopic = committedByGroup[0]?.topics.find(
+    (t) => t.name === topic
+  );
+  for (const p of committedTopic?.partitions ?? []) {
+    committed.set(p.partitionIndex, Number(p.committedOffset));
   }
-  const partitions: PartitionLag[] = endOffsets.map((eo) => {
-    const endOffset = Number(eo.offset);
-    const lowWatermark = Number(eo.low);
-    const rawCommitted = committed.get(eo.partition);
+  const partitions: PartitionLag[] = partitionIndexes.map((partition) => {
+    const endOffset = endOffsets.get(partition) ?? 0;
+    const lowWatermark = lowWatermarks.get(partition) ?? 0;
+    const rawCommitted = committed.get(partition);
     // -1 means the group has never committed on this partition; treat the
     // whole backlog down to the low watermark as lag rather than computing
     // a bogus `endOffset - (-1)`.
@@ -324,7 +411,7 @@ export const sampleConsumerGroupLag = async (
         ? lowWatermark
         : rawCommitted;
     return {
-      partition: eo.partition,
+      partition,
       endOffset,
       committedOffset,
       lag: Math.max(0, endOffset - committedOffset),
@@ -334,6 +421,19 @@ export const sampleConsumerGroupLag = async (
     sampledAt: Date.now(),
     totalLag: partitions.reduce((sum, p) => sum + p.lag, 0),
     partitions,
+  };
+};
+
+/** The group's state (`Stable`, `PreparingRebalance`, …) and its member count. */
+export const describeConsumerGroup = async (
+  admin: Admin,
+  groupId: string
+): Promise<{ state: string; members: number }> => {
+  const groups = await admin.describeGroups({ groups: [groupId] });
+  const group = groups.get(groupId);
+  return {
+    state: group?.state ?? 'Unknown',
+    members: group?.members.size ?? 0,
   };
 };
 
@@ -350,20 +450,22 @@ export const disconnectKafka = async (config: CoreConfig): Promise<void> => {
   const tasks: Promise<unknown>[] = [];
   for (const c of consumers) {
     tasks.push(
-      c.disconnect().catch((err) => {
-        kafkaLogger(config).error({ err }, 'kafka consumer disconnect error');
+      c.close(true).catch((err) => {
+        kafkaLogger(config).error({ err }, 'kafka consumer close error');
       })
     );
   }
   consumers.clear();
-  if (producer) {
-    const p = producer;
-    producer = null;
-    producerConnectPromise = null;
+  const pending = producerConnectPromise;
+  producer = null;
+  producerConnectPromise = null;
+  if (pending) {
     tasks.push(
-      p.disconnect().catch((err) => {
-        kafkaLogger(config).error({ err }, 'kafka producer disconnect error');
-      })
+      pending
+        .then((p) => p.close())
+        .catch((err) => {
+          kafkaLogger(config).error({ err }, 'kafka producer close error');
+        })
     );
   }
   await Promise.all(tasks);

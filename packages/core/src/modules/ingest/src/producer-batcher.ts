@@ -5,7 +5,7 @@
 // Two invariants the tests hold this file to:
 //
 // 1. ORDER. Messages leave in the order they were enqueued: within a batch
-// because the array keeps that order (kafkajs partitions per message by key,
+// because the array keeps that order (the producer partitions per message by key,
 // and same-key messages in one `send` land in one partition batch in array
 // order), and across batches because this file keeps exactly ONE send
 // outstanding at a time. That second half is why the guarantee does not depend

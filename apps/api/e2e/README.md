@@ -228,8 +228,8 @@ Method: RSS/CPU sampled via `/proc/<pid>/status` + `/proc/<pid>/stat` at 1Hz,
 pid resolved from the pid files `verification/harness` writes at
 `/tmp/openpanel-v1-harness/{api,worker}.pid` (falling back to resolving the
 pid from the role's listening TCP port when no pid file exists, e.g. under
-`pnpm dev` — see `process-monitor.ts`). Kafka lag sampled via the kafkajs
-admin API (`fetchTopicOffsets` − `fetchOffsets`) at 1Hz. `/track` latency
+`pnpm dev` — see `process-monitor.ts`). Kafka lag sampled via the Kafka
+admin API (end offsets − the group's committed offsets) at 1Hz. `/track` latency
 wraps every request in `emit()` with `performance.now()`. None of the three
 depends on Node specifically (plain `/proc` reads, the admin API,
 `performance.now()`) so the same harness profiles a Bun-run api/worker

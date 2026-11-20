@@ -36,7 +36,7 @@ const DEFAULT_KAFKA_MAX_WAIT_MS = 500;
 const DEFAULT_KAFKA_MAX_MESSAGES_PER_PARTITION = 256;
 const DEFAULT_KAFKA_SESSION_TIMEOUT_MS = 30_000;
 const DEFAULT_KAFKA_HEARTBEAT_INTERVAL_MS = 3000;
-/** kafkajs's own default, so leaving the variable unset changes nothing. */
+/** What kafkajs defaulted to, so an install that never set it sees no change (the current client's own is 2 min). */
 const DEFAULT_KAFKA_REBALANCE_TIMEOUT_MS = 60_000;
 const DEFAULT_KAFKA_REQUEST_TIMEOUT_MS = 5000;
 const DEFAULT_KAFKA_CONNECTION_TIMEOUT_MS = 2000;
@@ -624,7 +624,7 @@ function checkOtlpHasKey(raw: RawEnv, ctx: z.RefinementCtx): void {
   });
 }
 
-/** kafkajs evicts a consumer that cannot heartbeat inside its session. */
+/** The broker evicts a consumer that cannot heartbeat inside its session. */
 function checkKafkaHeartbeatFitsSession(
   raw: RawEnv,
   ctx: z.RefinementCtx

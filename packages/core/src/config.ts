@@ -129,8 +129,8 @@ export interface KafkaSecurityConfig {
 }
 
 /**
- * The Kafka transport's knobs. Every one is resolved: kafkajs is handed these
- * values verbatim, so a `??` at the call site would be a second default.
+ * The Kafka transport's knobs. Every one is resolved: the client is handed
+ * these values verbatim, so a `??` at the call site would be a second default.
  */
 export interface KafkaConfig {
   clientId: string;
@@ -151,7 +151,7 @@ export interface KafkaConfig {
   producerRetries: number;
   producerInitialRetryMs: number;
   producerMaxRetryMs: number;
-  /** kafkajs `maxInFlightRequests`. 1: one produce round-trip at a time. */
+  /** The producer's `maxInflights`. 1: one produce round-trip at a time. */
   producerMaxInFlight: number;
   /** Messages accumulated into one `send()`. Below 2 batching is off. */
   producerBatchSize: number;
@@ -159,7 +159,7 @@ export interface KafkaConfig {
   producerBatchLingerMs: number;
   /**
    * The broker's `max.message.bytes`. `/track` refuses a larger body with a
-   * 413 rather than letting kafkajs answer with a raw protocol error at 500.
+   * 413 rather than letting the broker answer with a raw protocol error at 500.
    * Raise this alongside the broker's own setting.
    */
   maxMessageBytes: number;

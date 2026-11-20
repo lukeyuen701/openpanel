@@ -124,6 +124,24 @@ describe('external Kafka', () => {
     expect(found).not.toContain('files/redpanda-bootstrap');
     expect(found).not.toContain('upgrade/drain-old-queue');
   });
+
+  test('asks the operator to confirm the broker version, with nothing to fix', () => {
+    const dir = v1Copy();
+    editEnv(dir, (text) => `${text}KAFKA_BROKERS="kafka.internal:9092"\n`);
+
+    const finding = runDoctor(loadInstall(dir)).find(
+      (candidate) => candidate.id === 'env/external-kafka-version'
+    );
+    expect(finding?.severity).toBe('warn');
+    expect(finding?.fix).toBeUndefined();
+    expect(finding?.manual).toContain('3.5');
+  });
+
+  test('the bundled Redpanda needs no version check', () => {
+    const dir = v1Copy();
+    editEnv(dir, (text) => `${text}KAFKA_BROKERS="op-rp:9092"\n`);
+    expect(ids(dir)).not.toContain('env/external-kafka-version');
+  });
 });
 
 describe('env renames', () => {

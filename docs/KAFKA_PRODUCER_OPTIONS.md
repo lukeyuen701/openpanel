@@ -5,8 +5,8 @@ batching now ships on — `KAFKA_PRODUCER_BATCH_SIZE=25`,
 `KAFKA_PRODUCER_BATCH_LINGER_MS=5`. `KAFKA_PRODUCER_MAX_IN_FLIGHT` stays `1`:
 raising it measured +2–3%, i.e. noise, for a documented reordering hazard.
 
-This document is the knob reference — what each one does, and the kafkajs
-retry coupling you must understand before touching the in-flight one. The
+This document is the knob reference — what each one does, and the retry
+coupling you must understand before touching the in-flight one. The
 measurement that fed the decision is in
 `verification/benchmarks/05-v2-saturation.md` and `06-producer-options.md`; the
 throughput a self-hoster should plan with is in
@@ -40,7 +40,7 @@ All three are read by the config loader, `apps/api/src/config/env.ts` (the sole
 
 | Env var | Default | What it does |
 |---|---|---|
-| `KAFKA_PRODUCER_MAX_IN_FLIGHT` | `1` | kafkajs `maxInFlightRequests`: how many produce requests may be outstanding on the producer's connection at once. `1` serialises every produce. Raising it lets requests overlap — ADR-023 measured that at +2–3% and rejected it; read the retry coupling below before you do it anyway. |
+| `KAFKA_PRODUCER_MAX_IN_FLIGHT` | `1` | The producer's `maxInflights`: how many produce requests may be outstanding on each of its broker connections at once. `1` serialises every produce. Raising it lets requests overlap — ADR-023 measured that at +2–3% and rejected it; read the retry coupling below before you do it anyway. |
 | `KAFKA_PRODUCER_BATCH_SIZE` | `25` | Messages accumulated into ONE `send()`. `>= 2` turns the accumulator on; ADR-023 ships `25`, above which the measured win is flat. `1` turns batching off, restoring the pre-ADR-023 path byte-for-byte: one message, one awaited send. |
 | `KAFKA_PRODUCER_BATCH_LINGER_MS` | `5` | How long a partially filled batch may wait for company before it is sent anyway, **added to the response time of the request that is waiting**. Under load a batch fills by size first, so this is only really paid on a quiet install — which is why ADR-023 took 5 ms over the 21%-faster 25 ms. **Inert while the batch size is 1.** |
 
@@ -63,9 +63,9 @@ The accumulator (`src/producer-batcher.ts`) holds two guarantees, each with a
 test in `src/producer-batcher.test.ts`:
 
 1. **Per-key ordering survives.** Messages leave in the order they were
-   enqueued — within a batch because the array preserves that order (kafkajs
-   partitions per message by key, and same-key messages in one `send()` land in
-   one partition batch in array order), and across batches because the
+   enqueued — within a batch because the array preserves that order (the
+   producer partitions per message by key, and same-key messages in one `send()`
+   land in one partition batch in array order), and across batches because the
    accumulator keeps exactly **one send outstanding at a time**. That second
    half is why ordering does not depend on `maxInFlightRequests` staying at 1.
 2. **A caller's promise settles on its own batch.** A failed `send()` rejects
@@ -86,11 +86,14 @@ still answers only after the broker has acknowledged the caller's message.
 
 ### The retry coupling — why option 4 must not be measured alone
 
-kafkajs 2.2.4 defaults an idempotent producer to
-`retries: Number.MAX_SAFE_INTEGER`, and logs
-`Limiting retries for the idempotent producer may invalidate EoS guarantees`
-when you lower it (`kafkajs/src/producer/index.js:43-55`). This codebase
-lowers it: `KAFKA_PRODUCER_RETRIES`, `DEFAULT_KAFKA_PRODUCER_RETRIES = 2`.
+An idempotent producer is meant to retry without bound: kafkajs 2.2.4, the
+client these measurements ran on, defaulted to `retries: Number.MAX_SAFE_INTEGER`
+and warned that limiting it "may invalidate EoS guarantees". This codebase
+lowers it: `KAFKA_PRODUCER_RETRIES`, `DEFAULT_KAFKA_PRODUCER_RETRIES = 2`, with
+the wait between attempts doubling from `KAFKA_PRODUCER_INITIAL_RETRY_MS` up to
+`KAFKA_PRODUCER_MAX_RETRY_MS`. A produce that runs out of retries rebuilds the
+producer (`producer-errors.ts`), so the next one starts under a fresh producer
+id.
 
 So today's `maxInFlightRequests: 1` is plausibly **compensating for a retry
 setting that already weakened idempotency**, and the in-code comment
@@ -100,7 +103,7 @@ consistent with that reading.
 
 **Consequence for the measurement: vary `KAFKA_PRODUCER_RETRIES` together with
 `KAFKA_PRODUCER_MAX_IN_FLIGHT`.** A configuration-4 run at `retries=2` is a
-different durability posture from one at kafkajs's own default, and a
+different durability posture from one with unbounded retries, and a
 throughput number from either is not transferable to the other. M16-002 did
 **not** change the retry default; that is part of the decision, not part of
 making it measurable.

@@ -41,7 +41,8 @@ export class LagMonitor {
   async start(intervalMs = 1000): Promise<void> {
     try {
       this.admin = createKafkaAdmin(kafkaConfig);
-      await this.admin.connect();
+      // The client connects lazily; ask for metadata so a dead broker shows up here.
+      await this.admin.metadata({ topics: [this.topic] });
       this.connected = true;
     } catch (error) {
       console.warn(
@@ -79,7 +80,7 @@ export class LagMonitor {
     }
     this.timer = null;
     if (this.connected && this.admin) {
-      await this.admin.disconnect().catch(() => {
+      await this.admin.close().catch(() => {
         // Best-effort teardown; a stress harness exiting shouldn't hang on it.
       });
     }

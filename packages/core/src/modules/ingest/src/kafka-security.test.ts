@@ -31,18 +31,19 @@ const withSasl = (
 describe('resolveKafkaSecurity', () => {
   it('is plaintext without auth when nothing is configured', () => {
     expect(resolveKafkaSecurity(plaintext, readFile)).toEqual({
-      ssl: false,
+      tls: undefined,
       sasl: undefined,
+      saslMechanism: null,
     });
   });
 
-  it('is a bare `true` for TLS with the system trust store', () => {
+  it('is empty tls options for TLS with the system trust store', () => {
     expect(
       resolveKafkaSecurity(
         { ...plaintext, ssl: { ...plaintext.ssl, enabled: true } },
         readFile
       )
-    ).toEqual({ ssl: true, sasl: undefined });
+    ).toEqual({ tls: {}, sasl: undefined, saslMechanism: null });
   });
 
   it('passes a custom CA and rejectUnauthorized through to tls options', () => {
@@ -57,7 +58,7 @@ describe('resolveKafkaSecurity', () => {
           },
         },
         readFile
-      ).ssl
+      ).tls
     ).toEqual({ ca: [FAKE_PEM], rejectUnauthorized: false });
   });
 
@@ -77,15 +78,20 @@ describe('resolveKafkaSecurity', () => {
     ).toThrow(/Failed to read KAFKA_SSL_CA_PATH "\/missing.pem"/);
   });
 
-  it('hands SASL credentials to kafkajs unchanged, per mechanism', () => {
-    for (const mechanism of [
-      'plain',
-      'scram-sha-256',
-      'scram-sha-512',
-    ] as const) {
+  it('hands SASL credentials to the client unchanged, under its mechanism names', () => {
+    const clientNames = {
+      plain: 'PLAIN',
+      'scram-sha-256': 'SCRAM-SHA-256',
+      'scram-sha-512': 'SCRAM-SHA-512',
+    } as const;
+    for (const [mechanism, clientName] of Object.entries(clientNames) as [
+      keyof typeof clientNames,
+      (typeof clientNames)[keyof typeof clientNames],
+    ][]) {
       expect(resolveKafkaSecurity(withSasl(mechanism), readFile)).toEqual({
-        ssl: true,
-        sasl: { mechanism, username: 'op', password: 'secret' },
+        tls: {},
+        sasl: { mechanism: clientName, username: 'op', password: 'secret' },
+        saslMechanism: mechanism,
       });
     }
   });
@@ -94,8 +100,9 @@ describe('resolveKafkaSecurity', () => {
     expect(
       resolveKafkaSecurity(withSasl('plain', plaintext.ssl), readFile)
     ).toEqual({
-      ssl: false,
-      sasl: { mechanism: 'plain', username: 'op', password: 'secret' },
+      tls: undefined,
+      sasl: { mechanism: 'PLAIN', username: 'op', password: 'secret' },
+      saslMechanism: 'plain',
     });
   });
 });

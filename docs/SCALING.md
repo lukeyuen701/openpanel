@@ -75,8 +75,8 @@ that look promising:
   baseline is +3%, which this box cannot distinguish from run-to-run variation.
   It is not a lever.
 
-The knob reference — what each setting does, and the kafkajs retry coupling you
-must understand before raising `maxInFlightRequests` — lives in
+The knob reference — what each setting does, and the retry coupling you must
+understand before raising `maxInFlightRequests` — lives in
 [`KAFKA_PRODUCER_OPTIONS.md`](./KAFKA_PRODUCER_OPTIONS.md). How to reproduce any
 run above is [`BENCHMARK_HARNESS.md`](./BENCHMARK_HARNESS.md).
 
@@ -264,6 +264,6 @@ are not sharing it.
 ## See also
 
 - [`KAFKA_PRODUCER_OPTIONS.md`](./KAFKA_PRODUCER_OPTIONS.md) — the producer
-  knobs, what each one does, and the kafkajs retry coupling.
+  knobs, what each one does, and the retry coupling.
 - [`BENCHMARK_HARNESS.md`](./BENCHMARK_HARNESS.md) — how to reproduce any run on
   this page against your own hardware.

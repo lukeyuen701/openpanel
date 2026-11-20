@@ -250,6 +250,7 @@ async function startIngestConsumer(
     kafkaLogger: kafkaLogger(config.core),
     topic: config.core.kafka.eventsTopic,
     partitionsConsumedConcurrently: config.core.kafka.partitionsConcurrent,
+    maxMessagesPerBatch: config.core.kafka.maxMessagesPerPartition,
     batch: {
       // One Ctx per message, scoped to the requestId the producer stamped into
       // the envelope. The one binding a work scope cannot supply is resolved
