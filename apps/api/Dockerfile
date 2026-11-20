@@ -93,7 +93,8 @@ RUN find /app/node_modules/.bun -maxdepth 1 -name '*musl*' -prune -exec rm -rf {
 # PRISMA-CLI — the Prisma CLI the start command runs (`prisma migrate deploy`), with its engines, installed on its own
 # so it does not pull devDependencies into the app's node_modules. Shipping it means a container start needs no
 # registry and downloads nothing. The version must match packages/db's `prisma` devDependency, which generated the
-# client; the build fails if they drift. `prisma --version` proves the CLI runs and its engines are present.
+# client; the build fails if they drift. `prisma --version` proves the CLI runs and its engines are present. The
+# `effect` override mirrors the root package.json's: @prisma/config pins a release with a ReDoS advisory.
 FROM base AS prisma-cli
 
 ARG PRISMA_VERSION=7.10.1
@@ -103,7 +104,7 @@ WORKDIR /opt/prisma
 COPY packages/db/package.json /tmp/db-package.json
 
 RUN grep -q "\"prisma\": \"${PRISMA_VERSION}\"" /tmp/db-package.json && \
-    echo '{"name":"prisma-cli","private":true}' > package.json && \
+    echo '{"name":"prisma-cli","private":true,"overrides":{"effect":"3.22.5"}}' > package.json && \
     bun add --exact "prisma@${PRISMA_VERSION}" && \
     ./node_modules/.bin/prisma --version
 

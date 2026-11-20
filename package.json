@@ -52,7 +52,8 @@
     "lucide-react@^1.7.0": "0.555.0",
     "framer-motion@^12.40.0": "12.40.0",
     "motion-dom@^12.23.23": "12.40.0",
-    "vue": "3.5.25"
+    "vue": "3.5.25",
+    "effect": "3.22.5"
   },
   "scripts": {
     "test": "bun run test:core && bun run test:rest",
