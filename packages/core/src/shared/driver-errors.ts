@@ -17,15 +17,20 @@ export interface DriverFailure {
 const BAD_REQUEST = 400;
 const NOT_FOUND = 404;
 
+const MALFORMED_ID: DriverFailure = {
+  trpc: 'BAD_REQUEST',
+  status: BAD_REQUEST,
+  message: 'Malformed id',
+};
+
 /** https://www.prisma.io/docs/orm/reference/error-reference */
 const PRISMA_FAILURES: Record<string, DriverFailure> = {
   // What an `@db.Uuid` column raises for a non-UUID id. It fires BEFORE any
   // findUnique null check, so a correct not-found guard never gets to run.
-  P2023: {
-    trpc: 'BAD_REQUEST',
-    status: BAD_REQUEST,
-    message: 'Malformed id',
-  },
+  // The pg driver adapter reports it as P2007 (Postgres' 22P02); Prisma's own
+  // engine said P2023.
+  P2007: MALFORMED_ID,
+  P2023: MALFORMED_ID,
   // Every `findUniqueOrThrow` miss.
   P2025: {
     trpc: 'NOT_FOUND',

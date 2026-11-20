@@ -24,13 +24,14 @@
 
 import { createClient } from '../packages/db/src/clickhouse/client';
 import { PrismaClient } from '../packages/db/src/generated/prisma/client';
+import { createPostgresAdapter } from '../packages/db/src/postgres-adapter';
 import { TEST_CLICKHOUSE_URL, TEST_DATABASE_URL } from './databases';
 
 // Lazily create a Prisma client so DATABASE_URL is read at call time,
 // not at module-import time (globalSetup runs before env is configured).
 function getDb() {
   const url = process.env.DATABASE_URL ?? TEST_DATABASE_URL;
-  return new PrismaClient({ datasources: { db: { url } } });
+  return new PrismaClient({ adapter: createPostgresAdapter(url) });
 }
 
 export const FIXTURE = {

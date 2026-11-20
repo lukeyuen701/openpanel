@@ -1,6 +1,7 @@
 import { getSubscriptionState } from '@openpanel/payments/subscription-state';
 import { PrismaClient } from './generated/prisma/client';
 import { logger } from './logger';
+import { createPostgresAdapter } from './postgres-adapter';
 
 export * from './generated/prisma/client';
 
@@ -12,9 +13,18 @@ const subscriptionStateNeeds = {
 } as const;
 
 const getPrismaClient = () => {
+  const databaseUrl = process.env.DATABASE_URL;
+  if (!databaseUrl) {
+    throw new Error('DATABASE_URL is not set');
+  }
+  const adapter = createPostgresAdapter(databaseUrl, (error) => {
+    logger.error({ err: error }, 'postgres connection error');
+  });
+
   // emit: 'event' keeps the engine from writing prisma:error lines straight
   // to stderr, so they flow through pino to the OTLP pipeline instead.
   const client = new PrismaClient({
+    adapter,
     // Prisma's default error format splices file, line and a source snippet
     // into messages that reach API clients verbatim. `minimal` keeps our
     // source layout out of a 500.

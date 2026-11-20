@@ -20,11 +20,13 @@ const clickhouseError = (code: string, type: string) =>
 
 describe('classifyDriverError', () => {
   test('a malformed id on a @db.Uuid column is a 400, not a 500', () => {
-    expect(classifyDriverError(prismaError('P2023'))).toEqual({
-      trpc: 'BAD_REQUEST',
-      status: 400,
-      message: 'Malformed id',
-    });
+    // P2007 from the pg driver adapter, P2023 from Prisma's former engine.
+    for (const code of ['P2007', 'P2023']) {
+      expect([code, classifyDriverError(prismaError(code))]).toEqual([
+        code,
+        { trpc: 'BAD_REQUEST', status: 400, message: 'Malformed id' },
+      ]);
+    }
   });
 
   test('a findUniqueOrThrow miss is a 404', () => {

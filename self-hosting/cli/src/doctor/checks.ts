@@ -422,10 +422,10 @@ export const apiMigrations: Check = (install) => {
   if (command.includes('bunx prisma')) {
     return {
       id: 'compose/api-migrations',
-      severity: 'warn',
-      title: 'op-api downloads the Prisma CLI at every start',
+      severity: 'error',
+      title: 'op-api starts with a Prisma CLI that cannot read this release',
       detail:
-        'The image ships the Prisma CLI, so the api can start without reaching the npm registry.',
+        'The schema now takes its database URL from prisma.config.ts, which the Prisma 6 CLI this command downloads fails to parse. The image ships the matching CLI.',
       fix: replaceApiCommand,
     };
   }

@@ -94,7 +94,7 @@ const stopWhenCancelled = t.middleware(async ({ ctx, next }) => {
  * Turns a failure caused by the CALLER into the status it deserves. Code below
  * the transport says so with a `BadRequestError`; drivers only label theirs.
  *
- * A malformed id raises Prisma P2023 before any `findUnique` null check can
+ * A malformed id raises Prisma P2007 before any `findUnique` null check can
  * run, and the driver's message (for ClickHouse, the generated SQL) would
  * otherwise reach the client as a 500. Anything `classifyDriverError` does not
  * recognise stays a 500, because a query bug is not the caller's mistake.

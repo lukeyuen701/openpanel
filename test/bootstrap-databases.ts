@@ -11,6 +11,7 @@ import * as path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createClient } from '../packages/db/src/clickhouse/client';
 import { PrismaClient } from '../packages/db/src/generated/prisma/client';
+import { createPostgresAdapter } from '../packages/db/src/postgres-adapter';
 import {
   clickhouseUrl,
   POSTGRES_MAINTENANCE_URL,
@@ -23,7 +24,7 @@ import {
 const testDir = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(testDir, '..');
 const prismaBin = path.join(repoRoot, 'packages/db/node_modules/.bin/prisma');
-const prismaSchema = path.join(repoRoot, 'packages/db/prisma/schema.prisma');
+const prismaConfig = path.join(repoRoot, 'packages/db/prisma.config.ts');
 const clickhouseSchema = path.join(testDir, 'clickhouse-schema.sql');
 
 /** Always present; only used as a foothold for `CREATE DATABASE`. */
@@ -36,7 +37,7 @@ const COMMENT_PREFIX = '--';
 
 async function ensurePostgresDatabase() {
   const maintenance = new PrismaClient({
-    datasources: { db: { url: POSTGRES_MAINTENANCE_URL } },
+    adapter: createPostgresAdapter(POSTGRES_MAINTENANCE_URL),
   });
   try {
     const existing = await maintenance.$queryRawUnsafe<unknown[]>(
@@ -56,11 +57,10 @@ async function ensurePostgresDatabase() {
 }
 
 function migratePostgresSchema() {
-  execFileSync(prismaBin, ['migrate', 'deploy', '--schema', prismaSchema], {
+  execFileSync(prismaBin, ['migrate', 'deploy', '--config', prismaConfig], {
     cwd: repoRoot,
-    // Both: schema.prisma's datasource declares `directUrl`, and the repo's
-    // .env leaves DATABASE_URL_DIRECT as an unexpanded shell reference that
-    // the Prisma CLI's own dotenv loader cannot resolve.
+    // Both: prisma.config.ts prefers DATABASE_URL_DIRECT, and the repo's .env
+    // leaves it as an unexpanded shell reference.
     env: {
       ...process.env,
       DATABASE_URL: TEST_DATABASE_URL,

@@ -76,7 +76,7 @@ describe('doctor on a v1 install', () => {
     );
   });
 
-  test('a v3 start command that downloads Prisma or runs the code migrations is rewritten', () => {
+  test('a v3 start command that downloads Prisma 6 or runs the code migrations is rewritten', () => {
     const install = loadInstall(V1_FIXTURE);
     applyFixes(install);
     install.compose.setIn(
@@ -93,7 +93,7 @@ describe('doctor on a v1 install', () => {
     const finding = runDoctor(install).find(
       (candidate) => candidate.id === 'compose/api-migrations'
     );
-    expect(finding?.severity).toBe('warn');
+    expect(finding?.severity).toBe('error');
 
     applyFixes(install);
     const command = String(

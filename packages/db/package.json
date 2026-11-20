@@ -5,7 +5,7 @@
   "main": "index.ts",
   "scripts": {
     "codegen": "bun run with-env prisma generate && bun prisma/prisma-json-types.ts",
-    "migrate": "bun run with-env prisma migrate dev",
+    "migrate": "bun run with-env prisma migrate dev && bun run codegen",
     "studio": "bun run with-env prisma studio --port ${STUDIO_PORT:-5555} --browser none",
     "migrate:deploy:code": "bun run with-env bun ./scripts/migrate-code.ts",
     "migrate:deploy:db": "bun run with-env prisma migrate deploy",
@@ -23,17 +23,18 @@
     "@openpanel/payments": "workspace:*",
     "@openpanel/redis": "workspace:*",
     "@openpanel/shared": "workspace:*",
-    "@prisma/client": "6.19.3",
+    "@prisma/adapter-pg": "7.10.1",
+    "@prisma/client": "7.10.1",
     "pino": "catalog:",
     "pino-pretty": "catalog:",
-    "prisma-json-types-generator": "3.1.1",
     "zod": "catalog:"
   },
   "devDependencies": {
     "@openpanel/tsconfig": "workspace:*",
     "@types/node": "catalog:",
+    "@types/pg": "8.23.1",
     "bun-types": "1.4.5",
-    "prisma": "6.19.3",
+    "prisma": "7.10.1",
     "typescript": "catalog:"
   }
 }
