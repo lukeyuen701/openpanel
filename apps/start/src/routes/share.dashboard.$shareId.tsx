@@ -17,6 +17,7 @@ import {
   ReportItemSkeleton,
 } from '@/components/report/report-item';
 import { useTRPC } from '@/integrations/trpc/react';
+import { rethrowMissingShare } from '@/utils/share-not-found';
 
 const shareSearchSchema = z.object({
   header: z.optional(z.number().or(z.string().or(z.boolean()))),
@@ -26,11 +27,13 @@ export const Route = createFileRoute('/share/dashboard/$shareId')({
   component: RouteComponent,
   validateSearch: shareSearchSchema,
   loader: async ({ context, params }) => {
-    const share = await context.queryClient.ensureQueryData(
-      context.trpc.share.dashboard.queryOptions({
-        shareId: params.shareId,
-      })
-    );
+    const share = await context.queryClient
+      .ensureQueryData(
+        context.trpc.share.dashboard.queryOptions({
+          shareId: params.shareId,
+        })
+      )
+      .catch(rethrowMissingShare);
 
     return { share };
   },
@@ -67,15 +70,20 @@ export const Route = createFileRoute('/share/dashboard/$shareId')({
     };
   },
   pendingComponent: FullPageLoadingState,
-  errorComponent: () => (
+  errorComponent: ShareNotFound,
+  notFoundComponent: ShareNotFound,
+});
+
+function ShareNotFound() {
+  return (
     <EmptyState
       description="This link doesn't point to a shared dashboard anymore. Ask whoever sent it for a new one."
       icon={UnlinkIcon}
       title="Share not found"
       variant="page"
     />
-  ),
-});
+  );
+}
 
 function RouteComponent() {
   const { shareId } = Route.useParams();

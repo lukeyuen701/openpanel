@@ -9,6 +9,7 @@ import FullPageLoadingState from '@/components/full-page-loading-state';
 import { PublicPageCard } from '@/components/public-page-card';
 import { Button, LinkButton } from '@/components/ui/button';
 import { useTRPC } from '@/integrations/trpc/react';
+import { lenientSearch } from '@/utils/lenient-search';
 
 const unsubscribeSearchSchema = z.object({
   email: z.string().email(),
@@ -18,22 +19,43 @@ const unsubscribeSearchSchema = z.object({
 
 export const Route = createFileRoute('/unsubscribe')({
   component: RouteComponent,
-  validateSearch: unsubscribeSearchSchema,
+  validateSearch: lenientSearch(unsubscribeSearchSchema),
   pendingComponent: FullPageLoadingState,
-  // A missing or malformed parameter would otherwise show the raw ZodError.
-  errorComponent: () => (
+  errorComponent: InvalidLink,
+});
+
+function InvalidLink() {
+  return (
     <EmptyState
       description="This unsubscribe link is missing information or has expired. Open the link from your email again, or change your preferences from your account settings."
       icon={MailXIcon}
       title="Link not valid"
       variant="page"
     />
-  ),
-});
+  );
+}
 
 function RouteComponent() {
-  const search = useSearch({ from: '/unsubscribe' });
-  const { email, category, token } = search;
+  const { email, category, token } = useSearch({ from: '/unsubscribe' });
+
+  if (!(email && category && token)) {
+    return <InvalidLink />;
+  }
+
+  return <ConfirmUnsubscribe category={category} email={email} token={token} />;
+}
+
+interface ConfirmUnsubscribeProps {
+  email: string;
+  category: string;
+  token: string;
+}
+
+function ConfirmUnsubscribe({
+  email,
+  category,
+  token,
+}: ConfirmUnsubscribeProps) {
   const trpc = useTRPC();
   const [isUnsubscribing, setIsUnsubscribing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);

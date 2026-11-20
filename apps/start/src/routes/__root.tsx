@@ -84,7 +84,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     }
     return (
       <FullPageErrorState
-        description={error.message}
+        description={error instanceof Error ? error.message : String(error)}
         title={'Something went wrong'}
       >
         <LinkButton href="/">Go back to home</LinkButton>

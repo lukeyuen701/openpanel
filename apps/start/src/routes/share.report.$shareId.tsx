@@ -11,6 +11,7 @@ import { OverviewRange } from '@/components/overview/overview-range';
 import { useOverviewOptions } from '@/components/overview/useOverviewOptions';
 import { ReportChart } from '@/components/report-chart';
 import { useTRPC } from '@/integrations/trpc/react';
+import { rethrowMissingShare } from '@/utils/share-not-found';
 
 const shareSearchSchema = z.object({
   header: z.optional(z.number().or(z.string().or(z.boolean()))),
@@ -20,11 +21,13 @@ export const Route = createFileRoute('/share/report/$shareId')({
   component: RouteComponent,
   validateSearch: shareSearchSchema,
   loader: async ({ context, params }) => {
-    const share = await context.queryClient.ensureQueryData(
-      context.trpc.share.report.queryOptions({
-        shareId: params.shareId,
-      })
-    );
+    const share = await context.queryClient
+      .ensureQueryData(
+        context.trpc.share.report.queryOptions({
+          shareId: params.shareId,
+        })
+      )
+      .catch(rethrowMissingShare);
 
     if (!share) {
       return { share: null };
@@ -65,15 +68,20 @@ export const Route = createFileRoute('/share/report/$shareId')({
     };
   },
   pendingComponent: FullPageLoadingState,
-  errorComponent: () => (
+  errorComponent: ShareNotFound,
+  notFoundComponent: ShareNotFound,
+});
+
+function ShareNotFound() {
+  return (
     <EmptyState
       description="This link doesn't point to a shared report anymore. Ask whoever sent it for a new one."
       icon={UnlinkIcon}
       title="Share not found"
       variant="page"
     />
-  ),
-});
+  );
+}
 
 function RouteComponent() {
   const { shareId } = Route.useParams();

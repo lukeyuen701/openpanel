@@ -5,6 +5,7 @@ import { z } from 'zod';
 import { LogoSquare } from '@/components/logo';
 import { useNumber } from '@/hooks/use-numer-formatter';
 import { useTRPC } from '@/integrations/trpc/react';
+import { lenientSearch } from '@/utils/lenient-search';
 
 const widgetSearchSchema = z.object({
   shareId: z.string(),
@@ -12,20 +13,37 @@ const widgetSearchSchema = z.object({
 });
 
 export const Route = createFileRoute('/widget/badge')({
-  // Embedded in someone else's page, so this stays small. Without it a
-  // missing `shareId` fell through to the root handler, which prints
-  // `error.message` — for a ZodError that is the raw issues array.
-  errorComponent: () => (
+  errorComponent: InvalidWidgetLink,
+  component: RouteComponent,
+  validateSearch: lenientSearch(widgetSearchSchema),
+});
+
+// Embedded in someone else's page, so this stays small.
+function InvalidWidgetLink() {
+  return (
     <div className="p-2 text-muted-foreground text-xs">
       Missing or invalid widget link.
     </div>
-  ),
-  component: RouteComponent,
-  validateSearch: widgetSearchSchema,
-});
+  );
+}
 
 function RouteComponent() {
   const { shareId, color } = Route.useSearch();
+
+  if (!shareId) {
+    return <InvalidWidgetLink />;
+  }
+
+  return <BadgeWidgetLoader color={color} shareId={shareId} />;
+}
+
+function BadgeWidgetLoader({
+  shareId,
+  color,
+}: {
+  shareId: string;
+  color: string | undefined;
+}) {
   const trpc = useTRPC();
 
   // Fetch widget data

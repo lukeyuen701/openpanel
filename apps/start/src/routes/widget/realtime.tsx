@@ -15,6 +15,7 @@ import { useTRPC } from '@/integrations/trpc/react';
 import { countries } from '@/translations/countries';
 import type { RouterOutputs } from '@/trpc/client';
 import { cn } from '@/utils/cn';
+import { lenientSearch } from '@/utils/lenient-search';
 import { getChartColor } from '@/utils/theme';
 
 const DEFAULT_BAR_COLOR = getChartColor(0);
@@ -22,6 +23,7 @@ const BAR_RADIUS = 4;
 const BAR_GAP = 0.25;
 const NO_MARGIN = { top: 0, right: 0, bottom: 0, left: 0 };
 const TOOLTIP_MIN_WIDTH = 120;
+const DEFAULT_WIDGET_LIMIT = 10;
 
 type HistogramPoint =
   RouterOutputs['widget']['realtimeData']['histogram'][number] & {
@@ -30,25 +32,44 @@ type HistogramPoint =
 
 const widgetSearchSchema = z.object({
   shareId: z.string(),
-  limit: z.number().default(10),
+  limit: z.number().default(DEFAULT_WIDGET_LIMIT),
   color: z.string().optional(),
 });
 
 export const Route = createFileRoute('/widget/realtime')({
-  // Embedded in someone else's page, so this stays small. Without it a
-  // missing `shareId` fell through to the root handler, which prints
-  // `error.message` — for a ZodError that is the raw issues array.
-  errorComponent: () => (
+  errorComponent: InvalidWidgetLink,
+  component: RouteComponent,
+  validateSearch: lenientSearch(widgetSearchSchema),
+});
+
+// Embedded in someone else's page, so this stays small.
+function InvalidWidgetLink() {
+  return (
     <div className="p-2 text-muted-foreground text-xs">
       Missing or invalid widget link.
     </div>
-  ),
-  component: RouteComponent,
-  validateSearch: widgetSearchSchema,
-});
+  );
+}
 
 function RouteComponent() {
-  const { shareId, limit, color } = Route.useSearch();
+  const { shareId, limit = DEFAULT_WIDGET_LIMIT, color } = Route.useSearch();
+
+  if (!shareId) {
+    return <InvalidWidgetLink />;
+  }
+
+  return <RealtimeWidgetLoader color={color} limit={limit} shareId={shareId} />;
+}
+
+function RealtimeWidgetLoader({
+  shareId,
+  limit,
+  color,
+}: {
+  shareId: string;
+  limit: number;
+  color: string | undefined;
+}) {
   const trpc = useTRPC();
 
   // Fetch widget data

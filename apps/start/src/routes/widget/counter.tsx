@@ -6,6 +6,7 @@ import { Ping } from '@/components/ping';
 import useWS from '@/hooks/use-ws';
 import { useTRPC } from '@/integrations/trpc/react';
 import type { RouterOutputs } from '@/trpc/client';
+import { lenientSearch } from '@/utils/lenient-search';
 
 const widgetSearchSchema = z.object({
   shareId: z.string(),
@@ -14,20 +15,31 @@ const widgetSearchSchema = z.object({
 });
 
 export const Route = createFileRoute('/widget/counter')({
-  // Embedded in someone else's page, so this stays small. Without it a
-  // missing `shareId` fell through to the root handler, which prints
-  // `error.message` — for a ZodError that is the raw issues array.
-  errorComponent: () => (
+  errorComponent: InvalidWidgetLink,
+  component: RouteComponent,
+  validateSearch: lenientSearch(widgetSearchSchema),
+});
+
+// Embedded in someone else's page, so this stays small.
+function InvalidWidgetLink() {
+  return (
     <div className="p-2 text-muted-foreground text-xs">
       Missing or invalid widget link.
     </div>
-  ),
-  component: RouteComponent,
-  validateSearch: widgetSearchSchema,
-});
+  );
+}
 
 function RouteComponent() {
   const { shareId } = Route.useSearch();
+
+  if (!shareId) {
+    return <InvalidWidgetLink />;
+  }
+
+  return <CounterWidgetLoader shareId={shareId} />;
+}
+
+function CounterWidgetLoader({ shareId }: { shareId: string }) {
   const trpc = useTRPC();
 
   // Fetch widget data

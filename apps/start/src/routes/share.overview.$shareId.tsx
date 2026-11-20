@@ -19,6 +19,7 @@ import OverviewTopSources from '@/components/overview/overview-top-sources';
 import OverviewUserJourney from '@/components/overview/overview-user-journey';
 import OverviewWeeklyTrends from '@/components/overview/overview-weekly-trends';
 import { useTRPC } from '@/integrations/trpc/react';
+import { rethrowMissingShare } from '@/utils/share-not-found';
 
 const shareSearchSchema = z.object({
   header: z.optional(z.number().or(z.string().or(z.boolean()))),
@@ -28,11 +29,13 @@ export const Route = createFileRoute('/share/overview/$shareId')({
   component: RouteComponent,
   validateSearch: shareSearchSchema,
   loader: async ({ context, params }) => {
-    const share = await context.queryClient.ensureQueryData(
-      context.trpc.share.overview.queryOptions({
-        shareId: params.shareId,
-      })
-    );
+    const share = await context.queryClient
+      .ensureQueryData(
+        context.trpc.share.overview.queryOptions({
+          shareId: params.shareId,
+        })
+      )
+      .catch(rethrowMissingShare);
 
     return { share };
   },
@@ -58,15 +61,20 @@ export const Route = createFileRoute('/share/overview/$shareId')({
     };
   },
   pendingComponent: FullPageLoadingState,
-  errorComponent: () => (
+  errorComponent: ShareNotFound,
+  notFoundComponent: ShareNotFound,
+});
+
+function ShareNotFound() {
+  return (
     <EmptyState
       description="This link doesn't point to a shared overview anymore. Ask whoever sent it for a new one."
       icon={UnlinkIcon}
       title="Share not found"
       variant="page"
     />
-  ),
-});
+  );
+}
 
 function RouteComponent() {
   const { shareId } = Route.useParams();
