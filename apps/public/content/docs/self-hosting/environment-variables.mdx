@@ -849,7 +849,7 @@ Routing is all-or-nothing: if `KAFKA_BROKERS` is set, every event is produced to
 Connections are unauthenticated plaintext by default. For managed or production clusters, enable TLS with `KAFKA_SSL` and SASL authentication (`plain`, `scram-sha-256` or `scram-sha-512`) with the `KAFKA_SASL_*` variables below.
 
 <Callout>
-The client speaks the Kafka wire protocol via [kafkajs](https://kafka.js.org/), so any Kafka-compatible broker works. `self-hosting/docker-compose.template.yml` ships an `op-rp` service running [Redpanda](https://redpanda.com/) — a lightweight, single-binary broker — by default, with `KAFKA_BROKERS` already pointed at it. You can instead point `KAFKA_BROKERS` at any Kafka cluster of your own.
+The client speaks the Kafka wire protocol via [@platformatic/kafka](https://github.com/platformatic/kafka), which supports Apache Kafka 3.5 through 4.2 and brokers compatible with them. `self-hosting/docker-compose.template.yml` ships an `op-rp` service running [Redpanda](https://redpanda.com/) — a lightweight, single-binary broker — by default, with `KAFKA_BROKERS` already pointed at it. You can instead point `KAFKA_BROKERS` at a Kafka cluster of your own, running Apache Kafka 3.5 or newer.
 </Callout>
 
 ### KAFKA_BROKERS
