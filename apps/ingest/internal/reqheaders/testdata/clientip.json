@@ -1,0 +1,403 @@
+[
+ {
+  "order": null,
+  "headers": {},
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {},
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "x-forwarded-for": "81.2.69.142, 10.0.0.1"
+  },
+  "out": {
+   "ip": "81.2.69.142",
+   "header": "x-forwarded-for"
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "x-forwarded-for": "81.2.69.142, 10.0.0.1"
+  },
+  "out": {
+   "ip": "81.2.69.142",
+   "header": "x-forwarded-for"
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "x-forwarded-for": "10.0.0.1, 81.2.69.142"
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "x-forwarded-for": "10.0.0.1, 81.2.69.142"
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "openpanel-client-ip": "81.2.69.142",
+   "cf-connecting-ip": "1.1.1.1"
+  },
+  "out": {
+   "ip": "81.2.69.142",
+   "header": "openpanel-client-ip"
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "openpanel-client-ip": "81.2.69.142",
+   "cf-connecting-ip": "1.1.1.1"
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "cf-connecting-ip": "127.0.0.1",
+   "x-real-ip": "8.8.8.8"
+  },
+  "out": {
+   "ip": "8.8.8.8",
+   "header": "x-real-ip"
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "cf-connecting-ip": "127.0.0.1",
+   "x-real-ip": "8.8.8.8"
+  },
+  "out": {
+   "ip": "8.8.8.8",
+   "header": "x-real-ip"
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "forwarded": "for=192.0.2.60;proto=http;by=203.0.113.43"
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "forwarded": "for=192.0.2.60;proto=http;by=203.0.113.43"
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "forwarded": "for=\"[2001:db8:cafe::17]:4711\""
+  },
+  "out": {
+   "ip": "2001:db8:cafe::17",
+   "header": "forwarded"
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "forwarded": "for=\"[2001:db8:cafe::17]:4711\""
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "x-client-ip": "::ffff:127.0.0.1",
+   "x-real-ip": "::ffff:8.8.8.8"
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "x-client-ip": "::ffff:127.0.0.1",
+   "x-real-ip": "::ffff:8.8.8.8"
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "true-client-ip": "172.16.5.4",
+   "fastly-client-ip": "172.32.0.1"
+  },
+  "out": {
+   "ip": "172.32.0.1",
+   "header": "fastly-client-ip"
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "true-client-ip": "172.16.5.4",
+   "fastly-client-ip": "172.32.0.1"
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "x-real-ip": "999.1.1.1"
+  },
+  "out": {
+   "ip": "999.1.1.1",
+   "header": "x-real-ip"
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "x-real-ip": "999.1.1.1"
+  },
+  "out": {
+   "ip": "999.1.1.1",
+   "header": "x-real-ip"
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "x-real-ip": "fe80::1",
+   "do-connecting-ip": "2001:4860:4860::8888"
+  },
+  "out": {
+   "ip": "2001:4860:4860::8888",
+   "header": "do-connecting-ip"
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "x-real-ip": "fe80::1",
+   "do-connecting-ip": "2001:4860:4860::8888"
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "x-forwarded-for": " 8.8.4.4 "
+  },
+  "out": {
+   "ip": "8.8.4.4",
+   "header": "x-forwarded-for"
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "x-forwarded-for": " 8.8.4.4 "
+  },
+  "out": {
+   "ip": "8.8.4.4",
+   "header": "x-forwarded-for"
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "x-cluster-client-ip": "192.168.1.1",
+   "x-appengine-user-ip": "169.254.1.1",
+   "x-forwarded": "9.9.9.9"
+  },
+  "out": {
+   "ip": "9.9.9.9",
+   "header": "x-forwarded"
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "x-cluster-client-ip": "192.168.1.1",
+   "x-appengine-user-ip": "169.254.1.1",
+   "x-forwarded": "9.9.9.9"
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "x-forwarded-for": ""
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "x-forwarded-for": ""
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "x-real-ip": "::1"
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "x-real-ip": "::1"
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "x-real-ip": "fd00::1"
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "x-real-ip": "fd00::1"
+  },
+  "out": {
+   "ip": "",
+   "header": ""
+  }
+ },
+ {
+  "order": null,
+  "headers": {
+   "x-real-ip": "172.15.0.1"
+  },
+  "out": {
+   "ip": "172.15.0.1",
+   "header": "x-real-ip"
+  }
+ },
+ {
+  "order": [
+   "x-real-ip",
+   "x-forwarded-for"
+  ],
+  "headers": {
+   "x-real-ip": "172.15.0.1"
+  },
+  "out": {
+   "ip": "172.15.0.1",
+   "header": "x-real-ip"
+  }
+ }
+]

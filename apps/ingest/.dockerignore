@@ -1,0 +1,6 @@
+bin/
+parity/
+scripts/
+**/testdata/
+*.md
+node_modules/

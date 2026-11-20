@@ -38,6 +38,10 @@
         "typescript": "catalog:",
       },
     },
+    "apps/ingest": {
+      "name": "@openpanel/ingest",
+      "version": "0.0.1",
+    },
     "apps/public": {
       "name": "public",
       "version": "0.0.0",
@@ -1734,6 +1738,8 @@
     "@openpanel/email": ["@openpanel/email@workspace:packages/email"],
 
     "@openpanel/express": ["@openpanel/express@workspace:packages/sdks/express"],
+
+    "@openpanel/ingest": ["@openpanel/ingest@workspace:apps/ingest"],
 
     "@openpanel/logos": ["@openpanel/logos@workspace:packages/logos"],
 

@@ -1,0 +1,2330 @@
+[
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "__undefined__",
+  "out": false
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "",
+  "out": false
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "http://example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://www.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://app.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://app.example.com:3000",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://a.b.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "http://localhost:3000",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://EXAMPLE.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://example.com:443",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://example.com/path",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "null",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://xn--n3h.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://☃.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://evil.com/?q=example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://app.x.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://b.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://a.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://wwwexample.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://www.www.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "http://example.com:80",
+  "out": true
+ },
+ {
+  "cors": [
+   "*"
+  ],
+  "origin": "https://app.example.com:8080",
+  "out": true
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "__undefined__",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "http://example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://www.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://app.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://app.example.com:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://a.b.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "http://localhost:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://EXAMPLE.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://example.com:443",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://example.com/path",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "null",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://xn--n3h.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://☃.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://evil.com/?q=example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://app.x.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://b.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://a.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://wwwexample.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://www.www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "http://example.com:80",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com"
+  ],
+  "origin": "https://app.example.com:8080",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "__undefined__",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "http://example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://www.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://app.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://app.example.com:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://a.b.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "http://localhost:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://EXAMPLE.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://example.com:443",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://example.com/path",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "null",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://xn--n3h.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://☃.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://evil.com/?q=example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://app.x.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://b.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://a.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://wwwexample.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://www.www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "http://example.com:80",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://example.com"
+  ],
+  "origin": "https://app.example.com:8080",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "__undefined__",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "http://example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://www.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://app.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://app.example.com:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://a.b.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "http://localhost:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://EXAMPLE.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://example.com:443",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://example.com/path",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "null",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://xn--n3h.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://☃.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://evil.com/?q=example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://app.x.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://b.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://a.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://wwwexample.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://www.www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "http://example.com:80",
+  "out": false
+ },
+ {
+  "cors": [
+   "www.example.com"
+  ],
+  "origin": "https://app.example.com:8080",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "__undefined__",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "http://example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://app.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://app.example.com:3000",
+  "out": true
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://a.b.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "http://localhost:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://EXAMPLE.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://example.com:443",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://example.com/path",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "null",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://xn--n3h.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://☃.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://evil.com/?q=example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://app.x.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://b.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://a.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://wwwexample.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://www.www.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "http://example.com:80",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com"
+  ],
+  "origin": "https://app.example.com:8080",
+  "out": true
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "__undefined__",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "http://example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://app.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://app.example.com:3000",
+  "out": true
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://a.b.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "http://localhost:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://EXAMPLE.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://example.com:443",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://example.com/path",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "null",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://xn--n3h.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://☃.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://evil.com/?q=example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://app.x.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://b.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://a.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://wwwexample.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://www.www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "http://example.com:80",
+  "out": false
+ },
+ {
+  "cors": [
+   "*.example.com:3000"
+  ],
+  "origin": "https://app.example.com:8080",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "__undefined__",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "http://example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://app.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://app.example.com:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://a.b.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "http://localhost:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://EXAMPLE.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://example.com:443",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://example.com/path",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "null",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://xn--n3h.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://☃.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://evil.com/?q=example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://app.x.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://b.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://a.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://wwwexample.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://www.www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "http://example.com:80",
+  "out": false
+ },
+ {
+  "cors": [
+   "app.*.example.com"
+  ],
+  "origin": "https://app.example.com:8080",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "__undefined__",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "http://example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://app.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://app.example.com:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://a.b.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "http://localhost:3000",
+  "out": true
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://EXAMPLE.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://example.com:443",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://example.com/path",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "null",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://xn--n3h.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://☃.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://evil.com/?q=example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://app.x.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://b.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://a.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://wwwexample.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://www.www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "http://example.com:80",
+  "out": false
+ },
+ {
+  "cors": [
+   "http://localhost:3000"
+  ],
+  "origin": "https://app.example.com:8080",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "__undefined__",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "http://example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://app.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://app.example.com:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://a.b.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "http://localhost:3000",
+  "out": true
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://EXAMPLE.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://example.com:443",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://example.com/path",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "null",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://xn--n3h.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://☃.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://evil.com/?q=example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://app.x.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://b.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://a.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://wwwexample.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://www.www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "http://example.com:80",
+  "out": false
+ },
+ {
+  "cors": [
+   "localhost:3000"
+  ],
+  "origin": "https://app.example.com:8080",
+  "out": false
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "__undefined__",
+  "out": false
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "",
+  "out": false
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "http://example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://www.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://app.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://app.example.com:3000",
+  "out": true
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://a.b.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "http://localhost:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://EXAMPLE.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://example.com:443",
+  "out": true
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://example.com/path",
+  "out": true
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "null",
+  "out": false
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://xn--n3h.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://☃.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://evil.com/?q=example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://app.x.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://b.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://a.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://wwwexample.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://www.www.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "http://example.com:80",
+  "out": true
+ },
+ {
+  "cors": [
+   "*example*"
+  ],
+  "origin": "https://app.example.com:8080",
+  "out": true
+ },
+ {
+  "cors": [],
+  "origin": "__undefined__",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://example.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "http://example.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://www.example.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://app.example.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://app.example.com:3000",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://a.b.example.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "http://localhost:3000",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://EXAMPLE.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://example.com:443",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://example.com/path",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "null",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://xn--n3h.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://☃.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://evil.com/?q=example.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://app.x.example.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://b.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://a.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "example.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://wwwexample.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://www.www.example.com",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "http://example.com:80",
+  "out": false
+ },
+ {
+  "cors": [],
+  "origin": "https://app.example.com:8080",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "__undefined__",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "http://example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://app.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://app.example.com:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://a.b.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "http://localhost:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://EXAMPLE.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://example.com:443",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://example.com/path",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "null",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://xn--n3h.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://☃.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://evil.com/?q=example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://app.x.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://b.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://a.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://wwwexample.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://www.www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "http://example.com:80",
+  "out": false
+ },
+ {
+  "cors": [
+   "a.com",
+   "https://b.com/"
+  ],
+  "origin": "https://app.example.com:8080",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "__undefined__",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "http://example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://www.example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://app.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://app.example.com:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://a.b.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "http://localhost:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://EXAMPLE.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://example.com:443",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://example.com/path",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "null",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://xn--n3h.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://☃.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://evil.com/?q=example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://app.x.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://b.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://a.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "example.com",
+  "out": true
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://wwwexample.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://www.www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "http://example.com:80",
+  "out": false
+ },
+ {
+  "cors": [
+   "https://www.example.com"
+  ],
+  "origin": "https://app.example.com:8080",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "__undefined__",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "http://example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://app.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://app.example.com:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://a.b.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "http://localhost:3000",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://EXAMPLE.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://example.com:443",
+  "out": true
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://example.com/path",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "null",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://xn--n3h.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://☃.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://evil.com/?q=example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://app.x.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://b.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://a.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://wwwexample.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://www.www.example.com",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "http://example.com:80",
+  "out": false
+ },
+ {
+  "cors": [
+   "example.com:443"
+  ],
+  "origin": "https://app.example.com:8080",
+  "out": false
+ }
+]

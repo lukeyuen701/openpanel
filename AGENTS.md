@@ -17,6 +17,7 @@ Open-source product analytics (a Mixpanel alternative). Bun monorepo.
 |---|---|---|
 | `packages/core` | The backend: every module, the tRPC router, Elysia routes, BullMQ jobs, ingest | TypeScript |
 | `apps/api` | Thin shell that mounts core; `ROLE=api\|worker\|all` picks what one process runs | Elysia on Bun |
+| `apps/ingest` | Optional Go receiver for `POST /track` (type `track`), `/track/device-id` and `/event`, writing the API's Kafka records byte for byte and forwarding everything else to the API; its parity checks are in its README | Go |
 | `apps/start` | The dashboard | TanStack Start, React 19, Redux Toolkit, Tailwind v4, Recharts |
 | `packages/db` | Prisma (Postgres) + ClickHouse client and the `sql` tag (`src/clickhouse/sql.ts`) | |
 | `packages/seed` | Deterministic seed data for Postgres + ClickHouse (`bun run seed`) | |
@@ -80,6 +81,7 @@ a one-line fix does not need the full suite, a query or ingest change always doe
 | tRPC procedure / REST route (`packages/core`) | Call it (recipes below) with seeded ids and check the JSON; for auth changes, try the wrong role too | `bun test --isolate` in `packages/core` for that module |
 | ClickHouse query / chart / overview | Run old and new against the seeded data and diff results; check the numbers on the dashboard match a manual query | `packages/core` tests for the module; `bun run --filter @openpanel/db test` if you touched `packages/db` |
 | Ingest / worker / buffers / sessions | `bun run send journey --project acme-shop` (live events through Kafka → worker → ClickHouse), then query `events`/`sessions`/`profiles` for that session id | `packages/core` ingest + buffer tests, `apps/api/e2e/` for session lifecycle |
+| Go receiver (`apps/ingest`) or the TS ingest path it ports (`packages/core/src/modules/ingest`, `parseUserAgent`, `bots.ts`) | `bun run --filter @openpanel/ingest parity` (an API and the receiver side by side, answers and Kafka records diffed) | `bun run --filter @openpanel/ingest test` and `gen:check`; regenerate goldens with `golden` after a TS change |
 | SDK (`packages/sdks/*`) | `/sdk-testbed`: drive `apps/testbed` in a real browser against *your* API and read the rows in ClickHouse (`bun run --filter @openpanel/testbed e2e`); extend the spec for new behaviour | `bun run --filter @openpanel/web test`, `bun run --filter "./packages/sdks/*" typecheck`; a release goes through the SDKs workflow (`.github/workflows/sdks.yml`) |
 | MCP tools (`packages/core/src/modules/mcp`) | Call the product's MCP against *your* API and data: as the `openpanel` MCP server if one is configured for you, else over HTTP (`.seed.json` → `mcp.url`, recipe below); compare its answer with a direct query | `packages/core` mcp tests |
 | Schema / migration | `bun run --filter @openpanel/db migrate:deploy` on your isolated database, then `bun run seed --reset` and the seed tests (`bun run --filter @openpanel/seed test`) | `bun run typecheck` |

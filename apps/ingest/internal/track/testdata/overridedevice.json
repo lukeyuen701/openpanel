@@ -1,0 +1,42 @@
+[
+ {
+  "value": "__undefined__",
+  "out": null
+ },
+ {
+  "value": "",
+  "out": null
+ },
+ {
+  "value": "  ",
+  "out": null
+ },
+ {
+  "value": " abc ",
+  "out": "abc"
+ },
+ {
+  "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "out": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+ },
+ {
+  "value": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "out": null
+ },
+ {
+  "value": 5,
+  "out": null
+ },
+ {
+  "value": null,
+  "out": null
+ },
+ {
+  "value": true,
+  "out": null
+ },
+ {
+  "value": " yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy ",
+  "out": "yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy"
+ }
+]

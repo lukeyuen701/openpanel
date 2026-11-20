@@ -1,0 +1,458 @@
+[
+ {
+  "now": 1795176000000,
+  "input": "__undefined__",
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": null,
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": 0,
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "",
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "x",
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": 12345,
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": 1795176000000,
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": 1795175999999,
+  "out": {
+   "timestamp": 1795175999999,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": 1795176060000,
+  "out": {
+   "timestamp": 1795176060000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": 1795176060001,
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": 1795175100000,
+  "out": {
+   "timestamp": 1795175100000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": 1795175099999,
+  "out": {
+   "timestamp": 1795175099999,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": 946684800000,
+  "out": {
+   "timestamp": 946684800000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": 946684799999,
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": 1700000000000.7,
+  "out": {
+   "timestamp": 1700000000000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": -1,
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": 8640000000000000,
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": 8640000000000001,
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": true,
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": {},
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": [],
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20",
+  "out": {
+   "timestamp": 1795132800000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:59:00Z",
+  "out": {
+   "timestamp": 1795175940000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:59:00.123Z",
+  "out": {
+   "timestamp": 1795175940123,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:59:00.1234567Z",
+  "out": {
+   "timestamp": 1795175940123,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:59Z",
+  "out": {
+   "timestamp": 1795175940000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:59:00+02:00",
+  "out": {
+   "timestamp": 1795168740000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:59:00-0130",
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:59:00",
+  "out": {
+   "timestamp": 1795147140000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20 11:59:00",
+  "out": {
+   "timestamp": 1795147140000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:59:00.000+00:00",
+  "out": {
+   "timestamp": 1795175940000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11",
+  "out": {
+   "timestamp": 1793491200000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026",
+  "out": {
+   "timestamp": 1767225600000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "+002026-11-20T11:00:00Z",
+  "out": {
+   "timestamp": 1795172400000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T24:00:00Z",
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-02-30T00:00:00Z",
+  "out": {
+   "timestamp": 1772409600000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:59:60Z",
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "Fri, 20 Nov 2026 11:00:00 GMT",
+  "out": {
+   "timestamp": 1795172400000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "Nov 20 2026",
+  "out": {
+   "timestamp": 1795104000000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026/11/20",
+  "out": {
+   "timestamp": 1795104000000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "11/20/2026",
+  "out": {
+   "timestamp": 1795104000000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "1700000000000",
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": " 2026-11-20T11:00:00Z",
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:00:00z",
+  "out": {
+   "timestamp": 1795172400000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20t11:00:00Z",
+  "out": {
+   "timestamp": 1795172400000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:00:00.Z",
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:00:00,123Z",
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-1-2",
+  "out": {
+   "timestamp": 1767283200000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:00:00.5Z",
+  "out": {
+   "timestamp": 1795172400500,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:00:00.12Z",
+  "out": {
+   "timestamp": 1795172400120,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "1999-12-31T23:59:59.999Z",
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T12:01:00.001Z",
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:59:00.999999999Z",
+  "out": {
+   "timestamp": 1795175940999,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:59:00+14:00",
+  "out": {
+   "timestamp": 1795125540000,
+   "isTimestampFromThePast": true
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:59:00-12:00",
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-20T11:59:00+24:00",
+  "out": {
+   "timestamp": 1795176000000,
+   "isTimestampFromThePast": false
+  }
+ },
+ {
+  "now": 1795176000000,
+  "input": "2026-11-19T23:00:00.000-01:00",
+  "out": {
+   "timestamp": 1795132800000,
+   "isTimestampFromThePast": true
+  }
+ }
+]

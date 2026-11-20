@@ -1,0 +1,217 @@
+[
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\"}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"a\"}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"extra\":1},\"extra\":2}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"a\"}}"
+ },
+ {
+  "text": "{\"payload\":{\"groups\":[\"g\"],\"profileId\":\"p\",\"properties\":{\"b\":1,\"a\":2,\"1\":3},\"name\":\"a\"},\"type\":\"track\"}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"properties\":{\"1\":3,\"b\":1,\"a\":2},\"profileId\":\"p\",\"groups\":[\"g\"]}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"\"}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"session_start\"}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"profileId\":\"\"}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"profileId\":12}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"profileId\":12}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"profileId\":1.5}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"profileId\":1.5}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"profileId\":null}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":null}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":null}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":[]}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":[]}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":[\"\"]}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":[\"gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg\"]}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":[\"gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg\"]}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":[\"ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggg\"]}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":[\"😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀\"]}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":[\"😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀\"]}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":[\"😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀\"]}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":[\"😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀\"]}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":[\"g0\",\"g1\",\"g2\",\"g3\",\"g4\",\"g5\",\"g6\",\"g7\",\"g8\",\"g9\",\"g10\",\"g11\",\"g12\",\"g13\",\"g14\",\"g15\",\"g16\",\"g17\",\"g18\",\"g19\",\"g20\",\"g21\",\"g22\",\"g23\",\"g24\",\"g25\",\"g26\",\"g27\",\"g28\",\"g29\",\"g30\",\"g31\",\"g32\",\"g33\",\"g34\",\"g35\",\"g36\",\"g37\",\"g38\",\"g39\",\"g40\",\"g41\",\"g42\",\"g43\",\"g44\",\"g45\",\"g46\",\"g47\",\"g48\",\"g49\",\"g50\",\"g51\",\"g52\",\"g53\",\"g54\",\"g55\",\"g56\",\"g57\",\"g58\",\"g59\",\"g60\",\"g61\",\"g62\",\"g63\",\"g64\",\"g65\",\"g66\",\"g67\",\"g68\",\"g69\",\"g70\",\"g71\",\"g72\",\"g73\",\"g74\",\"g75\",\"g76\",\"g77\",\"g78\",\"g79\",\"g80\",\"g81\",\"g82\",\"g83\",\"g84\",\"g85\",\"g86\",\"g87\",\"g88\",\"g89\",\"g90\",\"g91\",\"g92\",\"g93\",\"g94\",\"g95\",\"g96\",\"g97\",\"g98\",\"g99\",\"g100\"]}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":[\"g0\",\"g1\",\"g2\",\"g3\",\"g4\",\"g5\",\"g6\",\"g7\",\"g8\",\"g9\",\"g10\",\"g11\",\"g12\",\"g13\",\"g14\",\"g15\",\"g16\",\"g17\",\"g18\",\"g19\",\"g20\",\"g21\",\"g22\",\"g23\",\"g24\",\"g25\",\"g26\",\"g27\",\"g28\",\"g29\",\"g30\",\"g31\",\"g32\",\"g33\",\"g34\",\"g35\",\"g36\",\"g37\",\"g38\",\"g39\",\"g40\",\"g41\",\"g42\",\"g43\",\"g44\",\"g45\",\"g46\",\"g47\",\"g48\",\"g49\",\"g50\",\"g51\",\"g52\",\"g53\",\"g54\",\"g55\",\"g56\",\"g57\",\"g58\",\"g59\",\"g60\",\"g61\",\"g62\",\"g63\",\"g64\",\"g65\",\"g66\",\"g67\",\"g68\",\"g69\",\"g70\",\"g71\",\"g72\",\"g73\",\"g74\",\"g75\",\"g76\",\"g77\",\"g78\",\"g79\",\"g80\",\"g81\",\"g82\",\"g83\",\"g84\",\"g85\",\"g86\",\"g87\",\"g88\",\"g89\",\"g90\",\"g91\",\"g92\",\"g93\",\"g94\",\"g95\",\"g96\",\"g97\",\"g98\",\"g99\"]}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":[\"g0\",\"g1\",\"g2\",\"g3\",\"g4\",\"g5\",\"g6\",\"g7\",\"g8\",\"g9\",\"g10\",\"g11\",\"g12\",\"g13\",\"g14\",\"g15\",\"g16\",\"g17\",\"g18\",\"g19\",\"g20\",\"g21\",\"g22\",\"g23\",\"g24\",\"g25\",\"g26\",\"g27\",\"g28\",\"g29\",\"g30\",\"g31\",\"g32\",\"g33\",\"g34\",\"g35\",\"g36\",\"g37\",\"g38\",\"g39\",\"g40\",\"g41\",\"g42\",\"g43\",\"g44\",\"g45\",\"g46\",\"g47\",\"g48\",\"g49\",\"g50\",\"g51\",\"g52\",\"g53\",\"g54\",\"g55\",\"g56\",\"g57\",\"g58\",\"g59\",\"g60\",\"g61\",\"g62\",\"g63\",\"g64\",\"g65\",\"g66\",\"g67\",\"g68\",\"g69\",\"g70\",\"g71\",\"g72\",\"g73\",\"g74\",\"g75\",\"g76\",\"g77\",\"g78\",\"g79\",\"g80\",\"g81\",\"g82\",\"g83\",\"g84\",\"g85\",\"g86\",\"g87\",\"g88\",\"g89\",\"g90\",\"g91\",\"g92\",\"g93\",\"g94\",\"g95\",\"g96\",\"g97\",\"g98\",\"g99\"]}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"groups\":[1]}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"properties\":null}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"properties\":[]}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"properties\":\"x\"}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"properties\":{}}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"properties\":{}}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"revenue\",\"properties\":{\"__revenue\":10}}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"revenue\",\"properties\":{\"__revenue\":10}}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"revenue\",\"properties\":{\"__revenue\":-1}}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"revenue\",\"properties\":{\"__revenue\":0}}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"revenue\",\"properties\":{\"__revenue\":0}}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"revenue\",\"properties\":{\"__revenue\":1.5}}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"revenue\",\"properties\":{\"__revenue\":\"10\"}}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"revenue\",\"properties\":{\"__revenue\":null}}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"revenue\",\"properties\":{\"__revenue\":null}}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"revenue\",\"properties\":{\"__revenue\":1e300}}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"revenue\",\"properties\":{\"__revenue\":1e+300}}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"other\",\"properties\":{\"__revenue\":1.5}}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"other\",\"properties\":{\"__revenue\":1.5}}}"
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"/wp-admin\"}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":5}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\"}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":null}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":[]}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"identify\",\"payload\":{\"profileId\":\"x\"}}",
+  "success": true,
+  "data": "{\"type\":\"identify\",\"payload\":{\"profileId\":\"x\"}}"
+ },
+ {
+  "text": "{\"type\":\"TRACK\",\"payload\":{\"name\":\"a\"}}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "[]",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "null",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "\"x\"",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{}",
+  "success": false,
+  "data": null
+ },
+ {
+  "text": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"properties\":{\"__proto__\":{\"x\":1}}}}",
+  "success": true,
+  "data": "{\"type\":\"track\",\"payload\":{\"name\":\"a\",\"properties\":{}}}"
+ }
+]

@@ -1,0 +1,102 @@
+[
+ {
+  "name": "page_view",
+  "out": false
+ },
+ {
+  "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "out": false
+ },
+ {
+  "name": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+  "out": true
+ },
+ {
+  "name": "a\nb",
+  "out": true
+ },
+ {
+  "name": "a\rb",
+  "out": true
+ },
+ {
+  "name": "SELECT pg_sleep(5)",
+  "out": true
+ },
+ {
+  "name": "/wp-login.php",
+  "out": true
+ },
+ {
+  "name": "/.env",
+  "out": true
+ },
+ {
+  "name": "/phpmyadmin",
+  "out": true
+ },
+ {
+  "name": "/foo.php",
+  "out": true
+ },
+ {
+  "name": "/index.html",
+  "out": false
+ },
+ {
+  "name": "${jndi}",
+  "out": true
+ },
+ {
+  "name": "x' or '1",
+  "out": true
+ },
+ {
+  "name": "Union Select",
+  "out": true
+ },
+ {
+  "name": "/admin.json",
+  "out": true
+ },
+ {
+  "name": "/a.PHP",
+  "out": true
+ },
+ {
+  "name": "session_start",
+  "out": false
+ },
+ {
+  "name": "revenue",
+  "out": false
+ },
+ {
+  "name": "../etc",
+  "out": true
+ },
+ {
+  "name": "Ünïcödé",
+  "out": false
+ },
+ {
+  "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+  "out": true
+ },
+ {
+  "name": "😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀😀",
+  "out": false
+ },
+ {
+  "name": "/WP-admin",
+  "out": true
+ },
+ {
+  "name": "x/cgi-bin/y",
+  "out": true
+ },
+ {
+  "name": "#<Article:0x1>",
+  "out": true
+ }
+]

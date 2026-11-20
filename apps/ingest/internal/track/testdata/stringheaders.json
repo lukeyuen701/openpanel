@@ -1,0 +1,24 @@
+[
+ {
+  "headers": {},
+  "out": "{}"
+ },
+ {
+  "headers": {
+   "user-agent": "ua",
+   "openpanel-sdk-name": "web",
+   "openpanel-sdk-version": "1.0",
+   "openpanel-client-id": "c",
+   "request-id": "r",
+   "x-other": "no"
+  },
+  "out": "{\"user-agent\":\"ua\",\"openpanel-sdk-name\":\"web\",\"openpanel-sdk-version\":\"1.0\",\"openpanel-client-id\":\"c\",\"request-id\":\"r\"}"
+ },
+ {
+  "headers": {
+   "user-agent": "",
+   "request-id": "r"
+  },
+  "out": "{\"request-id\":\"r\"}"
+ }
+]

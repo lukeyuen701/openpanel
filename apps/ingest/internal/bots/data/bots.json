@@ -1,0 +1,4017 @@
+[
+ {
+  "includes": "WireReaderBot",
+  "name": "WireReaderBot",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "monitoring360bot",
+  "name": "360 Monitoring",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Cloudflare-Healthchecks",
+  "name": "Cloudflare Health Checks",
+  "category": "Service Agent"
+ },
+ {
+  "regex": "(360Spider(?:-Image|-Video)?)",
+  "name": "$1",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Aboundex",
+  "name": "Aboundexbot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "AcoonBot",
+  "name": "Acoon",
+  "category": "Search bot"
+ },
+ {
+  "regex": "AddThis\\.com",
+  "name": "AddThis.com",
+  "category": "Social Media Agent"
+ },
+ {
+  "includes": "AhrefsBot",
+  "name": "aHrefs Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "AhrefsSiteAudit",
+  "name": "AhrefsSiteAudit",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "ia_archiver|alexabot|verifybot",
+  "name": "Alexa Crawler",
+  "category": "Search bot"
+ },
+ {
+  "includes": "alexa site audit",
+  "name": "Alexa Site Audit",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Amazonbot-Video",
+  "name": "Amazonbot-Video",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Amazonbot",
+  "name": "Amazonbot",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "Amzn-SearchBot",
+  "name": "Amzn-SearchBot",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "Amzn-User",
+  "name": "Amzn-User",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "AmazonAdBot",
+  "name": "Amazon AdBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "NovaAct",
+  "name": "NovaAct",
+  "category": "AI Agent"
+ },
+ {
+  "includes": "AmazonBuyForMe",
+  "name": "AmazonBuyForMe",
+  "category": "AI Agent"
+ },
+ {
+  "includes": "amazon-kendra",
+  "name": "Amazon Kendra",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Amazon[ -]Route ?53[ -]Health[ -]Check[ -]Service",
+  "name": "Amazon Route53 Health Check",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "AmorankSpider",
+  "name": "Amorank Spider",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ApacheBench",
+  "name": "ApacheBench",
+  "category": "Benchmark"
+ },
+ {
+  "includes": "Apache/",
+  "name": "Apache",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "Applebot-Extended",
+  "name": "Applebot-Extended",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "Applebot",
+  "name": "Applebot",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "iTMS",
+  "name": "iTMS",
+  "category": "Crawler"
+ },
+ {
+  "includes": "AppSignalBot",
+  "name": "AppSignalBot",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Arachni",
+  "name": "Arachni",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "AspiegelBot",
+  "name": "AspiegelBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Castro 2, Episode Duration Lookup",
+  "name": "Castro 2",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "Curious George",
+  "name": "Analytics SEO Crawler",
+  "category": "Crawler"
+ },
+ {
+  "regex": "archive\\.org_bot|special_archiver",
+  "name": "archive.org bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Ask Jeeves/Teoma",
+  "name": "Ask Jeeves",
+  "category": "Search bot"
+ },
+ {
+  "regex": "Backlink-Check\\.de",
+  "name": "Backlink-Check.de",
+  "category": "Crawler"
+ },
+ {
+  "includes": "BacklinkCrawler",
+  "name": "BacklinkCrawler",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Baidu.*spider|baidu Transcoder",
+  "name": "Baidu Spider",
+  "category": "Search bot"
+ },
+ {
+  "includes": "BazQux",
+  "name": "BazQux Reader",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "Better Uptime Bot",
+  "name": "Better Uptime Bot",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "MSNBot|msrbot|bingbot|bingadsbot|BingPreview|msnbot-(UDiscovery|NewsBlogs)|adidxbot",
+  "name": "BingBot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Blackbox Exporter",
+  "name": "Blackbox Exporter",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Blekkobot",
+  "name": "Blekkobot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "BLEXBot",
+  "name": "BLEXBot Crawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Bloglovin",
+  "name": "Bloglovin",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "Blogtrottr",
+  "name": "Blogtrottr",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "BoardReader Blog Indexer",
+  "name": "BoardReader Blog Indexer",
+  "category": "Crawler"
+ },
+ {
+  "includes": "BountiiBot",
+  "name": "Bountii Bot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Browsershots",
+  "name": "Browsershots",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "BUbiNG",
+  "name": "BUbiNG",
+  "category": "Crawler"
+ },
+ {
+  "regex": "(?<!HTC)[ _]Butterfly/",
+  "name": "Butterfly Robot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "CareerBot",
+  "name": "CareerBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "CCBot",
+  "name": "ccBot crawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Cliqzbot",
+  "name": "Cliqzbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Cloudflare-AMP",
+  "name": "CloudFlare AMP Fetcher",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Cloudflare-?Diagnostics",
+  "name": "Cloudflare Diagnostics",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "CloudFlare-AlwaysOnline",
+  "name": "CloudFlare Always Online",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Cloudflare-SSLDetector",
+  "name": "Cloudflare SSL Detector",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Cloudflare Custom Hostname Verification",
+  "name": "Cloudflare Custom Hostname Verification",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "Cloudflare-Traffic-Manager",
+  "name": "Cloudflare Traffic Manager",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Cloudflare-Smart-Transit",
+  "name": "Cloudflare Smart Transit",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "CloudflareObservatory",
+  "name": "Cloudflare Observatory",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "https://developers\\.cloudflare\\.com/security-center/",
+  "name": "Cloudflare Security Insights",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "coccoc\\.com",
+  "name": "Cốc Cốc Bot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "collectd",
+  "name": "Collectd",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "CommaFeed",
+  "name": "CommaFeed",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "CSS Certificate Spider",
+  "name": "CSS Certificate Spider",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Datadog Agent|Datadog/?Synthetics",
+  "name": "Datadog Agent",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Datanyze",
+  "name": "Datanyze",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Dataprovider",
+  "name": "Dataprovider",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Daum(?!(?:Apps|Device))",
+  "name": "Daum",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Dazoobot",
+  "name": "Dazoobot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "discobot",
+  "name": "Discobot",
+  "category": "Search bot"
+ },
+ {
+  "regex": "Domain Re-Animator Bot|support@domainreanimator\\.com",
+  "name": "Domain Re-Animator Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "DotBot",
+  "name": "DotBot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "DuckDuck(?:Go-Favicons-)?Bot",
+  "name": "DuckDuckBot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "DuckAssistBot",
+  "name": "DuckAssistBot",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "EasouSpider",
+  "name": "Easou Spider",
+  "category": "Search bot"
+ },
+ {
+  "includes": "eCairn-Grabber",
+  "name": "eCairn-Grabber",
+  "category": "Crawler"
+ },
+ {
+  "includes": "EMail Exractor",
+  "name": "EMail Exractor",
+  "category": "Crawler"
+ },
+ {
+  "includes": "evc-batch",
+  "name": "evc-batch",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Exabot|ExaleadCloudview",
+  "name": "ExaBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ExactSeek Crawler",
+  "name": "ExactSeek Crawler",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Ezooms",
+  "name": "Ezooms",
+  "category": "Crawler"
+ },
+ {
+  "regex": "facebook(?:catalog|externalhit|externalua|platform|scraper)",
+  "name": "Facebook Crawler",
+  "category": "Social Media Agent"
+ },
+ {
+  "includes": "meta-externalagent",
+  "name": "Meta-ExternalAgent",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "meta-externalfetcher",
+  "name": "Meta-ExternalFetcher",
+  "category": "Social Media Agent"
+ },
+ {
+  "includes": "meta-webindexer",
+  "name": "Meta-WebIndexer",
+  "category": "Social Media Agent"
+ },
+ {
+  "includes": "meta-externalads",
+  "name": "Meta-ExternalAds",
+  "category": "Social Media Agent"
+ },
+ {
+  "includes": "FacebookBot",
+  "name": "FacebookBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Feedbin",
+  "name": "Feedbin",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "FeedBurner",
+  "name": "FeedBurner",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "Feed Wrangler",
+  "name": "Feed Wrangler",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "Feedly",
+  "name": "Feedly",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "Feedspot",
+  "name": "Feedspot",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "Fever/",
+  "name": "Fever",
+  "category": "Feed Fetcher"
+ },
+ {
+  "regex": "FlipboardProxy|FlipboardRSS",
+  "name": "Flipboard",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "Findxbot",
+  "name": "Findxbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "FreshRSS",
+  "name": "FreshRSS",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "Genieo",
+  "name": "Genieo Web filter",
+  "category": ""
+ },
+ {
+  "includes": "GigablastOpenSource",
+  "name": "Gigablast",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Gluten Free Crawler",
+  "name": "Gluten Free Crawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "gobuster",
+  "name": "Gobuster",
+  "category": "Unknown"
+ },
+ {
+  "includes": "ichiro",
+  "name": "Goo",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Storebot-Google",
+  "name": "Google StoreBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Google Favicon",
+  "name": "Google Favicon",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Google Search Console",
+  "name": "Google Search Console",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Google Page Speed Insights",
+  "name": "Google PageSpeed Insights",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "google_partner_monitoring",
+  "name": "Google Partner Monitoring",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Google-Cloud-Scheduler",
+  "name": "Google Cloud Scheduler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Google-Structured-Data-Testing-Tool",
+  "name": "Google Structured Data Testing Tool",
+  "category": "Validator"
+ },
+ {
+  "includes": "GoogleStackdriverMonitoring",
+  "name": "Google Stackdriver Monitoring",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Google-Transparency-Report",
+  "name": "Google Transparency Report",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Google-CloudVertexBot",
+  "name": "Google-CloudVertexBot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "Google-Firebase",
+  "name": "Google-Firebase",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "Google-ilp",
+  "name": "Google-ilp",
+  "category": "Crawler"
+ },
+ {
+  "regex": "via ggpht\\.com GoogleImageProxy",
+  "name": "Gmail Image Proxy",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Google-Document-Conversion",
+  "name": "Google-Document-Conversion",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "GoogleDocs; apps-spreadsheets",
+  "name": "Google Sheets",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "GoogleDocs; apps-presentations",
+  "name": "Google Slides",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "GoogleDocs;",
+  "name": "Google Docs",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "SeznamEmailProxy",
+  "name": "Seznam Email Proxy",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Seznam-Zbozi-robot",
+  "name": "Seznam Zbozi.cz",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Heurekabot-Feed",
+  "name": "Heureka Feed",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ShopAlike",
+  "name": "ShopAlike",
+  "category": "Crawler"
+ },
+ {
+  "regex": "deepcrawl\\.com",
+  "name": "Lumar",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Googlebot-News",
+  "name": "Googlebot News",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Google-Site-Verification",
+  "name": "Google-Site-Verification",
+  "category": "Validator"
+ },
+ {
+  "includes": "Google-Read-Aloud",
+  "name": "Google-Read-Aloud",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Adwords-(?:DisplayAds|Express|Instant)|Google Web Preview|Google[ -]Publisher[ -]Plugin|Google-(?:adstxt|Ads-Conversions|Ads-Qualify|Adwords|AMPHTML|Assess|BusinessLinkVerification|HotelAdsVerifier|InspectionTool|Lens|PageRenderer|Shopping-Quality|Sites-Thumbnails|speakr|Stale-Content-Probe|Test|Youtube-Links)|(?:AdsBot|APIs|Feedfetcher|Mediapartners)-Google(?:-Mobile)?|Google(?:AdSenseInfeed|AssociationService|bot|Other|Prober|Producer|Sites)|Google.*/\\+/web/snippet",
+  "name": "Googlebot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Google-NotebookLM",
+  "name": "Google-NotebookLM",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "Google-Extended",
+  "name": "Google-Extended",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "Gemini-Deep-Research",
+  "name": "Gemini-Deep-Research",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "GoogleAgent-Mariner",
+  "name": "GoogleAgent-Mariner",
+  "category": "AI Agent"
+ },
+ {
+  "includes": "GoogleAgent-Search",
+  "name": "GoogleAgent-Search",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "Bard-AI",
+  "name": "Bard-AI",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "Gemini-AI",
+  "name": "Gemini-AI",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "Google-Pinpoint",
+  "name": "Google-Pinpoint",
+  "category": "AI Assistant"
+ },
+ {
+  "regex": "^Google$",
+  "name": "Googlebot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Google-Safety",
+  "name": "Google-Safety",
+  "category": "Crawler"
+ },
+ {
+  "includes": "DuplexWeb-Google",
+  "name": "DuplexWeb-Google",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Google-Area120-PrivacyPolicyFetcher",
+  "name": "Google Area 120 Privacy Policy Fetcher",
+  "category": "Crawler"
+ },
+ {
+  "includes": "HubSpot ",
+  "name": "HubSpot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "vuhuv(?:Bot|RBT)",
+  "name": "vuhuvBot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "HTTPMon",
+  "name": "HTTPMon",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "ICC-Crawler",
+  "name": "ICC-Crawler",
+  "category": "Crawler"
+ },
+ {
+  "regex": "inoreader\\.com",
+  "name": "inoreader",
+  "category": "Feed Reader"
+ },
+ {
+  "includes": "iisbot",
+  "name": "IIS Site Analysis",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ips-agent",
+  "name": "IPS Agent",
+  "category": "Crawler"
+ },
+ {
+  "regex": "IP-Guide\\.com",
+  "name": "IP-Guide Crawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "k6/",
+  "name": "K6",
+  "category": "Unknown"
+ },
+ {
+  "includes": "kouio",
+  "name": "Kouio",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "larbin",
+  "name": "Larbin web crawler",
+  "category": "Crawler"
+ },
+ {
+  "regex": "[A-z0-9]*-Lighthouse",
+  "name": "Lighthouse",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "last-modified\\.com",
+  "name": "LastMod Bot",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "linkdexbot|linkdex\\.com",
+  "name": "Linkdex Bot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "LinkedInBot",
+  "name": "LinkedIn Bot",
+  "category": "Social Media Agent"
+ },
+ {
+  "includes": "ltx71",
+  "name": "LTX71",
+  "category": "Security Checker"
+ },
+ {
+  "regex": "Mail\\.RU",
+  "name": "Mail.Ru Bot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "magpie-crawler",
+  "name": "Magpie-Crawler",
+  "category": "Social Media Agent"
+ },
+ {
+  "includes": "MagpieRSS",
+  "name": "MagpieRSS",
+  "category": "Feed Parser"
+ },
+ {
+  "includes": "masscan-ng",
+  "name": "masscan-ng",
+  "category": "Crawler"
+ },
+ {
+  "regex": ".*masscan",
+  "name": "masscan",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Mastodon/",
+  "name": "Mastodon Bot",
+  "category": "Social Media Agent"
+ },
+ {
+  "includes": "meanpathbot",
+  "name": "Meanpath Bot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "MetaJobBot",
+  "name": "MetaJobBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "MetaInspector",
+  "name": "MetaInspector",
+  "category": "Crawler"
+ },
+ {
+  "includes": "MixrankBot",
+  "name": "MixRank Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "MJ12bot",
+  "name": "MJ12 Bot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Mnogosearch",
+  "name": "Mnogosearch",
+  "category": "Search bot"
+ },
+ {
+  "includes": "MojeekBot",
+  "name": "MojeekBot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "munin",
+  "name": "Munin",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "NalezenCzBot",
+  "name": "NalezenCzBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "check_http/v",
+  "name": "Nagios check_http",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "nbertaupete95\\(at\\)gmail\\.com",
+  "name": "nbertaupete95",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Netcraft(?: Web Server Survey| SSL Server Survey|SurveyAgent)",
+  "name": "Netcraft Survey Bot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "netEstate NE Crawler",
+  "name": "netEstate",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Netvibes",
+  "name": "Netvibes",
+  "category": "Feed Fetcher"
+ },
+ {
+  "regex": "NewsBlur .*(?:Fetcher|Finder)",
+  "name": "NewsBlur",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "NewsGatorOnline",
+  "name": "NewsGator",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "nlcrawler",
+  "name": "NLCrawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Nmap Scripting Engine",
+  "name": "Nmap",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "Nuzzel",
+  "name": "Nuzzel",
+  "category": "Crawler"
+ },
+ {
+  "includes": "NodePing",
+  "name": "NodePing",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "Octopus [\\d.]+",
+  "name": "Octopus",
+  "category": "Unknown"
+ },
+ {
+  "regex": "OnlineOrNot\\.com_bot",
+  "name": "OnlineOrNot Bot",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "webzio-extended",
+  "name": "webzio-extended",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "webzio",
+  "name": "webzio",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "omgili",
+  "name": "Omgilibot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "OpenindexSpider",
+  "name": "Openindex Spider",
+  "category": "Search bot"
+ },
+ {
+  "includes": "spbot",
+  "name": "OpenLinkProfiler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "OpenWebSpider",
+  "name": "OpenWebSpider",
+  "category": "Crawler"
+ },
+ {
+  "regex": "OrangeBot|VoilaBot",
+  "name": "Orange Bot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "PaperLiBot",
+  "name": "PaperLiBot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "phantomas/",
+  "name": "Phantomas",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "phpservermon",
+  "name": "PHP Server Monitor",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "Pocket(?:ImageCache|Parser)",
+  "name": "Pocket",
+  "category": "Read-it-later Service"
+ },
+ {
+  "includes": "PritTorrent",
+  "name": "PritTorrent",
+  "category": "Crawler"
+ },
+ {
+  "includes": "PRTG Network Monitor",
+  "name": "PRTG Network Monitor",
+  "category": "Network Monitor"
+ },
+ {
+  "includes": "psbot",
+  "name": "Picsearch bot",
+  "category": "Search bot"
+ },
+ {
+  "regex": "Pingdom(?:\\.com|TMS)",
+  "name": "Pingdom Bot",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Quora Link Preview",
+  "name": "Quora Link Preview",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Quora-Bot",
+  "name": "Quora Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "RamblerMail",
+  "name": "RamblerMail Image Proxy",
+  "category": "Crawler"
+ },
+ {
+  "includes": "QuerySeekerSpider",
+  "name": "QuerySeekerSpider",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Qwantify|Qwantbot",
+  "name": "Qwantbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Rainmeter",
+  "name": "Rainmeter",
+  "category": "Crawler"
+ },
+ {
+  "includes": "redditbot",
+  "name": "Reddit Bot",
+  "category": "Social Media Agent"
+ },
+ {
+  "includes": "Riddler",
+  "name": "Riddler",
+  "category": "Security search bot"
+ },
+ {
+  "includes": "rogerbot",
+  "name": "Rogerbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ROI Hunter",
+  "name": "ROI Hunter",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SafeDNSBot",
+  "name": "SafeDNSBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Scrapy",
+  "name": "Scrapy",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Screaming Frog SEO Spider",
+  "name": "Screaming Frog SEO Spider",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ScreenerBot",
+  "name": "ScreenerBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SemrushBot",
+  "name": "SemrushBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "BacklinksExtendedBot",
+  "name": "BacklinksExtendedBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SerpReputationManagementAgent",
+  "name": "Semrush Reputation Management",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "SplitSignalBot",
+  "name": "SplitSignalBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SiteAuditBot",
+  "name": "SiteAuditBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SensikaBot",
+  "name": "Sensika Bot",
+  "category": ""
+ },
+ {
+  "regex": "SEOENG(?:World)?Bot",
+  "name": "SEOENGBot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "seoscanners\\.net",
+  "name": "Seoscanners.net",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SkypeUriPreview",
+  "name": "Skype URI Preview",
+  "category": "Service Agent"
+ },
+ {
+  "regex": "SeznamBot|SklikBot|Seznam screenshot-generator",
+  "name": "Seznam Bot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "shopify-partner-homepage-scraper",
+  "name": "Shopify Partner",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ShopWiki",
+  "name": "ShopWiki",
+  "category": "Search tools"
+ },
+ {
+  "includes": "SilverReader",
+  "name": "SilverReader",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "SimplePie",
+  "name": "SimplePie",
+  "category": "Feed Parser"
+ },
+ {
+  "includes": "SISTRIX Crawler",
+  "name": "SISTRIX Crawler",
+  "category": "Crawler"
+ },
+ {
+  "regex": "compatible; (?:SISTRIX )?Optimizer",
+  "name": "SISTRIX Optimizer",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SiteSucker",
+  "name": "SiteSucker",
+  "category": "Crawler"
+ },
+ {
+  "regex": "sixy\\.ch",
+  "name": "Sixy.ch",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "Slackbot|Slack-ImgProxy",
+  "name": "Slackbot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Sogou[ -](?:head|inst|Orion|Pic|Test|web)[ -]spider|New-Sogou-Spider",
+  "name": "Sogou Spider",
+  "category": "Search bot"
+ },
+ {
+  "regex": "Sosospider|Sosoimagespider",
+  "name": "Soso Spider",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Sprinklr",
+  "name": "Sprinklr",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SSL Labs",
+  "name": "SSL Labs",
+  "category": "Validator"
+ },
+ {
+  "includes": "StatusCake",
+  "name": "StatusCake",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Superfeedr bot",
+  "name": "Superfeedr Bot",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "Sparkler",
+  "name": "Sparkler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Spinn3r",
+  "name": "Spinn3r",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SputnikBot",
+  "name": "Sputnik Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SputnikFaviconBot",
+  "name": "Sputnik Favicon Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SputnikImageBot",
+  "name": "Sputnik Image Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SurveyBot",
+  "name": "Survey Bot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "TarmotGezgin",
+  "name": "Tarmot Gezgin",
+  "category": "Search bot"
+ },
+ {
+  "includes": "TelegramBot",
+  "name": "TelegramBot",
+  "category": "Unknown"
+ },
+ {
+  "includes": "TLSProbe",
+  "name": "TLSProbe",
+  "category": "Security search bot"
+ },
+ {
+  "includes": "TinEye-bot",
+  "name": "TinEye Crawler",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Tiny Tiny RSS",
+  "name": "Tiny Tiny RSS",
+  "category": "Feed Fetcher"
+ },
+ {
+  "regex": "theoldreader\\.com",
+  "name": "theoldreader",
+  "category": "Feed Reader"
+ },
+ {
+  "regex": "Trackable/0\\.1",
+  "name": "Chartable",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "trendictionbot",
+  "name": "Trendiction Bot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "^Turnitin(?:Bot)?",
+  "name": "TurnitinBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "TweetedTimes",
+  "name": "TweetedTimes Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "TweetmemeBot",
+  "name": "Tweetmeme Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Twingly Recon",
+  "name": "Twingly Recon",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Twitterbot",
+  "name": "Twitterbot",
+  "category": "Social Media Agent"
+ },
+ {
+  "includes": "UniversalFeedParser",
+  "name": "UniversalFeedParser",
+  "category": "Feed Fetcher"
+ },
+ {
+  "regex": "via secureurl\\.fwdcdn\\.com",
+  "name": "UkrNet Mail Proxy",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Uptime(?:bot)?/",
+  "name": "Uptimebot",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "UptimeRobot",
+  "name": "UptimeRobot",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "URLAppendBot",
+  "name": "URLAppendBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Vagabondo",
+  "name": "Vagabondo",
+  "category": "Crawler"
+ },
+ {
+  "includes": "vkShare; ",
+  "name": "VK Share Button",
+  "category": "Crawler"
+ },
+ {
+  "includes": "VKRobot",
+  "name": "VK Robot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "VSMCrawler",
+  "name": "Visual Site Mapper Crawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Jigsaw",
+  "name": "W3C CSS Validator",
+  "category": "Validator"
+ },
+ {
+  "includes": "W3C_I18n-Checker",
+  "name": "W3C I18N Checker",
+  "category": "Validator"
+ },
+ {
+  "includes": "W3C-checklink",
+  "name": "W3C Link Checker",
+  "category": "Validator"
+ },
+ {
+  "regex": "W3C_Validator|Validator\\.nu",
+  "name": "W3C Markup Validation Service",
+  "category": "Validator"
+ },
+ {
+  "includes": "W3C-mobileOK",
+  "name": "W3C MobileOK Checker",
+  "category": "Validator"
+ },
+ {
+  "includes": "W3C_Unicorn",
+  "name": "W3C Unified Validator",
+  "category": "Validator"
+ },
+ {
+  "includes": "P3P Validator",
+  "name": "W3C P3P Validator",
+  "category": "Validator"
+ },
+ {
+  "includes": "Wappalyzer",
+  "name": "Wappalyzer",
+  "category": "Unknown"
+ },
+ {
+  "includes": "PTST/",
+  "name": "WebPageTest",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "WeSEE",
+  "name": "WeSEE:Search",
+  "category": "Search bot"
+ },
+ {
+  "includes": "WebbCrawler",
+  "name": "WebbCrawler",
+  "category": "Crawler"
+ },
+ {
+  "regex": "websitepulse[+ ]checker",
+  "name": "WebSitePulse",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "WordPress.+isitwp\\.com",
+  "name": "IsItWP",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Automattic Analytics Crawler",
+  "name": "Automattic Analytics",
+  "category": "Crawler"
+ },
+ {
+  "regex": "WordPress\\.com mShots",
+  "name": "WordPress.com mShots",
+  "category": "Service Agent"
+ },
+ {
+  "regex": "wp\\.com feedbot",
+  "name": "wp.com feedbot",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "WordPress",
+  "name": "WordPress",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "Wotbox",
+  "name": "Wotbox",
+  "category": "Search bot"
+ },
+ {
+  "includes": "XenForo",
+  "name": "XenForo",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "yacybot",
+  "name": "YaCy",
+  "category": "Search bot"
+ },
+ {
+  "regex": "Yahoo! Slurp|Yahoo!-AdCrawler",
+  "name": "Yahoo! Slurp",
+  "category": "Search bot"
+ },
+ {
+  "regex": "Yahoo Link Preview|Yahoo:LinkExpander:Slingstone",
+  "name": "Yahoo! Link Preview",
+  "category": "Crawler"
+ },
+ {
+  "includes": "YahooMailProxy",
+  "name": "Yahoo! Mail Proxy",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "YahooCacheSystem",
+  "name": "Yahoo! Cache System",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Y!J-(ASR|BR[IJOWY]|[BPW]SC)",
+  "name": "Yahoo! Japan $1",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Y!J",
+  "name": "Yahoo! Japan",
+  "category": "Crawler"
+ },
+ {
+  "regex": "YandexBot.+MirrorDetector",
+  "name": "YandexBot-MirrorDetector",
+  "category": "Crawler"
+ },
+ {
+  "regex": "(Yandex(?:(?:\\.Gazeta |Accessibility|Com|Mobile|MobileScreenShot|RenderResources|Screenshot|Sprav)?Bot|(?:AdNet|Antivirus|Blogs|Calendar|Catalog|Dialogs|Direct(?:Dyn)?|Favicons|ForDomain|ImageResizer|Images|Market|Media(?:naBot)?|Metrika|News(?:links)?|OntoDB(?:API)?|Pagechecker|Partner|RCA|SearchShop|(?:News|Site)links|Tracker|Turbo|Userproxy|Verticals|Vertis|Video(?:Parser)?|Webmaster))|YaDirectFetcher)",
+  "name": "$1",
+  "category": "Search bot"
+ },
+ {
+  "includes": "YandexAdditional",
+  "name": "YandexAdditionalBot",
+  "category": "AI Search Crawler"
+ },
+ {
+  "regex": "Yeti|NaverJapan|AdsBot-Naver",
+  "name": "Yeti/Naverbot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "YoudaoBot",
+  "name": "Youdao Bot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "YOURLS",
+  "name": "Yourls",
+  "category": "Crawler"
+ },
+ {
+  "regex": "YRSpider|YYSpider",
+  "name": "Yunyun Bot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "zgrab",
+  "name": "zgrab",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "Zookabot",
+  "name": "Zookabot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ZumBot",
+  "name": "ZumBot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "YottaaMonitor",
+  "name": "Yottaa Site Monitor",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "Yahoo Ad monitoring.*yahoo-ad-monitoring-SLN24857",
+  "name": "Yahoo Gemini",
+  "category": "Crawler"
+ },
+ {
+  "regex": ".*Java.*outbrain",
+  "name": "Outbrain",
+  "category": "Crawler"
+ },
+ {
+  "regex": "HubPages.*crawlingpolicy",
+  "name": "HubPages",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Pinterest(?:bot)?/.*www\\.pinterest\\.com",
+  "name": "Pinterest",
+  "category": "Crawler"
+ },
+ {
+  "regex": ".*Site24x7",
+  "name": "Site24x7 Website Monitoring",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": ".* HLB",
+  "name": "Site24x7 Defacement Monitor",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "s~snapchat-proxy",
+  "name": "Snapchat Proxy",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Snap URL Preview Service",
+  "name": "Snap URL Preview Service",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "SnapchatAds",
+  "name": "Snapchat Ads",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Let's Encrypt validation server",
+  "name": "Let's Encrypt Validation",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "GrapeshotCrawler",
+  "name": "Grapeshot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "www\\.monitor\\.us",
+  "name": "Monitor.Us",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Catchpoint",
+  "name": "Catchpoint",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "bitlybot",
+  "name": "BitlyBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Zao/",
+  "name": "Zao",
+  "category": "Crawler"
+ },
+ {
+  "includes": "lycos",
+  "name": "Lycos",
+  "category": "Unknown"
+ },
+ {
+  "includes": "Slurp",
+  "name": "Inktomi Slurp",
+  "category": "Unknown"
+ },
+ {
+  "regex": "Speedy ?Spider",
+  "name": "Speedy",
+  "category": "Unknown"
+ },
+ {
+  "regex": "nrsbot|NetResearchServer",
+  "name": "NetResearchServer",
+  "category": "Unknown"
+ },
+ {
+  "includes": "scooter",
+  "name": "Scooter",
+  "category": "Unknown"
+ },
+ {
+  "includes": "gigabot",
+  "name": "Gigabot",
+  "category": "Unknown"
+ },
+ {
+  "includes": "charlotte",
+  "name": "Charlotte",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Pompos",
+  "name": "Pompos",
+  "category": "Crawler"
+ },
+ {
+  "includes": "PagePeeker",
+  "name": "PagePeeker",
+  "category": "Crawler"
+ },
+ {
+  "includes": "WebThumbnail",
+  "name": "WebThumbnail",
+  "category": "Unknown"
+ },
+ {
+  "includes": "Willow Internet Crawler",
+  "name": "Willow Internet Crawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "EmailWolf",
+  "name": "EmailWolf",
+  "category": "Unknown"
+ },
+ {
+  "includes": "NetLyzer FastProbe",
+  "name": "NetLyzer FastProbe",
+  "category": "Unknown"
+ },
+ {
+  "regex": "AdMantX.*admantx\\.com",
+  "name": "ADMantX",
+  "category": "Unknown"
+ },
+ {
+  "includes": "Server Density Service Monitoring",
+  "name": "Server Density",
+  "category": "Unknown"
+ },
+ {
+  "regex": "RSSRadio \\(Push Notification Scanner;support@dorada\\.co\\.uk\\)",
+  "name": "RSSRadio Bot",
+  "category": "Unknown"
+ },
+ {
+  "regex": "^sentry",
+  "name": "Sentry Bot",
+  "category": "Unknown"
+ },
+ {
+  "regex": "^Spotify/[\\d.]+$",
+  "name": "Spotify",
+  "category": "Unknown"
+ },
+ {
+  "includes": "Embedly",
+  "name": "Embedly",
+  "category": "Crawler"
+ },
+ {
+  "includes": "BrandVerity",
+  "name": "BrandVerity",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Kaspersky Lab CFR link resolver",
+  "name": "Kaspersky",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "eZ Publish Link Validator",
+  "name": "eZ Publish Link Validator",
+  "category": "Crawler"
+ },
+ {
+  "includes": "woorankreview",
+  "name": "WooRank",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Siteimprove",
+  "name": "Siteimprove",
+  "category": "Search bot"
+ },
+ {
+  "includes": "CATExplorador",
+  "name": "CATExplorador",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Buck",
+  "name": "Buck",
+  "category": "Search bot"
+ },
+ {
+  "includes": "tracemyfile",
+  "name": "TraceMyFile",
+  "category": "Search bot"
+ },
+ {
+  "regex": "zelist\\.ro feed parser",
+  "name": "Ze List",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "weborama-fetcher",
+  "name": "Weborama",
+  "category": "Search bot"
+ },
+ {
+  "includes": "BoardReader Favicon Fetcher",
+  "name": "BoardReader",
+  "category": "Search bot"
+ },
+ {
+  "regex": "IDG/(?:EU|IT|RU|UK)",
+  "name": "IDG",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Bytespider",
+  "name": "Bytespider",
+  "category": "Search bot"
+ },
+ {
+  "includes": "TikTokSpider",
+  "name": "TikTokSpider",
+  "category": "Search bot"
+ },
+ {
+  "includes": "WikiDo",
+  "name": "WikiDo",
+  "category": "Search bot"
+ },
+ {
+  "regex": "Awario(?:Smart)?Bot",
+  "name": "Awario",
+  "category": "Search bot"
+ },
+ {
+  "includes": "AwarioRssBot",
+  "name": "Awario",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "oBot",
+  "name": "oBot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "SMTBot",
+  "name": "SMTBot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "LCC",
+  "name": "LCC",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Startpagina-Linkchecker",
+  "name": "Startpagina Linkchecker",
+  "category": "Search bot"
+ },
+ {
+  "includes": "MoodleBot-Linkchecker",
+  "name": "MoodleBot Linkchecker",
+  "category": "Search bot"
+ },
+ {
+  "includes": "GTmetrix",
+  "name": "GTmetrix",
+  "category": "Crawler"
+ },
+ {
+  "regex": "CyberFind ?Crawler",
+  "name": "CyberFind Crawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Nutch",
+  "name": "Nutch-based Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Seobility",
+  "name": "Seobility",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Vercelbot",
+  "name": "Vercel Bot",
+  "category": "Service bot"
+ },
+ {
+  "includes": "Grammarly",
+  "name": "Grammarly",
+  "category": "Service bot"
+ },
+ {
+  "includes": "Domains Project",
+  "name": "Domains Project",
+  "category": "Crawler"
+ },
+ {
+  "includes": "PetalBot",
+  "name": "Petal Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SerendeputyBot",
+  "name": "Serendeputy Bot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "ias-(?:va|sg).*admantx.*service-fetcher|admantx\\.com.*service-fetcher",
+  "name": "ADmantX Service Fetcher",
+  "category": "Service bot"
+ },
+ {
+  "includes": "SemanticScholarBot",
+  "name": "Semantic Scholar Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "VelenPublicWebCrawler",
+  "name": "Velen Public Web Crawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Barkrowler",
+  "name": "Barkrowler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "BDCbot",
+  "name": "BDCbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "adbeat",
+  "name": "Adbeat",
+  "category": "Crawler"
+ },
+ {
+  "regex": "(?:BuiltWith|BW/)",
+  "name": "BuiltWith",
+  "category": "Crawler"
+ },
+ {
+  "regex": "https://whatis\\.contentkingapp\\.com",
+  "name": "ContentKing",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "MicroAdBot",
+  "name": "MicroAdBot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "PingAdmin\\.Ru",
+  "name": "PingAdmin.Ru",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "notifyninja.+monitoring",
+  "name": "Notify Ninja",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "WebDataStats",
+  "name": "WebDataStats",
+  "category": "Crawler"
+ },
+ {
+  "regex": "parse\\.ly scraper",
+  "name": "parse.ly",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Nimbostratus-Bot",
+  "name": "Nimbostratus Bot",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "HeartRails_Capture",
+  "name": "HeartRails Capture",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "Project-Resonance",
+  "name": "Project Resonance",
+  "category": "Crawler"
+ },
+ {
+  "includes": "DataXu",
+  "name": "DataXu",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "Cocolyzebot",
+  "name": "Cocolyzebot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "veryhip",
+  "name": "VeryHip",
+  "category": "Crawler"
+ },
+ {
+  "includes": "LinkpadBot",
+  "name": "LinkpadBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "MuscatFerret",
+  "name": "MuscatFerret",
+  "category": "Crawler"
+ },
+ {
+  "regex": "PageThing\\.com",
+  "name": "PageThing",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ArchiveBox",
+  "name": "ArchiveBox",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Choosito",
+  "name": "Choosito",
+  "category": "Crawler"
+ },
+ {
+  "includes": "datagnionbot",
+  "name": "datagnionbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "WhatCMS",
+  "name": "WhatCMS",
+  "category": "Crawler"
+ },
+ {
+  "includes": "httpx",
+  "name": "httpx",
+  "category": "Crawler"
+ },
+ {
+  "regex": ".*\\.oast\\.",
+  "name": "Interactsh",
+  "category": "Security Checker"
+ },
+ {
+  "regex": "(?:expanseinc|paloaltonetworks)\\.com",
+  "name": "Cortex Xpanse",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "HuaweiWebCatBot",
+  "name": "HuaweiWebCatBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Hatena-Favicon",
+  "name": "Hatena Favicon",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Hatena-?Bookmark",
+  "name": "Hatena Bookmark",
+  "category": "Crawler"
+ },
+ {
+  "includes": "RyowlEngine",
+  "name": "Ryowl",
+  "category": "Crawler"
+ },
+ {
+  "includes": "OdklBot",
+  "name": "Odnoklassniki Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Mediatoolkitbot",
+  "name": "Mediatoolkit Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ZoominfoBot",
+  "name": "ZoominfoBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "WeViKaBot",
+  "name": "WeViKaBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SEOkicks",
+  "name": "SEOkicks",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Plukkie",
+  "name": "Plukkie",
+  "category": "Crawler"
+ },
+ {
+  "includes": "proximic;",
+  "name": "Comscore",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SurdotlyBot",
+  "name": "SurdotlyBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Gowikibot",
+  "name": "Gowikibot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SabsimBot",
+  "name": "SabsimBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "LumtelBot",
+  "name": "LumtelBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "PiplBot",
+  "name": "PiplBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "woobot",
+  "name": "WooRank",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Cookiebot",
+  "name": "Cookiebot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "NetSystemsResearch",
+  "name": "NetSystemsResearch",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "CensysInspect",
+  "name": "CensysInspect",
+  "category": "Security Checker"
+ },
+ {
+  "regex": "gdnplus\\.com",
+  "name": "GDNP",
+  "category": "Crawler"
+ },
+ {
+  "includes": "WellKnownBot",
+  "name": "WellKnownBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Adsbot",
+  "name": "Adsbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "MTRobot",
+  "name": "MTRobot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "serpstatbot",
+  "name": "serpstatbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "colly",
+  "name": "colly",
+  "category": "Crawler"
+ },
+ {
+  "includes": "l9tcpid",
+  "name": "l9tcpid",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "l9explore",
+  "name": "l9explore",
+  "category": "Security Checker"
+ },
+ {
+  "regex": "l9scan/|^Lkx-.*/",
+  "name": "LeakIX",
+  "category": "Security Checker"
+ },
+ {
+  "regex": "MegaIndex\\.ru",
+  "name": "MegaIndex",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Seekport",
+  "name": "Seekport",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Seolyt(?:Bot)?",
+  "name": "SeolytBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "YaK/",
+  "name": "YaK",
+  "category": "Crawler"
+ },
+ {
+  "includes": "KomodiaBot",
+  "name": "KomodiaBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "KStandBot",
+  "name": "KStandBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Neevabot",
+  "name": "Neevabot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Chatwork LinkPreview",
+  "name": "Chatwork LinkPreview",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "LinkPreview",
+  "name": "LinkPreview",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "JungleKeyThumbnail",
+  "name": "JungleKeyThumbnail",
+  "category": "Crawler"
+ },
+ {
+  "regex": "rocketmonitor(?:bot)?",
+  "name": "RocketMonitorBot",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "SitemapParser-VIPnytt",
+  "name": "SitemapParser-VIPnytt",
+  "category": "Crawler"
+ },
+ {
+  "regex": "DMBrowser|DMBrowser-[UB]V",
+  "name": "Dotcom Monitor",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "DataForSeoBot",
+  "name": "DataForSeoBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Discordbot",
+  "name": "Discord Bot",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "Linespider",
+  "name": "Linespider",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Cincraw",
+  "name": "Cincraw",
+  "category": "Crawler"
+ },
+ {
+  "includes": "CISPA Web Analyzer",
+  "name": "CISPA Web Analyzer",
+  "category": "Crawler"
+ },
+ {
+  "includes": "IonCrawl",
+  "name": "IONOS Crawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Crawldad",
+  "name": "Crawldad",
+  "category": "Crawler"
+ },
+ {
+  "regex": "https://securitytxt-scan\\.cs\\.hm\\.edu/",
+  "name": "security.txt scanserver",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "TigerBot",
+  "name": "TigerBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "TestCrawler",
+  "name": "TestCrawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "CrowdTanglebot",
+  "name": "CrowdTangle",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Sellers\\.Guide Crawler by Primis",
+  "name": "Sellers.Guide",
+  "category": "Crawler"
+ },
+ {
+  "includes": "OnalyticaBot",
+  "name": "Onalytica",
+  "category": "Crawler"
+ },
+ {
+  "includes": "deepnoc",
+  "name": "deepnoc",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Newslitbot",
+  "name": "Newslitbot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "um-(?:ANS|CC|FC|IC|LN)",
+  "name": "uMBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Abonti",
+  "name": "Abonti",
+  "category": "Crawler"
+ },
+ {
+  "regex": "collection@infegy\\.com",
+  "name": "Infegy",
+  "category": "Crawler"
+ },
+ {
+  "regex": "HTTP Banner Detection \\(https://security\\.ipip\\.net\\)",
+  "name": "IPIP",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "ev-crawler",
+  "name": "Headline",
+  "category": "Crawler"
+ },
+ {
+  "includes": "webprosbot",
+  "name": "WebPros",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ELB-HealthChecker",
+  "name": "Amazon ELB",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "Wheregoes\\.com Redirect Checker",
+  "name": "WhereGoes",
+  "category": "Crawler"
+ },
+ {
+  "includes": "project_patchwatch",
+  "name": "Project Patchwatch",
+  "category": "Crawler"
+ },
+ {
+  "includes": "InternetMeasurement",
+  "name": "InternetMeasurement",
+  "category": "Crawler"
+ },
+ {
+  "includes": "DomainAppender",
+  "name": "DomainAppender",
+  "category": "Crawler"
+ },
+ {
+  "includes": "FreeWebMonitoring SiteChecker",
+  "name": "FreeWebMonitoring",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Page Modified Pinger",
+  "name": "Page Modified Pinger",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "adstxtlab\\.com",
+  "name": "adstxtlab.com",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Iframely",
+  "name": "Iframely",
+  "category": "Crawler"
+ },
+ {
+  "includes": "DomainStatsBot",
+  "name": "DomainStatsBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "aiHitBot",
+  "name": "aiHitBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "DomainCrawler/",
+  "name": "DomainCrawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "AdAuth",
+  "name": "AdAuth",
+  "category": "Crawler"
+ },
+ {
+  "regex": "faveeo\\.com",
+  "name": "Faveeo",
+  "category": "Crawler"
+ },
+ {
+  "regex": "kozmonavt\\.",
+  "name": "Kozmonavt",
+  "category": "Crawler"
+ },
+ {
+  "includes": "CriteoBot/",
+  "name": "CriteoBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "PayPal IPN",
+  "name": "PayPal IPN",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "MaCoCu",
+  "name": "MaCoCu",
+  "category": "Crawler"
+ },
+ {
+  "includes": "CLASSLA",
+  "name": "CLASSLA-web",
+  "category": "Crawler"
+ },
+ {
+  "regex": "dnt-policy@eff\\.org",
+  "name": "EFF Do Not Track Verifier",
+  "category": "Crawler"
+ },
+ {
+  "includes": "InfoTigerBot",
+  "name": "InfoTigerBot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "(?:Birdcrawlerbot|CrawlaDeBot)",
+  "name": "Birdcrawlerbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ScamadviserExternalHit",
+  "name": "Scamadviser External Hit",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ZaldamoSearchBot",
+  "name": "Zaldamo",
+  "category": "Crawler"
+ },
+ {
+  "includes": "AFB",
+  "name": "Allloadin Favicon Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "LinkWalker",
+  "name": "LinkWalker",
+  "category": "Crawler"
+ },
+ {
+  "includes": "RenovateBot",
+  "name": "RenovateBot",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "INETDEX-BOT",
+  "name": "Inetdex Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "NETZZAPPEN",
+  "name": "NETZZAPPEN",
+  "category": "Crawler"
+ },
+ {
+  "regex": "panscient\\.com",
+  "name": "Panscient",
+  "category": "Crawler"
+ },
+ {
+  "regex": "research@pdrlabs\\.net",
+  "name": "PDR Labs",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "Nicecrawler",
+  "name": "NiceCrawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "t3versionsBot",
+  "name": "t3versions",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Crawlson",
+  "name": "Crawlson",
+  "category": "Crawler"
+ },
+ {
+  "includes": "tchelebi",
+  "name": "tchelebi",
+  "category": "Crawler"
+ },
+ {
+  "includes": "JobboerseBot",
+  "name": "JobboerseBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "RepoLookoutBot",
+  "name": "Repo Lookout",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "PATHspider",
+  "name": "PATHspider",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "everyfeed-spider",
+  "name": "Everyfeed",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "Exchange check",
+  "name": "Exchange check",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "Sublinq",
+  "name": "Sublinq",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Gregarius",
+  "name": "Gregarius",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "COMODO DCV",
+  "name": "COMODO DCV",
+  "category": "Service Agent"
+ },
+ {
+  "regex": "Sectigo DCV|acme\\.sectigo\\.com",
+  "name": "Sectigo DCV",
+  "category": "Service Agent"
+ },
+ {
+  "regex": "KlarnaBot-(?:DownloadProductImage|EnrichProducts|PriceWatcher)",
+  "name": "KlarnaBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Taboolabot",
+  "name": "Taboolabot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Asana",
+  "name": "Asana",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Chrome Privacy Preserving Prefetch Proxy",
+  "name": "Chrome Privacy Preserving Prefetch Proxy",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "URLinspectorBot",
+  "name": "URLinspector",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "EntferBot",
+  "name": "Entfer",
+  "category": "Crawler"
+ },
+ {
+  "includes": "TagInspector",
+  "name": "Tag Inspector",
+  "category": "Crawler"
+ },
+ {
+  "includes": "pageburst",
+  "name": "Pageburst",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Doximity-Diffbot",
+  "name": "Doximity-Diffbot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "regex": ".+diffbot",
+  "name": "Diffbot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "DisqusAdstxtCrawler",
+  "name": "Disqus",
+  "category": "Crawler"
+ },
+ {
+  "includes": "startmebot",
+  "name": "start.me",
+  "category": "Crawler"
+ },
+ {
+  "includes": "2ip bot",
+  "name": "2ip",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ReqBin Curl Client",
+  "name": "ReqBin",
+  "category": "Crawler"
+ },
+ {
+  "includes": "XoviBot",
+  "name": "XoviBot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Overcast/.+Podcast Sync",
+  "name": "Overcast Podcast Sync",
+  "category": "Service Agent"
+ },
+ {
+  "regex": "^Verity",
+  "name": "GumGum Verity",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "hackermention",
+  "name": "hackermention",
+  "category": "Feed Reader"
+ },
+ {
+  "includes": "BitSightBot",
+  "name": "BitSight",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "Ezgif",
+  "name": "Ezgif",
+  "category": "Service Agent"
+ },
+ {
+  "regex": "intelx\\.io_bot",
+  "name": "Intelligence X",
+  "category": "Crawler"
+ },
+ {
+  "includes": "FemtosearchBot",
+  "name": "Femtosearch",
+  "category": "Crawler"
+ },
+ {
+  "includes": "AdsTxtCrawler/",
+  "name": "AdsTxtCrawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Morningscore",
+  "name": "Morningscore Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Uptime-Kuma",
+  "name": "Uptime-Kuma",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "OAI-SearchBot",
+  "name": "OAI-SearchBot",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "GPTBot",
+  "name": "GPTBot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "ChatGPT-User",
+  "name": "ChatGPT-User",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "ChatGPT-Browser",
+  "name": "ChatGPT-Browser",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "BrightEdge Crawler",
+  "name": "BrightEdge",
+  "category": "Crawler"
+ },
+ {
+  "includes": "sfFeedReader",
+  "name": "sfFeedReader",
+  "category": "Feed Fetcher"
+ },
+ {
+  "regex": "cyberscan\\.io",
+  "name": "Cyberscan",
+  "category": "Security Checker"
+ },
+ {
+  "regex": "researchscan\\.comsys\\.rwth-aachen\\.de",
+  "name": "Research Scan",
+  "category": "Crawler"
+ },
+ {
+  "includes": "newspaper",
+  "name": "Scraping Robot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Ant(?:\\.com beta|Bot)",
+  "name": "Ant",
+  "category": "Crawler"
+ },
+ {
+  "includes": "WebwikiBot",
+  "name": "Webwiki",
+  "category": "Crawler"
+ },
+ {
+  "includes": "phpMyAdmin",
+  "name": "phpMyAdmin",
+  "category": "Service Agent"
+ },
+ {
+  "regex": "Matomo/[\\d.]+",
+  "name": "Matomo",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "Prometheus",
+  "name": "Prometheus",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "ArchiveTeam ArchiveBot",
+  "name": "ArchiveBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "MADBbot",
+  "name": "MADBbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "MeltwaterNews",
+  "name": "MeltwaterNews",
+  "category": "Crawler"
+ },
+ {
+  "includes": "owler",
+  "name": "OWLer",
+  "category": "Crawler"
+ },
+ {
+  "regex": "bbc\\.co\\.uk/display/men/Page\\+Monitor",
+  "name": "BBC Page Monitor",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "BBC-Forge-URL-Monitor-Twisted",
+  "name": "BBC Forge URL Monitor",
+  "category": "Site Monitor"
+ },
+ {
+  "regex": "ClaudeBot|Anthropic-Claude",
+  "name": "ClaudeBot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "Claude-SearchBot",
+  "name": "Claude-SearchBot",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "Claude-User",
+  "name": "Claude-User",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "Claude-Web",
+  "name": "Claude-Web",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "Imagesift",
+  "name": "ImageSift",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "TactiScout",
+  "name": "TactiScout",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Brightbot",
+  "name": "BrightBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "DaspeedBot",
+  "name": "DaspeedBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "StractBot",
+  "name": "Stract",
+  "category": "Crawler"
+ },
+ {
+  "includes": "GeedoBot",
+  "name": "GeedoBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "GeedoProductSearch",
+  "name": "GeedoProductSearch",
+  "category": "Crawler"
+ },
+ {
+  "includes": "BackupLand",
+  "name": "BackupLand",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Konturbot",
+  "name": "Konturbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "keys-so-bot",
+  "name": "Keys.so",
+  "category": "Crawler"
+ },
+ {
+  "includes": "LetsearchBot",
+  "name": "LetSearch",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Example3",
+  "name": "Example3",
+  "category": "Crawler"
+ },
+ {
+  "includes": "StatOnlineRuBot",
+  "name": "StatOnline.ru",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Spawning-AI",
+  "name": "Spawning AI",
+  "category": "Crawler"
+ },
+ {
+  "includes": "domain research project",
+  "name": "Domain Research Project",
+  "category": "Crawler"
+ },
+ {
+  "regex": "getodin\\.com",
+  "name": "Odin",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "YouBot",
+  "name": "YouBot",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "SiteScoreBot",
+  "name": "SiteScore",
+  "category": "Crawler"
+ },
+ {
+  "includes": "MBCrawler",
+  "name": "Monitor Backlinks",
+  "category": "Crawler"
+ },
+ {
+  "includes": "mariadb-mysql-kbs-bot",
+  "name": "MariaDB/MySQL Knowledge Base",
+  "category": "Crawler"
+ },
+ {
+  "includes": "GitHubCopilotChat",
+  "name": "GitHubCopilotChat",
+  "category": "AI Assistant"
+ },
+ {
+  "regex": "^pdrl\\.fm",
+  "name": "Podroll Analyzer",
+  "category": "Crawler"
+ },
+ {
+  "includes": "PodUptime/",
+  "name": "PodUptime",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "anthropic-ai",
+  "name": "Anthropic AI",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "NetpeakCheckerBot",
+  "name": "Netpeak Checker",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SandobaCrawler",
+  "name": "Sandoba//Crawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SirdataBot",
+  "name": "Sirdata",
+  "category": "Crawler"
+ },
+ {
+  "includes": "CheckMarkNetwork",
+  "name": "CheckMark Network",
+  "category": "Crawler"
+ },
+ {
+  "includes": "cohere-ai",
+  "name": "Cohere AI",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "Cohere-Command",
+  "name": "Cohere-Command",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "cohere-training",
+  "name": "cohere-training-data-crawler",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "PerplexityBot",
+  "name": "PerplexityBot",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "Perplexity-User",
+  "name": "Perplexity-User",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "TTD-Content",
+  "name": "The Trade Desk Content",
+  "category": "Crawler"
+ },
+ {
+  "includes": "montastic-monitor",
+  "name": "Montastic Monitor",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Ruby, Twurly v",
+  "name": "Twurly",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Mixnode(?:Cache)?",
+  "name": "Mixnode",
+  "category": "Crawler"
+ },
+ {
+  "includes": "CSSCheck",
+  "name": "CSSCheck",
+  "category": "Validator"
+ },
+ {
+  "includes": "MicrosoftPreview",
+  "name": "Microsoft Preview",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "s~virustotalcloud",
+  "name": "VirusTotal Cloud",
+  "category": "Crawler"
+ },
+ {
+  "includes": "TinEye",
+  "name": "TinEye",
+  "category": "Crawler"
+ },
+ {
+  "includes": "e~arsnova-filter-system",
+  "name": "ARSNova Filter System",
+  "category": "Crawler"
+ },
+ {
+  "includes": "botify",
+  "name": "Botify",
+  "category": "Crawler"
+ },
+ {
+  "includes": "adscanner",
+  "name": "Adscanner",
+  "category": "Crawler"
+ },
+ {
+  "includes": "online-webceo-bot",
+  "name": "WebCEO",
+  "category": "Crawler"
+ },
+ {
+  "includes": "NetTrack",
+  "name": "NetTrack",
+  "category": "Crawler"
+ },
+ {
+  "includes": "htmlyse",
+  "name": "htmlyse",
+  "category": "Crawler"
+ },
+ {
+  "includes": "TrendsmapResolver",
+  "name": "Trendsmap",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Shareaholic(?:bot)?",
+  "name": "Steve Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "keycdn-tools:",
+  "name": "KeyCDN Tools",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "keycdn-tools/",
+  "name": "KeyCDN Tools",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "Arquivo-web-crawler",
+  "name": "Arquivo.pt",
+  "category": "Crawler"
+ },
+ {
+  "regex": "WhatsMyIP\\.org",
+  "name": "WhatsMyIP.org",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "SenutoBot",
+  "name": "Senuto",
+  "category": "Crawler"
+ },
+ {
+  "includes": "GozleBot",
+  "name": "Gozle",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Quantcastbot",
+  "name": "Quantcast",
+  "category": "Crawler"
+ },
+ {
+  "includes": "FontRadar",
+  "name": "FontRadar",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ViberUrlDownloader",
+  "name": "Viber Url Downloader",
+  "category": "Service Agent"
+ },
+ {
+  "regex": "^Zeno$",
+  "name": "Zeno",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Barracuda Sentinel",
+  "name": "Barracuda Sentinel",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "RuxitSynthetic",
+  "name": "RuxitSynthetic",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "DynatraceSynthetic",
+  "name": "DynatraceSynthetic",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "sitebulb",
+  "name": "Sitebulb",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Monsidobot",
+  "name": "Monsidobot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "AccompanyBot",
+  "name": "AccompanyBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Ghost Inspector",
+  "name": "Ghost Inspector",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Google-Apps-Script",
+  "name": "Google Apps Script",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "SiteOne-Crawler",
+  "name": "SiteOne Crawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Detectify",
+  "name": "Detectify",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "DomCopBot",
+  "name": "DomCop Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Paqlebot",
+  "name": "Paqlebot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Wibybot",
+  "name": "Wibybot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Synapse",
+  "name": "Synapse",
+  "category": "Crawler"
+ },
+ {
+  "includes": "OSZKbot",
+  "name": "OSZKbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ZoomBot",
+  "name": "ZoomBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "RavenCrawler",
+  "name": "RavenCrawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "KadoBot",
+  "name": "KadoBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Dubbotbot",
+  "name": "Dubbotbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Swiftbot",
+  "name": "Swiftbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "EyeMonIT",
+  "name": "EyeMonit",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "ThousandEyes",
+  "name": "ThousandEyes",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "OmtrBot",
+  "name": "OmtrBot",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "WebMoney Advisor",
+  "name": "WebMoney Advisor",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "WebMon/",
+  "name": "WebMon",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "fragFINN",
+  "name": "fragFINN",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Clickagy",
+  "name": "Clickagy",
+  "category": "Crawler"
+ },
+ {
+  "includes": "kiwitcms-gitops",
+  "name": "Kiwi TCMS GitOps",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "webtru_crawler",
+  "name": "webtru",
+  "category": "Crawler"
+ },
+ {
+  "includes": "URLSuMaBot",
+  "name": "URLSuMaBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "360JK yunjiankong",
+  "name": "360JK",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "UCSBNetworkMeasurement",
+  "name": "UCSB Network Measurement",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Plesk screenshot bot",
+  "name": "Plesk Screenshot Service",
+  "category": "Service Agent"
+ },
+ {
+  "regex": "Who\\.is",
+  "name": "Who.is Bot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Probely",
+  "name": "Probely",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "Uptimia",
+  "name": "Uptimia",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "2GDPR",
+  "name": "2GDPR",
+  "category": "Service Agent"
+ },
+ {
+  "regex": "abuse\\.xmco\\.fr",
+  "name": "Serenety",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "CheckHost",
+  "name": "CheckHost",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "LAC_IAHarvester",
+  "name": "LAC IA Harvester",
+  "category": "Crawler"
+ },
+ {
+  "includes": "InsytfulBot",
+  "name": "InsytfulBot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "statista\\.com",
+  "name": "Statista",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SubstackContentFetch",
+  "name": "Substack Content Fetch",
+  "category": "Crawler"
+ },
+ {
+  "regex": "^ds9",
+  "name": "Deep SEARCH 9",
+  "category": "Crawler"
+ },
+ {
+  "regex": "LiveJournal\\.com",
+  "name": "LiveJournal",
+  "category": "Feed Fetcher"
+ },
+ {
+  "includes": "bitdiscovery",
+  "name": "Tenable.asm",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "Castopod",
+  "name": "Castopod",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Elastic/Synthetics",
+  "name": "Elastic Synthetics",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "WDG_Validator",
+  "name": "WDG HTML Validator",
+  "category": "Validator"
+ },
+ {
+  "regex": "scan@aegis.network",
+  "name": "Aegis",
+  "category": "Crawler"
+ },
+ {
+  "includes": "CrawlyProjectCrawler",
+  "name": "Crawly Project",
+  "category": "Crawler"
+ },
+ {
+  "includes": "BDFetch",
+  "name": "BDFetch",
+  "category": "Crawler"
+ },
+ {
+  "includes": "PunkMap",
+  "name": "Punk Map",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "GenomeCrawlerd",
+  "name": "Deepfield Genome",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Gaisbot",
+  "name": "Gaisbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "FAST-WebCrawler",
+  "name": "AlltheWeb",
+  "category": "Crawler"
+ },
+ {
+  "regex": "ducks\\.party",
+  "name": "ducks.party",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "DepSpid",
+  "name": "DepSpid",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Website-info\\.net",
+  "name": "Website-info",
+  "category": "Crawler"
+ },
+ {
+  "includes": "RedekenBot",
+  "name": "RedekenBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "semaltbot",
+  "name": "semaltbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "MakeMerryBot",
+  "name": "MakeMerryBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Timpibot",
+  "name": "Timpibot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Validbot",
+  "name": "ValidBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "NPBot",
+  "name": "NameProtectBot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "domaincodex\\.com",
+  "name": "Domain Codex",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Swisscows Favicons",
+  "name": "Swisscows Favicons",
+  "category": "Crawler"
+ },
+ {
+  "regex": "leak\\.info",
+  "name": "leak.info",
+  "category": "Crawler"
+ },
+ {
+  "includes": "workona",
+  "name": "Workona",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Bloglines",
+  "name": "Bloglines",
+  "category": "Crawler"
+ },
+ {
+  "includes": "heritrix",
+  "name": "Heritrix",
+  "category": "Crawler"
+ },
+ {
+  "regex": "search\\.marginalia\\.nu",
+  "name": "Marginalia",
+  "category": "Crawler"
+ },
+ {
+  "includes": "vu-server-health-scanner",
+  "name": "VU Server Health Scanner",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "Functionize",
+  "name": "Functionize",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Prerender",
+  "name": "Prerender",
+  "category": "Crawler"
+ },
+ {
+  "regex": "bl\\.uk_ldfc_bot",
+  "name": "The British Library Legal Deposit Bot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "Miniature\\.io",
+  "name": "Miniature.io",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "Convertify",
+  "name": "Convertify",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "ZoteroTranslationServer",
+  "name": "Zotero Translation Server",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "MuckRack",
+  "name": "MuckRack",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Golfe",
+  "name": "Golfe",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SpiderLing",
+  "name": "SpiderLing",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Bravebot",
+  "name": "Bravebot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "1001FirmsBot",
+  "name": "1001FirmsBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SteamChatURLLookup",
+  "name": "Steam Chat URL Lookup",
+  "category": "Service Agent"
+ },
+ {
+  "regex": "ohdear\\.app",
+  "name": "Oh Dear",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Inspici",
+  "name": "Inspici",
+  "category": "Crawler"
+ },
+ {
+  "includes": "peer39_crawler",
+  "name": "Peer39",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Pandalytics",
+  "name": "Pandalytics",
+  "category": "Crawler"
+ },
+ {
+  "includes": "CloudServerMarketSpider",
+  "name": "CloudServerMarketSpider",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Pigafetta",
+  "name": "Pigafetta",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Cotoyogi",
+  "name": "Cotoyogi",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SuggestBot",
+  "name": "SuggestBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "cms-experiment",
+  "name": "CMS Experiment",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "SiteCheckerBotCrawler",
+  "name": "SiteCheckerBotCrawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SBIder",
+  "name": "SBIder",
+  "category": "Crawler"
+ },
+ {
+  "includes": "LightspeedSystemsCrawler",
+  "name": "LightspeedSystemsCrawler",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Research JLU",
+  "name": "Research JLU",
+  "category": "Crawler"
+ },
+ {
+  "regex": "(?:hgf|OS)AlphaXCrawl",
+  "name": "AlphaXCrawl",
+  "category": "Crawler"
+ },
+ {
+  "includes": "WPMU DEV",
+  "name": "WPMU DEV",
+  "category": "Crawler"
+ },
+ {
+  "includes": "SnoopSecInspect",
+  "name": "SnoopSecInspect",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "ModatScanner",
+  "name": "ModatScanner",
+  "category": "Security Checker"
+ },
+ {
+  "regex": "researchcyber\\.net",
+  "name": "researchcyber.net",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "CrystalSemanticsBot",
+  "name": "CrystalSemanticsBot",
+  "category": "Crawler"
+ },
+ {
+  "regex": "najdu\\.s\\.holubem\\.eu",
+  "name": "najdu.s.holubem.eu",
+  "category": "Crawler"
+ },
+ {
+  "includes": "VORTEX/",
+  "name": "VORTEX",
+  "category": "Crawler"
+ },
+ {
+  "regex": "xtate/(\\d+\\.[.\\d]+)",
+  "name": "xtate",
+  "category": "Crawler"
+ },
+ {
+  "includes": "FediList Agent/",
+  "name": "FediList",
+  "category": "Social Media Agent"
+ },
+ {
+  "regex": "Grafana/(\\d+\\.[.\\d]+)",
+  "name": "Grafana",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "github-camo",
+  "name": "Github Camo",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Bluesky",
+  "name": "Bluesky",
+  "category": "Social Media Agent"
+ },
+ {
+  "regex": "OpenGraph\\.io",
+  "name": "OpenGraph.io",
+  "category": "Crawler"
+ },
+ {
+  "includes": "microsoft-flow/",
+  "name": "Microsoft Power Automate",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "Simbiat Software",
+  "name": "Simbiat Software",
+  "category": "Crawler"
+ },
+ {
+  "includes": "IbouBot",
+  "name": "IbouBot",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "AddSearchBot",
+  "name": "AddSearchBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "TerraCotta",
+  "name": "TerraCotta",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "KeybaseBot",
+  "name": "KeybaseBot",
+  "category": "Social Media Agent"
+ },
+ {
+  "includes": "Replicate-Bot",
+  "name": "Replicate-Bot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "regex": "cypex\\.ai",
+  "name": "Cypex",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "fhms-its-research-scanner",
+  "name": "FHMS ITS Research Scanner",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "Together-Bot",
+  "name": "Together-Bot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "xAI-Bot",
+  "name": "xAI-Bot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "Groq-Bot",
+  "name": "Groq-Bot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "regex": "bigsur\\.ai",
+  "name": "Big Sur AI",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "FirecrawlAgent",
+  "name": "FirecrawlAgent",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "SecurityHeaders",
+  "name": "SecurityHeaders",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "HaloBot",
+  "name": "HaloBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "RSiteAuditor",
+  "name": "RSiteAuditor",
+  "category": "Crawler"
+ },
+ {
+  "regex": "ORTc\\.me",
+  "name": "OpenRobotsTXT",
+  "category": "Crawler"
+ },
+ {
+  "regex": "obsrvr\\.net",
+  "name": "Observer",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "AliyunSecBot",
+  "name": "AliyunSecBot",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "Mediumbot",
+  "name": "Mediumbot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Heexybot",
+  "name": "Heexybot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "ForwardQR",
+  "name": "ForwardQR",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "CybaaBot",
+  "name": "CybaaBot",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "CybaaAgent",
+  "name": "CybaaAgent",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "DVbot",
+  "name": "DVbot",
+  "category": "Service Agent"
+ },
+ {
+  "includes": "Assetnote",
+  "name": "Assetnote",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "UGAResearchAgent",
+  "name": "UGAResearchAgent",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "SERankingBacklinksBot",
+  "name": "SERankingBacklinksBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "VertexWP",
+  "name": "VertexWP",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "Friendica",
+  "name": "Friendica",
+  "category": "Social Media Agent"
+ },
+ {
+  "includes": "Webliobot",
+  "name": "Webliobot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "sqalix",
+  "name": "sqalix",
+  "category": "Crawler"
+ },
+ {
+  "includes": "RecordedFuture",
+  "name": "RecordedFuture",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "Valimail",
+  "name": "Valimail",
+  "category": "Service Agent"
+ },
+ {
+  "regex": "FindFiles\\.net",
+  "name": "FindFiles.net",
+  "category": "Crawler"
+ },
+ {
+  "includes": "WanscannerBot",
+  "name": "WanscannerBot",
+  "category": "Security Checker"
+ },
+ {
+  "includes": "Kagibot",
+  "name": "Kagibot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "Ai2Bot-Dolma",
+  "name": "Ai2Bot-Dolma",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "Ai2Bot-DeepResearchEval",
+  "name": "Ai2Bot-DeepResearchEval",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "Ai2Bot",
+  "name": "Ai2Bot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "WARDBot",
+  "name": "WARDBot",
+  "category": "Site Monitor"
+ },
+ {
+  "includes": "Character-AI",
+  "name": "Character-AI",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "DeepseekBot",
+  "name": "DeepseekBot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "MistralAI-User",
+  "name": "MistralAI-User",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "Crawlspace",
+  "name": "Crawlspace",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "Devin",
+  "name": "Devin",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "Andibot",
+  "name": "Andibot",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "HypeStat",
+  "name": "HypeStat",
+  "category": "Crawler"
+ },
+ {
+  "includes": "StatusNestBacklinkSpider",
+  "name": "StatusNestBacklinkSpider",
+  "category": "Crawler"
+ },
+ {
+  "includes": "RunPod-Bot",
+  "name": "RunPod-Bot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "HuggingFace-Bot",
+  "name": "HuggingFace-Bot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "LinkBloom",
+  "name": "LinkBloom",
+  "category": "Crawler"
+ },
+ {
+  "includes": "img2dataset",
+  "name": "img2dataset",
+  "category": "Crawler"
+ },
+ {
+  "includes": "iAskBot",
+  "name": "iAskBot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "LinerBot",
+  "name": "LinerBot",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "Poggio-Citations",
+  "name": "Poggio-Citations",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "QualifiedBot",
+  "name": "QualifiedBot",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "ZanistaBot",
+  "name": "ZanistaBot",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "ChatGLM-Spider",
+  "name": "ChatGLM-Spider",
+  "category": "AI Data Scraper"
+ },
+ {
+  "regex": "gochitchat\\.ai",
+  "name": "Sider",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "SBIntuitionsBot",
+  "name": "SBIntuitionsBot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "ias_crawler",
+  "name": "IAS Crawler",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "ias_wombles",
+  "name": "IAS Wombles",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "ShapBot",
+  "name": "ShapBot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "LumeWebScan",
+  "name": "LumeWebScan",
+  "category": "Crawler"
+ },
+ {
+  "includes": "PanguBot",
+  "name": "PanguBot",
+  "category": "AI Data Scraper"
+ },
+ {
+  "includes": "Manus-User",
+  "name": "Manus-User",
+  "category": "AI Assistant"
+ },
+ {
+  "includes": "HubSpotContentSearchBot",
+  "name": "HubSpotContentSearchBot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "ProRata",
+  "name": "ProRata",
+  "category": "AI Search Crawler"
+ },
+ {
+  "includes": "blackboardally",
+  "name": "Blackboard Ally",
+  "category": "Crawler"
+ },
+ {
+  "regex": "semantic-visions\\.com",
+  "name": "svEye",
+  "category": "Crawler"
+ },
+ {
+  "includes": "CopyvioDetector",
+  "name": "CopyvioDetector",
+  "category": "Crawler"
+ },
+ {
+  "includes": "Eyeotabot",
+  "name": "Eyeotabot",
+  "category": "Crawler"
+ },
+ {
+  "includes": "YioopBot",
+  "name": "YioopBot",
+  "category": "Search bot"
+ },
+ {
+  "includes": "yoozBot",
+  "name": "yoozBot",
+  "category": "Search bot"
+ },
+ {
+  "regex": "(ABEvalBot|AdsTxtCrawlerTP|DNSResearchBot|Dormouse|FormFinder|GitCrawlerBot|HanaleiBot|ImportDomains|PrivacyPolicyBot|Robozilla|Secweb-Sectxt|SeoCherryBot|StudyBot|The Knowledge AI|Thinkbot|ThinkChaos|TprAdsTxtCrawler)",
+  "name": "$1",
+  "category": "Crawler"
+ },
+ {
+  "regex": "nuhk|grub-client|Download Demon|SearchExpress|Microsoft URL Control|borg|altavista|dataminr\\.com|teoma|oegp|http%20client|htdig|mogimogi|larbin|scrubby|searchsight|semanticdiscovery|snappy|zeal(?!ot)|dataparksearch|findlinks|BrowserMob|URL2PNG|ZooShot|GomezA|Google SketchUp|Read%20Later|7Siters|centuryb\\.o\\.t9|InterNaetBoten|EasyBib AutoCite|Bidtellect|tomnomnom/meg|cortex|Re-re Studio|adreview|AHC/|NameOfAgent|Request-Promise|ALittle Client|Hello,? world|wp_is_mobile|0xAbyssalDoesntExist|Anarchy99|^revolt|nvd0rz|xfa1|Hakai|gbrmss|fuck-your-hp|IDBTE4M CODE87|Antoine|Insomania|Hells-Net|b3astmode|Linux Gnu \\(cow\\)|Test Certificate Info|iplabel|Magellan|TheSafex?Internetx?Search|Searcherx?web|kirkland-signature|LinkChain|survey-security-dot-txt|infrawatch|Time/|r00ts3c-owned-you|nvdorz|Root Slut|NiggaBalls|BotPoke|GlobalWebSearch|xx032_bo9vs83_2a|sslshed|geckotrail|Wordup|Keydrop|\\(compatible\\)|John Recon|SPARK COMMIT|masjesu|Komaru_The_Cat|Jesus Christ of Nazareth is LORD|Kowai|Hakai|LoliSec|LMAO|^xenu|^(?:chrome|desktop|firefox|Abcd|Dark|KvshClient|Report Runner|url|Zeus|ZmEu)$|OnlyScans|TheInternetSearchx|Laravel Reaver|bang2013|libredtail|Mozilliqa|Tiberius|honeygain|AW-WB-Filter|SaferSoftwashLeadGen|YourUserAgentHere|phpneuralnetwork",
+  "name": "Generic Bot",
+  "category": "Unknown"
+ },
+ {
+  "regex": "[a-z0-9_-]*(?:(?<!cu|Hu|power[ _]|m[ _])bot(?![ _]TAB|[ _]?5[0-9]|[ _]Senior|[ _]Junior)|analyzer|appengine|archiver?|checker|collector|crawl|crawler|(?<!node-|uclient-|Mikrotik/\\d\\.[x\\d] |electron-)fetch(?:er)?|(?<!url)grabber|indexer|inspector|monitor|^parser|(?<!Microsoft |banshee-)project(?!or)|(?<!Google Wap |Blue |SpeedMode; )proxy|(?<!P)research|resolver|robots|(?<!Cam)scanner|scraper|script|searcher|(?<!-)security|spider(?! 8)|study|transcoder|uptime|user[ _]?agent|validator|-(?:AI|Extended|User)/)(?:[^a-z]|$)",
+  "name": "Generic Bot",
+  "category": "Unknown"
+ }
+]

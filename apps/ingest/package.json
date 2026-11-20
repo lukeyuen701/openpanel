@@ -1,0 +1,16 @@
+{
+  "name": "@openpanel/ingest",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "go build -trimpath -o bin/ingest ./cmd/ingest",
+    "dev": "go build -o bin/ingest ./cmd/ingest && dotenv -e ../../.env -- ./bin/ingest",
+    "test": "go vet ./... && go test ./...",
+    "gen": "bun scripts/gen-tables.ts",
+    "gen:check": "bun scripts/gen-tables.ts --check",
+    "golden": "bun parity/golden-core.ts",
+    "parity": "go build -o bin/ingest ./cmd/ingest && dotenv -e ../../.env -- bun parity/diff.ts",
+    "loadgen": "go run ./cmd/loadgen"
+  }
+}
