@@ -153,12 +153,18 @@ describe('ComboboxEvents', () => {
   beforeAll(() => {
     // jsdom has no layout, and cmdk scrolls the highlighted row into view.
     Element.prototype.scrollIntoView = vi.fn();
-    Element.prototype.matches = function matches(selector: string) {
-      return (
-        !topLayerSelectors.includes(selector) &&
-        nativeMatches.call(this, selector)
-      );
-    };
+    // defineProperty: lib.dom types `matches` as type-predicate overloads,
+    // which a plain boolean stub cannot be assigned to.
+    Object.defineProperty(Element.prototype, 'matches', {
+      configurable: true,
+      writable: true,
+      value(this: Element, selector: string) {
+        return (
+          !topLayerSelectors.includes(selector) &&
+          nativeMatches.call(this, selector)
+        );
+      },
+    });
   });
   afterEach(cleanup);
 
