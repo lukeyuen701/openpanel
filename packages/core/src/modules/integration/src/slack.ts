@@ -1,7 +1,7 @@
 // Credit to (@c_alares):
 // https://github.com/christianalares/seventy-seven/blob/main/packages/integrations/src/slack/index.ts
 
-import * as Slack from '@slack/bolt';
+import { InstallProvider, LogLevel } from '@slack/oauth';
 import {
   browserFetcher,
   postWebhook,
@@ -9,10 +9,6 @@ import {
   type WebhookResult,
 } from '../../../clients/integrations/fetcher';
 import type { CoreConfig } from '../../../config';
-
-const { LogLevel, App: SlackApp } = Slack;
-
-import { InstallProvider } from '@slack/oauth';
 
 const INSTALL_SCOPES = [
   'incoming-webhook',
@@ -30,7 +26,7 @@ export function slackInstaller(config: CoreConfig): InstallProvider {
   const { clientId, clientSecret, stateSecret } = config.slack;
   if (!clientId) {
     return {
-      generateInstallUrl: () => {},
+      generateInstallUrl: () => undefined,
       stateStore: {},
     } as unknown as InstallProvider;
   }
