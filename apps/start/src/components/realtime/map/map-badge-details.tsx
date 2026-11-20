@@ -1,5 +1,5 @@
 import { bind } from 'bind-event-listener';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useRef, useState } from 'react';
 import { MapBadgeDetailCard } from './map-badge-detail-card';
 import { closeMapBadgeDetails } from './realtime-map-badge-slice';

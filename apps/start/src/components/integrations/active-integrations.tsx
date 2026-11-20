@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { PlugIcon } from 'lucide-react';
 import { useMemo } from 'react';
 import { PingBadge } from '../ping';

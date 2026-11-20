@@ -1,6 +1,6 @@
 import type { IChartEvent } from '@openpanel/core/modules/report/report.constants';
 import { useQuery } from '@tanstack/react-query';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import {
   ActivityIcon,
   ArrowLeftIcon,

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { BellRingIcon, PlusIcon } from 'lucide-react';
 import { useMemo } from 'react';
 import { EmptyState } from '@/components/empty-state';

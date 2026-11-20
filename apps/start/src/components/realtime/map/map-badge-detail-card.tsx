@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
+import { motion } from 'motion/react';
 import { XIcon } from 'lucide-react';
 import type { RefObject } from 'react';
 import type { DisplayMarker } from './map-types';

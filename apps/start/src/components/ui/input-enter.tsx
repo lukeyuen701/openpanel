@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { CornerDownLeftIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Badge } from './badge';

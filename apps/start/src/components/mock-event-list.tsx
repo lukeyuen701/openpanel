@@ -1,5 +1,5 @@
 import type { IServiceEventMinimal } from '@openpanel/core';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { EventListItem } from '@/components/events/event-list-item';
 
