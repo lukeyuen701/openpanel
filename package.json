@@ -44,7 +44,6 @@
     "seroval": "1.3.2",
     "seroval-plugins": "1.3.2",
     "embla-carousel": "8.0.0-rc22",
-    "express": "4.19.2",
     "h3": "1.15.4",
     "nuxt": "4.2.2",
     "react-native": "0.73.6",
