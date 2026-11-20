@@ -4,7 +4,6 @@
 import { generateId } from '@openpanel/shared';
 import { parseUserAgent } from '@openpanel/shared/server';
 import { assocPath, pathOr, pick } from 'ramda';
-import { v4 as uuid } from 'uuid';
 import type { Buffers } from '../../buffers/create-buffers';
 import { resolveSessionTimeoutMs } from '../../buffers/session-buffer';
 import type { DbScope } from '../../cacheable-per-deps';
@@ -361,7 +360,7 @@ async function handleTrack(
   const queueData: IncomingEventPayload = {
     // The id of the ClickHouse row this event becomes, minted here so a
     // redelivered Kafka message is a duplicate we can recognise.
-    id: uuid(),
+    id: crypto.randomUUID(),
     projectId,
     headers,
     event: {
@@ -400,7 +399,7 @@ async function handleAi(
     payload.profileId === undefined ? undefined : String(payload.profileId);
 
   const queueData: IncomingEventPayload = {
-    id: uuid(),
+    id: crypto.randomUUID(),
     projectId,
     headers,
     event: {
@@ -772,7 +771,7 @@ export async function ingestLegacyEvent(
   await transport.produceIncomingEvent(
     {
       // See handleTrack: the producer mints the event id.
-      id: uuid(),
+      id: crypto.randomUUID(),
       projectId,
       headers,
       // Picked, not spread: this route has no body schema, and a stray field

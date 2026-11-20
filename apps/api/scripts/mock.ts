@@ -3,7 +3,6 @@ import * as faker from '@faker-js/faker';
 import { generateId, hashPassword } from '@openpanel/core';
 import { ClientType, db } from '@openpanel/db';
 import { getRedisCache } from '@openpanel/redis';
-import { v4 as uuidv4 } from 'uuid';
 
 const DOMAIN_COUNT = 5;
 const PROFILE_COUNT = 50;
@@ -30,9 +29,9 @@ interface Profile {
 
 const domains = Array.from({ length: DOMAIN_COUNT }, () => ({
   domain: `https://${faker.allFakers.en.internet.domainName()}`,
-  clientId: uuidv4(),
+  clientId: crypto.randomUUID(),
   profiles: Array.from({ length: PROFILE_COUNT }, () => ({
-    // id: uuidv4(),
+    // id: crypto.randomUUID(),
     // name: faker.allFakers.en.name.findName(),
     userAgent: faker.allFakers.en.internet.userAgent(),
     ip: faker.allFakers.en.internet.ipv4(),
@@ -99,7 +98,7 @@ function generateScreenViews({
   profile: Profile;
   eventsCount: number;
 }): Event[] {
-  return Array.from({ length: eventsCount }, (_, index) => ({
+  return Array.from({ length: eventsCount }, () => ({
     headers: {
       'openpanel-client-id': clientId,
       'x-client-ip': profile.ip,
@@ -239,7 +238,7 @@ function insertFakeEvents(events: Event[]) {
       },
     },
   };
-  const newEvents = [];
+  const newEvents: Event[] = [];
   for (const event of events) {
     (event.track.payload.properties as any).__group = generateId();
     newEvents.push(event);

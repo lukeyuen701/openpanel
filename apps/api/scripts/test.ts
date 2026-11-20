@@ -1,6 +1,5 @@
 import type { IClickhouseEvent } from '@openpanel/core';
 import { ch, formatClickhouseDate } from '@openpanel/db';
-import { v4 as uuid } from 'uuid';
 
 async function main() {
   const startDate = new Date('2025-01-01T00:00:00Z');
@@ -31,7 +30,7 @@ async function main() {
       eventTime.setSeconds(Math.floor(Math.random() * 60));
 
       events.push({
-        id: uuid(),
+        id: crypto.randomUUID(),
         name: eventNames[Math.floor(Math.random() * eventNames.length)]!,
         device_id: `device_${Math.floor(Math.random() * 1000)}`,
         profile_id: `profile_${Math.floor(Math.random() * 1000)}`,
