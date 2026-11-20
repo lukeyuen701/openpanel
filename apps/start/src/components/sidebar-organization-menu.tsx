@@ -1,6 +1,5 @@
 import { getSubscriptionStateMeta } from '@openpanel/payments/subscription-state-meta';
 import { Link, useParams } from '@tanstack/react-router';
-import { AnimatePresence, motion } from 'motion/react';
 import {
   ChevronDownIcon,
   CogIcon,
@@ -9,6 +8,7 @@ import {
   PlusIcon,
   UsersIcon,
 } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { SidebarIcon, sidebarItemClassName } from './sidebar-link';
 import { Badge } from './ui/badge';

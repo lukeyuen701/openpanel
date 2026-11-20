@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { motion } from 'motion/react';
 import { XIcon } from 'lucide-react';
+import { motion } from 'motion/react';
 import type { RefObject } from 'react';
 import type { DisplayMarker } from './map-types';
 import { getBadgeOverlayPosition, getProfileDisplayName } from './map-utils';

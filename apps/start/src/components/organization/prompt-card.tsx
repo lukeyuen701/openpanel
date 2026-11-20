@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from 'motion/react';
 import { XIcon } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 

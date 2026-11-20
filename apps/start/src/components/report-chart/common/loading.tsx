@@ -1,4 +1,3 @@
-import { AnimatePresence, motion } from 'motion/react';
 import {
   ActivityIcon,
   AlarmClockIcon,
@@ -11,6 +10,7 @@ import {
   PieChartIcon,
   TrendingUpIcon,
 } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import React, { useEffect, useState } from 'react';
 import { useReportChartContext } from '../context';
 import { cn } from '@/utils/cn';

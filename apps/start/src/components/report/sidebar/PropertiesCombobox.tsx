@@ -1,6 +1,5 @@
 import type { IChartEvent } from '@openpanel/core/modules/report/report.constants';
 import { useQuery } from '@tanstack/react-query';
-import { AnimatePresence, motion } from 'motion/react';
 import {
   ActivityIcon,
   ArrowLeftIcon,
@@ -9,6 +8,7 @@ import {
   TargetIcon,
   UserIcon,
 } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import VirtualList from 'rc-virtual-list';
 import { type Dispatch, type SetStateAction, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';

@@ -1,5 +1,5 @@
-import { motion } from 'motion/react';
 import type { LucideIcon } from 'lucide-react';
+import { motion } from 'motion/react';
 
 function SellingPointIcon({ icon: Icon }: { icon: LucideIcon }) {
   return (

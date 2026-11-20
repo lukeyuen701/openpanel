@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from 'motion/react';
 import { CornerDownLeftIcon } from 'lucide-react';
+import { AnimatePresence, motion } from 'motion/react';
 import { useEffect, useState } from 'react';
 import { Badge } from './badge';
 import { Input, type InputProps } from './input';

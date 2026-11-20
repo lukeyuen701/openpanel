@@ -1,7 +1,7 @@
 // Based on Christin Alares tag input component (https://github.com/christianalares/seventy-seven)
 
-import { useAnimate } from 'motion/react';
 import { XIcon } from 'lucide-react';
+import { useAnimate } from 'motion/react';
 import type { ElementRef } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { Button } from '@/components/ui/button';
