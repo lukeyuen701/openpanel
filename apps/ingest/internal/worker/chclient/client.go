@@ -179,13 +179,19 @@ func (c *Client) Insert(ctx context.Context, table string, lines []string, setti
 // UPDATE). Settings are the client defaults plus the per-call layer; the
 // insert defaults do not apply.
 func (c *Client) Command(ctx context.Context, statement string, settings Settings) error {
+	return c.CommandWithParams(ctx, statement, nil, settings)
+}
+
+// CommandWithParams is Command for a statement that binds {name:Type}
+// parameters (query_params of the Node client's command()).
+func (c *Client) CommandWithParams(ctx context.Context, statement string, params []Param, settings Settings) error {
 	merged := c.defaults.With(settings...)
 	_, err := c.do(ctx, "command", func(n *node) (*http.Request, error) {
 		body, err := c.encodeBody([]byte(statement))
 		if err != nil {
 			return nil, err
 		}
-		request, err := n.request(ctx, c.queryString(n, merged, nil, ""), body)
+		request, err := n.request(ctx, c.queryString(n, merged, params, ""), body)
 		if err != nil {
 			return nil, err
 		}

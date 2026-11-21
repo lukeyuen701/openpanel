@@ -198,7 +198,11 @@ func TestWireMatchesTheNodeClient(t *testing.T) {
 					}
 					err = client.Insert(ctx, call.Table, lines, settings)
 				case "command":
-					err = client.Command(ctx, call.Query, settings)
+					var params []Param
+					for _, pair := range call.Params {
+						params = append(params, Param{Name: pair[0].(string), Value: paramText(t, pair[1])})
+					}
+					err = client.CommandWithParams(ctx, call.Query, params, settings)
 				case "query":
 					var params []Param
 					for _, pair := range call.Params {

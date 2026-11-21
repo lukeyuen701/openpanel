@@ -23,7 +23,12 @@ type Call =
       objects?: unknown[];
       settings?: [string, string | number][];
     }
-  | { op: 'command'; query: string; settings?: [string, string | number][] }
+  | {
+      op: 'command';
+      query: string;
+      params?: [string, unknown][];
+      settings?: [string, string | number][];
+    }
   | { op: 'query'; query: string; params: [string, unknown][] };
 
 interface Scenario {
@@ -67,6 +72,16 @@ const SCENARIOS: Scenario[] = [
           ['allow_experimental_lightweight_update', 1],
           ['foo', 'a b'],
         ],
+      },
+      {
+        op: 'command',
+        query:
+          'UPDATE events SET profile_id = {p1:String} WHERE session_id = {p2:String}',
+        params: [
+          ['p1', "u'1\\"],
+          ['p2', 's\t2'],
+        ],
+        settings: [['mutations_sync', '0']],
       },
     ],
   },
@@ -167,6 +182,9 @@ async function runChild(scenario: Scenario) {
     } else if (call.op === 'command') {
       await ch.command({
         query: call.query,
+        ...(call.params
+          ? { query_params: Object.fromEntries(call.params) }
+          : {}),
         clickhouse_settings: Object.fromEntries(call.settings ?? []),
       });
     } else {

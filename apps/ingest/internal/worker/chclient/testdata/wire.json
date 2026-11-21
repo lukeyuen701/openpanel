@@ -73,6 +73,26 @@
       "a b"
      ]
     ]
+   },
+   {
+    "op": "command",
+    "query": "UPDATE events SET profile_id = {p1:String} WHERE session_id = {p2:String}",
+    "params": [
+     [
+      "p1",
+      "u'1\\"
+     ],
+     [
+      "p2",
+      "s\t2"
+     ]
+    ],
+    "settings": [
+     [
+      "mutations_sync",
+      "0"
+     ]
+    ]
    }
   ],
   "requests": [
@@ -364,6 +384,51 @@
     "authorization": "Basic dTpw",
     "contentEncoding": "gzip",
     "body": "ALTER TABLE events UPDATE a = 1 WHERE b = 2"
+   },
+   {
+    "method": "POST",
+    "path": "/",
+    "pairs": [
+     [
+      "query_id",
+      "<id>"
+     ],
+     [
+      "param_p1",
+      "u\\'1\\\\"
+     ],
+     [
+      "param_p2",
+      "s\\t2"
+     ],
+     [
+      "distributed_product_mode",
+      "allow"
+     ],
+     [
+      "date_time_input_format",
+      "best_effort"
+     ],
+     [
+      "async_insert",
+      "0"
+     ],
+     [
+      "query_plan_convert_any_join_to_semi_or_anti_join",
+      "0"
+     ],
+     [
+      "mutations_sync",
+      "0"
+     ],
+     [
+      "database",
+      "mydb"
+     ]
+    ],
+    "authorization": "Basic dTpw",
+    "contentEncoding": "gzip",
+    "body": "UPDATE events SET profile_id = {p1:String} WHERE session_id = {p2:String}"
    }
   ]
  },
