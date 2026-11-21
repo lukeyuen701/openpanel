@@ -4,7 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/redis/rueidis"
 )
@@ -19,11 +21,22 @@ type Redis interface {
 	HSet(ctx context.Context, key string, fieldValues ...string) error
 }
 
-// Reply is a script's answer: an integer or a bulk string.
+// Reply is a script's answer: an integer, a bulk string, an array or nil.
 type Reply struct {
 	Integer   int64
 	Text      string
 	IsInteger bool
+	Array     []Reply
+	IsArray   bool
+	IsNil     bool
+}
+
+// BlockingRedis is what the worker needs beyond the producer's commands.
+type BlockingRedis interface {
+	Redis
+	// BZPopMin blocks up to timeout for a member of the sorted set at key and
+	// returns its score; ok is false when the wait timed out.
+	BZPopMin(ctx context.Context, key string, timeout time.Duration) (score int64, ok bool, err error)
 }
 
 // ReplyError is an error Redis itself answered with (as opposed to a broken
@@ -79,14 +92,63 @@ func (r *RueidisClient) HSet(ctx context.Context, key string, fieldValues ...str
 	return wrapError(r.client.Do(ctx, command.Build()).Error())
 }
 
+// BZPopMin implements BlockingRedis. rueidis sends blocking commands on a
+// connection of their own, so the worker's other commands never queue behind it.
+func (r *RueidisClient) BZPopMin(ctx context.Context, key string, timeout time.Duration) (int64, bool, error) {
+	command := r.client.B().Bzpopmin().Key(key).Timeout(timeout.Seconds()).Build()
+	parts, err := r.client.Do(ctx, command).ToArray()
+	if rueidis.IsRedisNil(err) {
+		return 0, false, nil
+	}
+	if err != nil {
+		return 0, false, wrapError(err)
+	}
+	const popReplyLen = 3
+	if len(parts) != popReplyLen {
+		return 0, false, fmt.Errorf("bullmq: unexpected BZPOPMIN reply of %d elements", len(parts))
+	}
+	score, err := parts[2].ToString()
+	if err != nil {
+		return 0, false, fmt.Errorf("bullmq: unexpected BZPOPMIN score: %w", err)
+	}
+	// BullMQ reads the score with parseInt, which drops a fraction.
+	value, err := strconv.ParseFloat(score, 64)
+	if err != nil {
+		return 0, false, fmt.Errorf("bullmq: unexpected BZPOPMIN score %q: %w", score, err)
+	}
+	return int64(value), true, nil
+}
+
 func replyOf(result rueidis.RedisResult) (Reply, error) {
 	message, err := result.ToMessage()
 	if err != nil {
 		return Reply{}, wrapError(err)
 	}
+	return replyOfMessage(message)
+}
+
+func replyOfMessage(message rueidis.RedisMessage) (Reply, error) {
 	if message.IsInt64() {
 		value, err := message.AsInt64()
 		return Reply{Integer: value, IsInteger: true}, err
+	}
+	if message.IsNil() {
+		return Reply{IsNil: true}, nil
+	}
+	if message.IsArray() {
+		items, err := message.ToArray()
+		if err != nil {
+			return Reply{}, err
+		}
+		reply := Reply{IsArray: true, Array: make([]Reply, 0, len(items))}
+		for _, item := range items {
+			element, err := replyOfMessage(item)
+			if err != nil {
+				return Reply{}, err
+			}
+			reply.Array = append(reply.Array, element)
+		}
+		return reply, nil
 	}
 	text, err := message.ToString()
 	if err != nil {

@@ -35,6 +35,46 @@ func newQueueKeys(queueKey string) queueKeys {
 
 func (k queueKeys) meta() string { return k.base + "meta" }
 
+func (k queueKeys) key(suffix string) string { return k.base + suffix }
+
+// moveToActive is the eleven KEYS moveToActive takes; moveToFinished starts
+// with the first ten of them.
+func (k queueKeys) moveToActive() []string {
+	return []string{
+		k.key("wait"), k.key("active"), k.key("prioritized"), k.key("events"),
+		k.key("stalled"), k.key("limiter"), k.key("delayed"), k.key("paused"),
+		k.key("meta"), k.key("pc"), k.key("marker"),
+	}
+}
+
+func (k queueKeys) moveToFinished(target, jobID string) []string {
+	keys := k.moveToActive()[:10]
+	return append(keys, k.key(target), k.key(jobID), k.key("metrics:"+target), k.key("marker"))
+}
+
+func (k queueKeys) moveToDelayed(jobID string) []string {
+	return []string{
+		k.key("marker"), k.key("active"), k.key("prioritized"), k.key("delayed"),
+		k.key(jobID), k.key("events"), k.key("meta"), k.key("stalled"),
+		k.key("wait"), k.key("limiter"), k.key("pc"),
+	}
+}
+
+func (k queueKeys) retryJob(jobID string) []string {
+	return []string{
+		k.key("active"), k.key("wait"), k.key("paused"), k.key(jobID),
+		k.key("meta"), k.key("events"), k.key("delayed"), k.key("prioritized"),
+		k.key("pc"), k.key("marker"), k.key("stalled"),
+	}
+}
+
+func (k queueKeys) moveStalledJobsToWait() []string {
+	return []string{
+		k.key("stalled"), k.key("wait"), k.key("active"), k.key("stalled-check"),
+		k.key("meta"), k.key("paused"), k.key("marker"), k.key("events"), k.key("repeat"),
+	}
+}
+
 func (k queueKeys) addStandardJob() []string {
 	return []string{
 		k.base + "wait",

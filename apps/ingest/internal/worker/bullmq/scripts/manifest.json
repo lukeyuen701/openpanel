@@ -5,6 +5,36 @@
    "file": "addStandardJob.lua",
    "keys": 9,
    "sha1": "5ab432e88830d573e2fa33392ffbd4ad25a9b100"
+  },
+  "moveToActive": {
+   "file": "moveToActive.lua",
+   "keys": 11,
+   "sha1": "d96ca626f1ea141b44a856b312fc636d99aa9ea9"
+  },
+  "moveToFinished": {
+   "file": "moveToFinished.lua",
+   "keys": 14,
+   "sha1": "5254e19e22109731ef62871d4bb87bd4a66d2a5d"
+  },
+  "moveToDelayed": {
+   "file": "moveToDelayed.lua",
+   "keys": 11,
+   "sha1": "9f83944d6edafd63c74121d73299dd3358ddfe0c"
+  },
+  "retryJob": {
+   "file": "retryJob.lua",
+   "keys": 11,
+   "sha1": "812d06de3eaf0fb70e333b3d0142eed8bf630a2d"
+  },
+  "extendLocks": {
+   "file": "extendLocks.lua",
+   "keys": 1,
+   "sha1": "c35baf769e5dc3d9194b2bceca04ab59f7c510f7"
+  },
+  "moveStalledJobsToWait": {
+   "file": "moveStalledJobsToWait.lua",
+   "keys": 9,
+   "sha1": "1e9bb7deb6219644a634d32c430ce15ed39a377e"
   }
  }
 }

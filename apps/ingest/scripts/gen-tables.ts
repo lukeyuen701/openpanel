@@ -122,10 +122,18 @@ function botTables() {
   });
 }
 
-// The Lua the Go BullMQ producer sends, exactly as the bullmq package the
+// The Lua the Go BullMQ producer and worker send, exactly as the bullmq package the
 // worker runs ships it (includes already inlined), with the SHA ioredis would
 // compute so a test can pin what EVALSHA addresses.
-const BULLMQ_SCRIPTS = ['addStandardJob'] as const;
+const BULLMQ_SCRIPTS = [
+  'addStandardJob',
+  'moveToActive',
+  'moveToFinished',
+  'moveToDelayed',
+  'retryJob',
+  'extendLocks',
+  'moveStalledJobsToWait',
+] as const;
 const BULLMQ_DIR = 'internal/worker/bullmq/scripts';
 
 function bullmqScripts(): [string, string][] {
