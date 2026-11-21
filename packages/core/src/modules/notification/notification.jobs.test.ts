@@ -90,8 +90,11 @@ function stubJobCtx(
   };
 }
 
-test('the notification queue declares exactly the sendNotification job', () => {
-  expect(Object.keys(notificationQueueJobs)).toEqual(['sendNotification']);
+test('the notification queue declares the sendNotification and sendUsageAlert jobs', () => {
+  expect(Object.keys(notificationQueueJobs)).toEqual([
+    'sendUsageAlert',
+    'sendNotification',
+  ]);
   expect(queues.notification.jobs.sendNotification).toMatchObject({
     queue: 'notification',
     name: 'sendNotification',
@@ -142,4 +145,93 @@ test('sendNotification delegates to ctx.services.notification.dispatch', async (
   expect(calls).toEqual([
     { projectId: 'proj_1', title: 'Hello', message: 'World', sendToApp: true },
   ]);
+});
+
+function ctxWithOrganization(
+  organization: Record<string, unknown> | null,
+  updateMany: (args: unknown) => Promise<{ count: number }>
+): { ctx: JobCtx; reads: unknown[] } {
+  const reads: unknown[] = [];
+  const base = stubJobCtx({});
+  const db = {
+    organization: {
+      findUnique: async (args: unknown) => {
+        reads.push(args);
+        return organization;
+      },
+      updateMany,
+    },
+    member: {
+      findMany: () => {
+        throw new Error(
+          'no e-mail may be prepared for a claimed or idle alert'
+        );
+      },
+    },
+  } as unknown as AppDeps['db'];
+  return { ctx: { ...base, db }, reads };
+}
+
+test('sendUsageAlert validates its payload', () => {
+  expect(() =>
+    notificationQueueJobs.sendUsageAlert.payload.parse({})
+  ).toThrow();
+  expect(
+    notificationQueueJobs.sendUsageAlert.payload.parse({
+      organizationId: 'org_1',
+      count: 900,
+    })
+  ).toEqual({ organizationId: 'org_1', count: 900 });
+});
+
+test('sendUsageAlert re-reads the organization and ignores an unknown one', async () => {
+  const { ctx, reads } = ctxWithOrganization(null, async () => {
+    throw new Error('nothing to claim');
+  });
+  await notificationQueueJobs.sendUsageAlert.handler({
+    payload: { organizationId: 'org_1', count: 900 },
+    ctx,
+  });
+  expect(reads).toEqual([{ where: { id: 'org_1' } }]);
+});
+
+test('sendUsageAlert sends nothing when the organization has no limit', async () => {
+  const claims: unknown[] = [];
+  const { ctx } = ctxWithOrganization(
+    { id: 'org_1', subscriptionPeriodEventsLimit: 0 },
+    async (args) => {
+      claims.push(args);
+      return { count: 1 };
+    }
+  );
+  await notificationQueueJobs.sendUsageAlert.handler({
+    payload: { organizationId: 'org_1', count: 900 },
+    ctx,
+  });
+  expect(claims).toEqual([]);
+});
+
+test('sendUsageAlert claims once: a repeated job whose claim was lost sends nothing', async () => {
+  const claims: unknown[] = [];
+  const { ctx } = ctxWithOrganization(
+    {
+      id: 'org_1',
+      name: 'Acme',
+      subscriptionPeriodEventsLimit: 1000,
+      usageWarningSentAt: null,
+      usageExceededSentAt: null,
+    },
+    async (args) => {
+      claims.push(args);
+      return { count: 0 };
+    }
+  );
+  await notificationQueueJobs.sendUsageAlert.handler({
+    payload: { organizationId: 'org_1', count: 900 },
+    ctx,
+  });
+  expect(claims).toHaveLength(1);
+  expect(claims[0]).toMatchObject({
+    where: { id: 'org_1', usageWarningSentAt: null },
+  });
 });

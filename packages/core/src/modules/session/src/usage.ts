@@ -96,11 +96,31 @@ export const updateEventsCount = cacheablePerDeps(
 );
 
 /**
+ * The usage alert of a count another process computed (the Go worker's
+ * updateEventsCount): the organization is read again so the thresholds and the
+ * sent-at markers are current, then the same conditional claim as above
+ * decides who sends, so a repeated job sends nothing.
+ */
+export async function sendUsageAlertsForOrganization(
+  deps: ServiceDeps,
+  organizationId: string,
+  count: number
+): Promise<void> {
+  const organization = await deps.db.organization.findUnique({
+    where: { id: organizationId },
+  });
+  if (!organization) {
+    return;
+  }
+  await sendUsageAlerts(deps, organization, count);
+}
+
+/**
  * One warning at 80% and one notice at 100% per billing cycle. The sent-at
  * markers are cleared by the Polar webhook when a new cycle resets the usage
  * counter (or the limit is raised), so each cycle can alert again.
  */
-async function sendUsageAlerts(
+export async function sendUsageAlerts(
   deps: ServiceDeps,
   organization: Organization,
   count: number

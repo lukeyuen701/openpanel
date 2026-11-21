@@ -5,6 +5,7 @@ import type { Prisma } from '@openpanel/db/src/prisma-client';
 import { z } from 'zod';
 import { isProviderError } from '../../clients/provider-error';
 import { defineJob } from '../../jobs/define';
+import { sendUsageAlertsForOrganization } from '../session/src/usage';
 
 // A loose mirror of `Prisma.NotificationUncheckedCreateInput` — the payload
 // is a Prisma create input on the wire, and BullMQ stores job data as JSON,
@@ -22,8 +23,29 @@ const notificationPayload = z.object({
   payload: z.unknown().optional(),
 });
 
+/**
+ * Enqueued by the Go worker's updateEventsCount when an organization crossed
+ * 80% or 100% of its limit: the e-mails are React Email templates, which only
+ * this worker renders.
+ */
+const usageAlertPayload = z.object({
+  organizationId: z.string(),
+  count: z.number(),
+});
+
 /** The `notification` queue's own job. */
 export const notificationQueueJobs = {
+  sendUsageAlert: defineJob({
+    payload: usageAlertPayload,
+    handler: async ({ payload, ctx }) => {
+      await sendUsageAlertsForOrganization(
+        ctx,
+        payload.organizationId,
+        payload.count
+      );
+    },
+  }),
+
   sendNotification: defineJob({
     payload: z.object({ notification: notificationPayload }),
     handler: async ({ payload, ctx }) => {
