@@ -80,7 +80,7 @@ export {
   startSchedulers,
 } from './jobs/schedulers';
 export type { WorkerHandle } from './jobs/workers';
-export { runJob, startWorkers } from './jobs/workers';
+export { runJob, startWorkers, withDisabledJobs } from './jobs/workers';
 export type {
   QueueProducerHandle,
   QueueProducers,

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'bun:test';
 import {
+  CRON_JOB_VALUES,
   concurrencyEnvKey,
   concurrencyOverride,
   ENABLED_QUEUE_VALUES,
@@ -62,6 +63,38 @@ describe('ENABLED_QUEUES', () => {
     expect(() =>
       loadConfig({ ...base, ENABLED_QUEUES: 'events_kafka' })
     ).toThrow(/"events_kafka" was renamed to "events"/);
+  });
+});
+
+describe('DISABLED_CRON_JOBS', () => {
+  it('is empty when unset or blank', () => {
+    expect(loadConfig(base).DISABLED_CRON_JOBS).toEqual([]);
+    expect(
+      loadConfig({ ...base, DISABLED_CRON_JOBS: '  ' }).DISABLED_CRON_JOBS
+    ).toEqual([]);
+  });
+
+  it('accepts cron job names from the registry', () => {
+    expect(CRON_JOB_VALUES).toContain('flushEvents');
+    expect(
+      loadConfig({ ...base, DISABLED_CRON_JOBS: 'flushEvents,sessionReaper' })
+        .DISABLED_CRON_JOBS
+    ).toEqual(['flushEvents', 'sessionReaper']);
+  });
+
+  it('trims whitespace around names', () => {
+    expect(
+      loadConfig({
+        ...base,
+        DISABLED_CRON_JOBS: ' flushEvents , flushSessions ',
+      }).DISABLED_CRON_JOBS
+    ).toEqual(['flushEvents', 'flushSessions']);
+  });
+
+  it('rejects an unknown name and lists the accepted ones', () => {
+    expect(() =>
+      loadConfig({ ...base, DISABLED_CRON_JOBS: 'flushEvents,nope' })
+    ).toThrow(/unknown cron job "nope"\. Accepted values: .*flushEvents/);
   });
 });
 

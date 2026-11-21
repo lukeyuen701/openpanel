@@ -132,6 +132,26 @@ export function startWorkers<TQueues extends QueueMap>({
   };
 }
 
+/**
+ * A copy of `definition` whose named jobs complete without running. Handing a
+ * job to another process leaves its scheduler registered here, so ticks keep
+ * arriving and re-enabling the job needs no scheduler change.
+ */
+export function withDisabledJobs<TDefinition extends QueueDefinition>(
+  definition: TDefinition,
+  disabled: readonly string[]
+): TDefinition {
+  const jobs = Object.fromEntries(
+    Object.entries(definition.jobs).map(([name, job]) => [
+      name,
+      disabled.includes(name)
+        ? { ...job, handler: async () => undefined }
+        : job,
+    ])
+  );
+  return { ...definition, jobs };
+}
+
 /** The shape of a BullMQ job this needs, so a test does not have to build one. */
 export interface RunnableJob {
   id?: string;

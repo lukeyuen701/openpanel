@@ -7,7 +7,7 @@ import type { Logger } from '../logger';
 import { defineJob, defineQueue } from './define';
 import { wrap } from './envelope';
 import { createRecordingProducers } from './testing';
-import { runJob } from './workers';
+import { runJob, withDisabledJobs } from './workers';
 
 function stubLogger(): Logger {
   const noop = () => undefined;
@@ -113,4 +113,27 @@ test('the payload is re-parsed in the worker, not trusted', async () => {
   await expect(
     runJob(queue, bullJob('import', wrap({ importId: 42 }, {})), stubDeps())
   ).rejects.toThrow();
+});
+
+test('a disabled job completes without running its handler, an enabled one runs', async () => {
+  const ran: string[] = [];
+  const job = (name: string) =>
+    defineJob({
+      payload: z.object({}),
+      handler: async () => {
+        ran.push(name);
+      },
+    });
+  const cron = defineQueue('import', {
+    jobs: { disabledJob: job('disabledJob'), enabledJob: job('enabledJob') },
+  });
+  const narrowed = withDisabledJobs(cron, ['disabledJob']);
+
+  await runJob(narrowed, bullJob('disabledJob', wrap({}, {})), stubDeps());
+  await runJob(narrowed, bullJob('enabledJob', wrap({}, {})), stubDeps());
+
+  expect(ran).toEqual(['enabledJob']);
+  // The original definition, and so its schedulers, is left alone.
+  await runJob(cron, bullJob('disabledJob', wrap({}, {})), stubDeps());
+  expect(ran).toEqual(['enabledJob', 'disabledJob']);
 });

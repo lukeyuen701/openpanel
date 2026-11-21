@@ -61,6 +61,7 @@ import {
   startWorkers,
   TRPC_ENDPOINT,
   type WorkerHandle,
+  withDisabledJobs,
 } from '@openpanel/core';
 import { ch } from '@openpanel/db/src/clickhouse/client';
 import {
@@ -211,10 +212,14 @@ function consumedQueues(): Record<string, QueueDefinition> {
       continue;
     }
     const concurrency = config.concurrency[name];
-    selected[name] =
+    const tuned =
       concurrency === undefined
         ? definition
         : { ...definition, worker: { ...definition.worker, concurrency } };
+    selected[name] =
+      name === CRON_QUEUE_NAME
+        ? withDisabledJobs(tuned, config.DISABLED_CRON_JOBS)
+        : tuned;
   }
 
   return selected;
@@ -530,6 +535,12 @@ async function main() {
 
   if (workersEnabled) {
     const definitions = consumedQueues();
+    if (definitions[CRON_QUEUE_NAME] && config.DISABLED_CRON_JOBS.length > 0) {
+      logger.info(
+        { jobs: config.DISABLED_CRON_JOBS },
+        'cron jobs disabled on this process'
+      );
+    }
     workers = startWorkers({
       definitions,
       deps,

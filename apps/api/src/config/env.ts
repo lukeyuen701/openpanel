@@ -83,6 +83,9 @@ export const ENABLED_QUEUE_VALUES = [
 
 export type EnabledQueue = (typeof ENABLED_QUEUE_VALUES)[number];
 
+/** The `cron` queue's job names, read from the registry so the accepted set cannot drift. */
+export const CRON_JOB_VALUES = Object.keys(queues.cron.jobs);
+
 const RENAMED_QUEUE_TOKENS: Record<string, string> = {
   events_kafka: KAFKA_QUEUE_TOKEN,
 };
@@ -341,6 +344,29 @@ const enabledQueuesSchema = z.preprocess(
     )
 );
 
+/**
+ * Cron jobs this process leaves to another one (the Go worker). Same doctrine
+ * as ENABLED_QUEUES: an unknown name fails boot rather than silently running a
+ * job the operator meant to hand over.
+ */
+const disabledCronJobsSchema = z.preprocess(
+  blankToUndefined,
+  z
+    .string()
+    .optional()
+    .superRefine((value, ctx) => {
+      for (const token of splitTokens(value)) {
+        if (!CRON_JOB_VALUES.includes(token)) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `DISABLED_CRON_JOBS: unknown cron job "${token}". Accepted values: ${CRON_JOB_VALUES.join(', ')}.`,
+          });
+        }
+      }
+    })
+    .transform((value) => splitTokens(value))
+);
+
 /** One `<QUEUE>_CONCURRENCY` slot per registry queue. A non-numeric or
  *  non-positive value is ignored and the default kept. */
 const concurrencyShape = Object.fromEntries(
@@ -400,6 +426,7 @@ const rawSchema = z.object({
    */
   QUEUE_NAMESPACE: optionalString,
   ENABLED_QUEUES: enabledQueuesSchema,
+  DISABLED_CRON_JOBS: disabledCronJobsSchema,
   DISABLE_WORKERS: definedIsTrueSchema,
   DISABLE_BULLBOARD: trueOrOneSchema,
   /** HTTP Basic credentials for operator-only surfaces; bull-board today. */
@@ -999,6 +1026,7 @@ export interface Config {
   QUEUE_CLUSTER: boolean;
   QUEUE_NAMESPACE: string | undefined;
   ENABLED_QUEUES: EnabledQueue[];
+  DISABLED_CRON_JOBS: string[];
   DISABLE_WORKERS: boolean;
   AUTOMATIC_MIGRATIONS: boolean;
   DISABLE_BULLBOARD: boolean;
@@ -1047,6 +1075,7 @@ const envSchema = rawSchema
       QUEUE_CLUSTER: raw.QUEUE_CLUSTER,
       QUEUE_NAMESPACE: raw.QUEUE_NAMESPACE,
       ENABLED_QUEUES: raw.ENABLED_QUEUES,
+      DISABLED_CRON_JOBS: raw.DISABLED_CRON_JOBS,
       DISABLE_WORKERS: raw.DISABLE_WORKERS,
       AUTOMATIC_MIGRATIONS: raw.AUTOMATIC_MIGRATIONS,
       DISABLE_BULLBOARD: raw.DISABLE_BULLBOARD,
