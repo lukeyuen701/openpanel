@@ -35,8 +35,9 @@ RUN --mount=type=secret,id=maxmind_license_key,required=false \
 
 FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=build /out/ingest /app/ingest
-# The events consumer; run it with the command /app/worker (the image's own
-# entrypoint and healthcheck are the receiver's).
+# The Go worker. The entrypoint and healthcheck are the receiver's, so a
+# worker container overrides both: entrypoint ["/app/worker"] and the
+# healthcheck ["/app/worker", "healthcheck"].
 COPY --from=build /out/worker /app/worker
 COPY --from=geo /geo/*.mmdb /app/geo/
 ENV INGEST_GEO_DIR=/app/geo \
