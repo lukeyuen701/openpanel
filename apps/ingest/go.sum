@@ -23,6 +23,8 @@ github.com/kylelemons/godebug v1.1.0 h1:RPNrshWIDI6G2gRW9EHilWtl7Z6Sb1BR0xunSBf0
 github.com/kylelemons/godebug v1.1.0/go.mod h1:9/0rRGxNHcop5bhtWyNeEfOS8JIWk580+fNqagV/RAw=
 github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 h1:C3w9PqII01/Oq1c1nUAm88MOHcQC9l5mIlSMApZMrHA=
 github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822/go.mod h1:+n7T8mK8HuQTcFwEeznm/DIxMOiR9yIdICNftLE1DvQ=
+github.com/nationallibraryofnorway/whatwg-url v0.9.1 h1:kGyhz2uSi70VS1JxgSZwZjpmrV8bM5PercNlxhMlls8=
+github.com/nationallibraryofnorway/whatwg-url v0.9.1/go.mod h1:3KSm5/kiby6KExnnCXZ1Vmdwc+pLZokAdtJavchDKwg=
 github.com/onsi/gomega v1.44.0 h1:eAiGl3Pw5jz5GQdDff0BcxYpAX1JxW8xD7mFUuwNfZQ=
 github.com/onsi/gomega v1.44.0/go.mod h1:e/C2HwaZ1DhvjzXXuFhcR7hY7Sh9pl7MmoWKEjzwcdA=
 github.com/oschwald/maxminddb-golang/v2 v2.9.1 h1:7o5EFBYe8S7+3ppDmYNaoEn1x/GZ4P9P25vxS9vBGpM=

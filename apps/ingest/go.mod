@@ -1,11 +1,12 @@
 module openpanel/ingest
 
-go 1.26.0
+go 1.27.0
 
 require (
 	github.com/dlclark/regexp2 v1.12.0
 	github.com/hashicorp/golang-lru/v2 v2.0.7
 	github.com/jackc/pgx/v5 v5.13.0
+	github.com/nationallibraryofnorway/whatwg-url v0.9.1
 	github.com/oschwald/maxminddb-golang/v2 v2.9.1
 	github.com/prometheus/client_golang v1.25.0
 	github.com/redis/rueidis v1.0.80
