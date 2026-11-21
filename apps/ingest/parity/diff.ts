@@ -46,9 +46,46 @@ const secrets = {
 };
 const dbUrl = (process.env.DATABASE_URL ?? '').split('?')[0]!;
 const sql = new SQL(dbUrl);
+const redisUrl = process.env.REDIS_URL ?? 'redis://localhost:23379';
+
+// Both sides 500 on /track/device-id without two salts, and only the worker
+// creates them, so a fresh environment needs its own for the run.
+const REQUIRED_SALTS = 2;
+const SALT_PREFIX = 'ingest-parity-';
+const SALT_CACHE_KEY = 'cachable:op:salt:[]';
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+async function ensureSalts() {
+  const [{ count }] = await sql`SELECT count(*)::int AS count FROM salts`;
+  if (count >= REQUIRED_SALTS) {
+    return;
+  }
+  const randomSalt = () =>
+    `${SALT_PREFIX}${Buffer.from(crypto.getRandomValues(new Uint8Array(32))).toString('hex')}`;
+  const now = Date.now();
+  await sql`INSERT INTO salts (salt, "createdAt", "updatedAt") VALUES (${randomSalt()}, ${new Date(now - DAY_MS)}, ${new Date(now - DAY_MS)}), (${randomSalt()}, ${new Date(now)}, ${new Date(now)})`;
+  await clearSaltCache();
+}
+
+// The prefix marks the run's salts, so a run left behind by --keep or a crash
+// is cleaned up by the next one.
+async function removeSalts() {
+  const removed =
+    await sql`DELETE FROM salts WHERE salt LIKE ${`${SALT_PREFIX}%`} RETURNING salt`;
+  if (removed.length) {
+    await clearSaltCache();
+  }
+}
+
+async function clearSaltCache() {
+  const redis = new Bun.RedisClient(redisUrl);
+  await redis.del(SALT_CACHE_KEY);
+  redis.close();
+}
 
 async function setupFixtures() {
   await teardownFixtures();
+  await ensureSalts();
   await sql`INSERT INTO organizations (id, name) VALUES (${ids.org}, 'Ingest parity')`;
   await sql`INSERT INTO organizations (id, name, "windDownStep") VALUES (${ids.orgWound}, 'Ingest parity wound down', 'blocked')`;
   await sql`INSERT INTO projects (id, name, "organizationId", cors, filters) VALUES (${ids.project}, 'Parity', ${ids.org}, ${'{https://parity.example,*.wild.example,http://localhost:3000}'}::text[], ${JSON.stringify(
@@ -80,6 +117,7 @@ async function setupFixtures() {
 }
 
 async function teardownFixtures() {
+  await removeSalts();
   await sql`DELETE FROM clients WHERE "organizationId" IN (${ids.org}, ${ids.orgWound})`;
   await sql`DELETE FROM projects WHERE "organizationId" IN (${ids.org}, ${ids.orgWound})`;
   await sql`DELETE FROM organizations WHERE id IN (${ids.org}, ${ids.orgWound})`;
@@ -120,6 +158,8 @@ async function startServers() {
   const env = {
     ...process.env,
     LOG_LEVEL: 'warn',
+    // The wound-down cases expect a refusal, which self-hosted installs skip.
+    SELF_HOSTED: 'false',
     KAFKA_BROKERS: process.env.KAFKA_BROKERS ?? '127.0.0.1:23092',
   };
   children.push(
@@ -898,18 +938,18 @@ async function main() {
     const liveHeaders = browserHeaders(ids.scrypt, 'https://parity.example', [
       ['x-live-session', '1'],
     ]);
-    const probe = JSON.parse(
-      (
-        await send(TS_PORT, {
-          method: 'GET',
-          path: '/track/device-id',
-          headers: dropHeader(liveHeaders, 'content-type'),
-        })
-      ).body
-    ) as { deviceId: string };
-    const redis = new Bun.RedisClient(
-      process.env.REDIS_URL ?? 'redis://localhost:23379'
-    );
+    const probeResponse = await send(TS_PORT, {
+      method: 'GET',
+      path: '/track/device-id',
+      headers: dropHeader(liveHeaders, 'content-type'),
+    });
+    if (probeResponse.status !== 200) {
+      throw new Error(
+        `/track/device-id answered ${probeResponse.status}: ${probeResponse.body}`
+      );
+    }
+    const probe = JSON.parse(probeResponse.body) as { deviceId: string };
+    const redis = new Bun.RedisClient(redisUrl);
     const endedAt = new Date(Date.now() - 60_000)
       .toISOString()
       .replace('T', ' ')
