@@ -12,6 +12,7 @@
     "gen:check": "bun scripts/gen-tables.ts --check && bun scripts/gen-referrers.ts --check",
     "worker-parity": "dotenv -e ../../.env -- bun parity/worker-diff.ts",
     "worker-parity:go": "go build -trimpath -o bin/worker ./cmd/worker && dotenv -e ../../.env -- bun parity/worker-diff.ts --a ts --b go --go-bin bin/worker",
+    "worker-parity:full": "go build -trimpath -o bin/worker ./cmd/worker && dotenv -e ../../.env -- bun parity/worker-diff.ts --a ts --b go --full --go-bin bin/worker",
     "golden:events": "dotenv -e ../../.env -- bun parity/golden-events.ts",
     "golden": "bun parity/golden-core.ts",
     "golden:jsport": "bun parity/golden-jsport.ts",

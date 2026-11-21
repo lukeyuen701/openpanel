@@ -538,6 +538,22 @@ const GEN_REVENUES: unknown[] = [
   1e21,
   '3e2',
 ];
+// The same positions as GEN_REVENUES, with values ClickHouse can store: the
+// revenue column is a UInt64, and a value it rejects (0.99, 1e21) fails the
+// insert of the whole batch that holds it.
+const GEN_REVENUES_CLICKHOUSE: unknown[] = [
+  4999,
+  1250,
+  12,
+  99,
+  7,
+  0,
+  3,
+  null,
+  100_000,
+  Number.MAX_SAFE_INTEGER,
+  300,
+];
 const GEN_UNICODE = [
   '日本語のテスト — ünïcödé',
   'Æblegrød 🍎',
@@ -613,7 +629,58 @@ interface GenDevice {
   groups?: string[];
 }
 
-export function buildGeneratedCorpus(): CorpusRecord[] {
+/**
+ * The producer's session rule under a different idle timeout: a device's
+ * session id changes when the next event comes more than `timeoutMs` after the
+ * latest one, which is also the worker's boundary rule (session-buffer.ts). The
+ * corpus is written for the 30 minute default; a run with a shorter timeout
+ * must have the producers mint ids accordingly, or one id would span several
+ * worker sessions and the end of the first would close the live one. Records
+ * without a device (server and AI records) and past-timestamp records keep the
+ * session of their device.
+ */
+export function alignSessionsToTimeout(
+  records: CorpusRecord[],
+  timeoutMs: number
+): CorpusRecord[] {
+  const devices = new Map<string, { n: number; lastAt: number }>();
+  return records.map((record) => {
+    const payload = JSON.parse(record.value);
+    if (!(payload.deviceId && payload.sessionId)) {
+      return record;
+    }
+    const at = new Date(payload.event.timestamp).getTime();
+    const key = `${payload.projectId}|${payload.deviceId}`;
+    const state = devices.get(key) ?? {
+      n: 0,
+      lastAt: Number.NEGATIVE_INFINITY,
+    };
+    if (!payload.event.isTimestampFromThePast) {
+      if (
+        at - state.lastAt > timeoutMs &&
+        state.lastAt > Number.NEGATIVE_INFINITY
+      ) {
+        state.n += 1;
+      }
+      state.lastAt = Math.max(state.lastAt, at);
+    }
+    devices.set(key, state);
+    const aligned = sessionId(payload.projectId, payload.deviceId, state.n);
+    return {
+      ...record,
+      value: record.value.replace(
+        `"sessionId":"${payload.sessionId}"`,
+        `"sessionId":"${aligned}"`
+      ),
+    };
+  });
+}
+
+export function buildGeneratedCorpus(
+  sessionTimeoutMs = SESSION_TIMEOUT_MS,
+  clickhouseSafe = false
+): CorpusRecord[] {
+  const revenues = clickhouseSafe ? GEN_REVENUES_CLICKHOUSE : GEN_REVENUES;
   const rand = seededRandom(GENERATED_SEED);
   const waves: RecordSpec[][] = [[], [], [], [], [], [], []];
   const devices: GenDevice[] = [];
@@ -693,7 +760,7 @@ export function buildGeneratedCorpus(): CorpusRecord[] {
     } else if (roll < 0.78) {
       clientEvent(d, wave, 'revenue', at, {
         ...genPath(rand),
-        __revenue: pick(rand, GEN_REVENUES),
+        __revenue: pick(rand, revenues),
         currency: pick(rand, GEN_CURRENCIES),
       });
     } else if (roll < 0.9) {
@@ -736,10 +803,10 @@ export function buildGeneratedCorpus(): CorpusRecord[] {
   // Wave 2: some devices come back after an idle gap around the timeout; the
   // producer mints a new session id when the gap is past it.
   const gaps = [
-    SESSION_TIMEOUT_MS - 1000,
-    SESSION_TIMEOUT_MS,
-    SESSION_TIMEOUT_MS + 1,
-    SESSION_TIMEOUT_MS + 61_000,
+    sessionTimeoutMs - 1000,
+    sessionTimeoutMs,
+    sessionTimeoutMs + 1,
+    sessionTimeoutMs + 61_000,
     2 * HOUR,
     DAY + 5 * MINUTE,
   ];
@@ -749,7 +816,7 @@ export function buildGeneratedCorpus(): CorpusRecord[] {
     }
     const gap = pick(rand, gaps);
     d.clock += gap;
-    if (gap > SESSION_TIMEOUT_MS) {
+    if (gap > sessionTimeoutMs) {
       d.session += 1;
     }
     clientEvent(d, 2, 'screen_view', d.clock, genPath(rand));
