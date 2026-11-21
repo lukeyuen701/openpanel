@@ -10,8 +10,10 @@ export interface ProfileBackfillEntry {
   profileId: string;
 }
 
-// Max session IDs per IN clause before we split into another query
-const CHUNK_SIZE = 500;
+// Sessions per UPDATE. Each binds four URL parameters and ClickHouse rejects a
+// request with more than http_max_fields (1000) of them ("Too many form
+// fields"), so 500 sessions failed on every tick above about 245.
+export const BACKFILL_SESSIONS_PER_UPDATE = 200;
 
 const DEFAULT_BATCH_SIZE = 1000;
 
@@ -78,8 +80,7 @@ export class ProfileBackfillBuffer extends BaseBuffer {
       TABLE_NAMES.events
     );
 
-    const chunks = this.chunks(entries, CHUNK_SIZE);
-    let processedChunks = 0;
+    const chunks = this.chunks(entries, BACKFILL_SESSIONS_PER_UPDATE);
 
     const chStart = performance.now();
     for (const chunk of chunks) {
@@ -114,17 +115,15 @@ export class ProfileBackfillBuffer extends BaseBuffer {
           allow_experimental_lightweight_update: '1',
         },
       });
-
-      processedChunks++;
     }
     const chInsertMs = performance.now() - chStart;
 
-    let trimMs: number | undefined;
-    if (processedChunks === chunks.length) {
-      const trimStart = performance.now();
-      await this.redis.ltrim(this.redisKey, raw.length, -1);
-      trimMs = performance.now() - trimStart;
-    }
+    // A failing chunk throws out of the loop above, so nothing is trimmed
+    // unless every chunk landed; the UPDATE is idempotent, so the next tick
+    // simply sends the whole batch again.
+    const trimStart = performance.now();
+    await this.redis.ltrim(this.redisKey, raw.length, -1);
+    const trimMs = performance.now() - trimStart;
 
     this.reportFlushStats({
       rowsProcessed: raw.length,
