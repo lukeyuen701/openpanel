@@ -109,6 +109,11 @@ C 层的这些 service 同时服务 tRPC（`ctx.services.cohort/gsc/insight/orga
 | 日期 | 阶段 | 内容 | 结果 |
 |---|---|---|---|
 | 2026-11-22 | P0 | 消费组协议兼容性 spike：本地 Redpanda，6 分区，一个 TS 成员（@platformatic/kafka，协议 `RoundRobinAssigner` v0）加一个 Go 成员（franz-go，`internal/kafka/balancer.go` 的 `EventsGroupBalancer`） | **通过**。TS 做 leader 时把 [0,2,4] 分给 Go，Go 做 leader 时把 [1,3,5] 分给 TS，双方都能正常消费。结论：P1 可以按分区灰度（混合消费组）。注意：Go worker 必须处理 SIGTERM 并主动离开消费组，否则要等会话超时后才会重新分配 |
+| 2026-11-22 | P0 | 差异测试 rig（`apps/ingest/parity/worker-diff.ts`，`bun run worker-parity`）；TS 对 TS 比对，确认哪些字段本身就不确定 | 通过。归一化处理的字段：墙上时钟（inserted_at、profile 时间、BullMQ timestamp、wallclock 分数）、worker 生成的 uuid、不同设备之间的行顺序；Go 不写的 `cachable:*` 不参与比对 |
+| 2026-11-22 | P0 | TS 端新增 `DISABLED_CRON_JOBS` | 已提交，有测试 |
+| 2026-11-22 | P1 | Go 消费端：consumer、wire、config、jsport、projects、notify、bullmq（写入）、events、`cmd/worker` | **rig 比对 TS 对 Go 无差异**：手写语料 19 条，生成语料 1,970 条（4 个分区、7 批）。另外用 `-race` 编译的二进制跑了一遍 rig，没有数据竞争 |
+| 2026-11-22 | P2 | ClickHouse 客户端（请求逐字节对齐 Node 客户端，故障切换，每次重试都重建请求体）、flush 锁（同一段 Lua）、调度器、`GO_WORKER_CRON_JOBS`；bot、ai、replay、group 的 flush | 线上测试：TS 和 Go 写入的行一致；TS 和 Go 的锁互斥 |
+| 2026-11-22 | P3 预备 | Go 版 BullMQ consumer（BullMQ 自带的 Lua） | 和 Bun worker 同时消费一个队列，300 个任务每个只执行一次；进程被杀后，任务由卡住任务检查（stalled check）放回队列 |
 
 ### 本地无法完成、需要在生产或 staging 上做的门槛
 - 生产 worker 的 CPU profile 和基线
