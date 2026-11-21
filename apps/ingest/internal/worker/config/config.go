@@ -60,11 +60,15 @@ const (
 
 // Config is the worker's environment, parsed.
 type Config struct {
-	Role           string
-	EnabledQueues  []string
-	DisableWorkers bool
-	QueueCluster   bool
-	QueueNamespace string
+	Role          string
+	EnabledQueues []string
+	// EnabledQueuesSet is whether ENABLED_QUEUES was set at all. The Bun
+	// default (every queue) must not start the Go events consumer: a Go
+	// container sharing the Bun env file would otherwise join the events group.
+	EnabledQueuesSet bool
+	DisableWorkers   bool
+	QueueCluster     bool
+	QueueNamespace   string
 
 	ShutdownForceExit        time.Duration
 	RedisCacheCommandTimeout time.Duration
@@ -136,6 +140,9 @@ func (c Config) ConsumesEvents() bool {
 	if c.Role == RoleAPI || c.DisableWorkers {
 		return false
 	}
+	if !c.EnabledQueuesSet {
+		return false
+	}
 	for _, queue := range c.EnabledQueues {
 		if queue == EventsQueueToken {
 			return true
@@ -157,6 +164,11 @@ func (l *loader) problem(format string, args ...any) {
 }
 
 // value is blankToUndefined: unset and whitespace-only are the same.
+func (l *loader) isSet(name string) bool {
+	_, ok := l.value(name)
+	return ok
+}
+
 func (l *loader) value(name string) (string, bool) {
 	v := strings.TrimSpace(l.getenv(name))
 	return v, v != ""
@@ -284,6 +296,7 @@ func Load(getenv func(string) string) (Config, error) {
 	cfg := Config{
 		Role:                      l.role(),
 		EnabledQueues:             l.enabledQueues(),
+		EnabledQueuesSet:          l.isSet("ENABLED_QUEUES"),
 		DisableWorkers:            l.definedIsTrue("DISABLE_WORKERS"),
 		QueueCluster:              l.definedIsTrue("QUEUE_CLUSTER"),
 		QueueNamespace:            l.optionalText("QUEUE_NAMESPACE"),

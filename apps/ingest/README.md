@@ -153,7 +153,7 @@ start.
 
 | Part | Switched on by | What it does |
 |---|---|---|
-| Events consumer | `ROLE=worker` (or `all`) and `events` in `ENABLED_QUEUES` | joins the consumer group `openpanel-events` (the same group protocol name as the Bun consumer, so Bun and Go members share one group and split its partitions), turns each record into the event row, session, profile and AI buffer writes, project filters, first-event marker, notification rules, and enqueues the `sessions` and `notification` BullMQ jobs |
+| Events consumer | `ROLE=worker` (or `all`) and `events` in an explicitly set `ENABLED_QUEUES` (unlike the Bun worker, an unset `ENABLED_QUEUES` does not start it, so a Go container sharing the Bun env file never joins the group by accident) | joins the consumer group `openpanel-events` (the same group protocol name as the Bun consumer, so Bun and Go members share one group and split its partitions), turns each record into the event row, session, profile and AI buffer writes, project filters, first-event marker, notification rules, and enqueues the `sessions` and `notification` BullMQ jobs |
 | BullMQ queues | `GO_WORKER_QUEUES` | consumes the `sessions` queue (session end, the funnel notification check, the usage count) with BullMQ's own Lua scripts; a Bun worker can consume the same queue at the same time |
 | Cron jobs | `GO_WORKER_CRON_JOBS` | `flushEvents`, `flushSessions`, `flushProfiles`, `flushProfileBackfill`, `flushBots`, `flushReplay`, `flushGroups`, `flushAiEvents`, `sessionReaper`, `sessionVacuum`; each takes the same `lock:<buffer>` Redis lock as the Bun flush, so the two never flush one buffer at once |
 

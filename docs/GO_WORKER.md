@@ -145,7 +145,7 @@ C 层的这些 service 同时服务 tRPC（`ctx.services.cohort/gsc/insight/orga
 - **一次只做一个阶段里的一步**，每一步做完等 lag 回到 0、对账通过，再做下一步。每一步的回滚都是把这一步改的变量改回去，不需要改数据。
 - **Bun worker 的变量**：`ENABLED_QUEUES` 不设置等于全部队列（`events,sessions,cron,notification,import,insights,gsc,cohortCompute`）。要去掉 `events` 时必须把剩下的写全，例如 `ENABLED_QUEUES=sessions,cron,notification,import,insights,gsc,cohortCompute`。`DISABLED_CRON_JOBS` 是逗号分隔的 cron 任务 id，写错名字会让 Bun worker 启动失败；它让这个进程"完成但不执行"这些任务，调度器仍然登记着。
 - **Go worker 的变量**：`ROLE=worker`；`GO_WORKER_QUEUES`（目前只接受 `sessions`）；`GO_WORKER_CRON_JOBS`（任务 id 同上；Go 只实现这 10 个：`flushEvents`、`flushSessions`、`flushProfiles`、`flushProfileBackfill`、`flushBots`、`flushReplay`、`flushGroups`、`flushAiEvents`、`sessionReaper`、`sessionVacuum`，写别的名字启动失败）。其余变量和 Bun 的同名，共用同一个 env 文件。
-- **Go 容器必须显式写 `ENABLED_QUEUES`**。共用的 env 文件里通常没有它，而"未设置"等于全部队列，Go 容器会因此加入 `openpanel-events` 消费组。不消费 events 的 Go 容器写一个不含 `events` 的值（例如 `ENABLED_QUEUES=cron`；Go 只看其中有没有 `events`，其他名字被接受但不起作用）。compose 的 `environment` 优先于 `env_file`。
+- **Go 的 events 消费端要显式开启。** 共用的 env 文件里通常没有 `ENABLED_QUEUES`。对 Bun 来说，"未设置"表示消费全部队列；Go worker 则把"未设置"当作不启动 events 消费端，只有显式写了含 `events` 的 `ENABLED_QUEUES` 才会加入 `openpanel-events` 消费组。这样即使 Go 容器沿用了 Bun 的 env 文件，也不会意外切换。不消费 events 的 Go 容器可以不写，或者写一个不含 `events` 的值（例如 `ENABLED_QUEUES=cron`）。compose 里 `environment` 的设置优先于 `env_file`。
 - **镜像**：和接收端同一个镜像，但镜像的入口和健康检查是接收端的，所以必须用 `entrypoint` 覆盖（只写 `command: /app/worker` 会变成 `/app/ingest /app/worker`，启动的是接收端），并覆盖健康检查。ops 端口是 `API_PORT`（默认 3000，和 Bun worker 一样）。
 
 ```yaml

@@ -179,8 +179,9 @@ func TestConsumesEventsNeedsAConsumingRoleWorkersOnAndTheEventsToken(t *testing.
 		want bool
 	}{
 		{"api role", nil, false},
-		{"worker, all queues", map[string]string{"ROLE": "worker"}, true},
-		{"all role", map[string]string{"ROLE": "all"}, true},
+		{"worker, ENABLED_QUEUES unset", map[string]string{"ROLE": "worker"}, false},
+		{"all role, ENABLED_QUEUES unset", map[string]string{"ROLE": "all"}, false},
+		{"all role, events", map[string]string{"ROLE": "all", "ENABLED_QUEUES": "events"}, true},
 		{"workers disabled", map[string]string{"ROLE": "worker", "DISABLE_WORKERS": "false"}, false},
 		{"no events token", map[string]string{"ROLE": "worker", "ENABLED_QUEUES": "sessions,cron"}, false},
 		{"events only", map[string]string{"ROLE": "worker", "ENABLED_QUEUES": "events"}, true},
