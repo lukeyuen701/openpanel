@@ -13,6 +13,7 @@
     "[Social login (Google & GitHub)](/docs/self-hosting/social-login)",
     "[Google Search Console](/docs/self-hosting/google-search-console)",
     "[High volume setup](/docs/self-hosting/high-volume)",
+    "[Upgrading ClickHouse](/docs/self-hosting/upgrade-clickhouse)",
     "supporter-access-latest-docker-images",
     "changelog"
   ]

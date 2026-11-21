@@ -1,0 +1,125 @@
+---
+title: Upgrading ClickHouse
+description: Move the bundled ClickHouse to the supported release, with a backup to fall back on
+---
+
+import { Callout } from 'fumadocs-ui/components/callout';
+import { Step, Steps } from 'fumadocs-ui/components/steps';
+import { SelfHostingVersionBanner } from '@/components/self-hosting-version-banner';
+
+<SelfHostingVersionBanner />
+
+New installs run ClickHouse **26.8 LTS** (`clickhouse/clickhouse-server:26.8.42.13`). Installs created earlier keep the version in their `docker-compose.yml` until you change it: `openpanel upgrade` never touches the ClickHouse image. `openpanel doctor` tells you when yours is older than the supported release.
+
+OpenPanel keeps working on older ClickHouse releases, but ClickHouse fixes only its three latest stable releases and its two latest LTS releases. 25.10 is no longer among them.
+
+<Callout type="warn">
+The upgrade is one-way. Once ClickHouse 26.8 has written to the data volume, an older server refuses to start on it. The way back is the backup you take in step 2, so do not skip it.
+</Callout>
+
+## Before you start
+
+- About 15 minutes, most of it the backup. The dashboard is unavailable while ClickHouse is stopped.
+- Free disk space for one compressed copy of the ClickHouse volume.
+- Your current version:
+
+```bash
+docker compose exec op-ch clickhouse-client --query "SELECT version()"
+```
+
+Tracking keeps working during the upgrade: the api accepts events into Redpanda while ClickHouse is down, and the worker writes them once it is back. Meanwhile `op-api` reports itself unhealthy, which is expected; Caddy keeps sending it traffic.
+
+<Steps>
+<Step>
+
+### Stop the worker and ClickHouse
+
+Run these in the directory that holds your `docker-compose.yml`. Note any detached parts first, so you can tell old ones from new ones after the upgrade:
+
+```bash
+docker compose exec op-ch clickhouse-client --query "SELECT database, table, reason, count() FROM system.detached_parts GROUP BY ALL"
+docker compose stop op-worker op-ch
+```
+
+</Step>
+<Step>
+
+### Back up the ClickHouse volume
+
+Find the volume's full name (Compose prefixes it with the project name), then archive it while ClickHouse is stopped:
+
+```bash
+docker volume ls --filter name=op-ch-data
+docker run --rm -v <project>_op-ch-data:/data -v "$PWD":/backup alpine tar czf /backup/op-ch-data-backup.tgz -C /data .
+```
+
+</Step>
+<Step>
+
+### Change the image and start ClickHouse
+
+In `docker-compose.yml`, set the `op-ch` image:
+
+```yaml
+op-ch:
+  image: clickhouse/clickhouse-server:26.8.42.13
+```
+
+Then pull it and start ClickHouse:
+
+```bash
+docker compose pull op-ch
+docker compose up -d op-ch
+```
+
+</Step>
+<Step>
+
+### Check it, then start the worker
+
+```bash
+docker compose exec op-ch clickhouse-client --query "SELECT version()"
+docker compose exec op-ch clickhouse-client --query "SELECT database, table, count() FROM system.detached_parts GROUP BY ALL"
+docker compose up -d op-worker
+```
+
+The first query prints `26.8.42.13`. The second should print the same as before the upgrade; a new row means ClickHouse could not load a part. `op-worker` starts once `op-api` is healthy again, usually within a few seconds. Open the dashboard and check that your charts show data.
+
+</Step>
+</Steps>
+
+## Memory on a shared host
+
+From 26.5 and 26.6, ClickHouse adapts to the memory free on the machine, which matters when it shares a host with the rest of the stack:
+
+- A query runs on fewer threads while free memory is short, about one thread per `max_threads_min_free_memory_per_thread` (1 GiB by default) of free memory. On a test machine with 1 to 2 GiB free, heavy charts took two to two and a half times as long as on 25.10.
+- The server's memory limit follows the memory the kernel reports as available, so ClickHouse leaves room for Postgres, Redis and Redpanda instead of growing until the kernel kills a process.
+
+Check how much memory is free while the stack runs:
+
+```bash
+docker compose exec op-ch clickhouse-client --query "SELECT formatReadableSize(value) FROM system.asynchronous_metrics WHERE metric = 'OSMemoryAvailable'"
+```
+
+If that is only a few GiB and charts got slower, add more memory, or lower the per-thread requirement in `clickhouse/clickhouse-user-config.xml`, inside `<profiles><default>`:
+
+```xml
+<max_threads_min_free_memory_per_thread>268435456</max_threads_min_free_memory_per_thread>
+```
+
+Only do this on 26.5 or later: an older ClickHouse does not know the setting and refuses to start.
+
+## Going back
+
+If something is wrong, put the backup back and return to the image you had. Never start the old image on a volume the new one has written to: it fails to start, and it can mark data it cannot read as broken.
+
+```bash
+docker compose stop op-worker op-ch
+docker run --rm -v <project>_op-ch-data:/data -v "$PWD":/backup alpine sh -c "find /data -mindepth 1 -delete && tar xzf /backup/op-ch-data-backup.tgz -C /data"
+```
+
+Set the `op-ch` image back to your previous tag, then `docker compose up -d op-ch op-worker`. Events tracked after the backup was taken are not in the restored data.
+
+## Coolify
+
+The Coolify template now ships ClickHouse 26.8. Its earlier `24.3.2` image cannot run OpenPanel's migrations, so an install on it never finished setting up. A Coolify install that does run on an older ClickHouse follows the same steps: back up the `opch-data` volume, then change the `opch` image.
