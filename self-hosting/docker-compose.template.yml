@@ -63,7 +63,7 @@ services:
     #   - 6379:6379
 
   op-ch:
-    image: clickhouse/clickhouse-server:25.10.2.65
+    image: clickhouse/clickhouse-server:26.8.42.13
     restart: always
     volumes:
       - op-ch-data:/var/lib/clickhouse

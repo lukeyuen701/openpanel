@@ -36,6 +36,7 @@ describe('doctor on a v1 install', () => {
       'compose/api-migrations',
       'env/kafka-brokers',
       'env/kafka-partitions',
+      'compose/clickhouse-version',
       'env/auth-secret',
       'env/api-url-ssr',
       'env/automatic-migrations',

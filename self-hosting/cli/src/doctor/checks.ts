@@ -491,6 +491,50 @@ export const externalKafkaVersion: Check = (install) => {
   };
 };
 
+const CLICKHOUSE_IMAGE = 'clickhouse/clickhouse-server';
+const CLICKHOUSE_SERVICE = 'op-ch';
+const CLICKHOUSE_VERSION_PATTERN = /^(\d+)\.(\d+)/;
+const DOCKER_HUB_PREFIX = /^(docker\.io\/|index\.docker\.io\/)/;
+
+const clickhouseImageOf = (compose: Document) =>
+  String(compose.getIn(['services', CLICKHOUSE_SERVICE, 'image']) ?? '');
+
+const clickhouseRelease = (image: string): [number, number] | null => {
+  const [repository = '', tag] = image.split(':');
+  if (repository.replace(DOCKER_HUB_PREFIX, '') !== CLICKHOUSE_IMAGE || !tag) {
+    return null;
+  }
+  const match = CLICKHOUSE_VERSION_PATTERN.exec(tag);
+  return match ? [Number(match[1]), Number(match[2])] : null;
+};
+
+const isOlderRelease = (
+  [major, minor]: [number, number],
+  [targetMajor, targetMinor]: [number, number]
+) => major < targetMajor || (major === targetMajor && minor < targetMinor);
+
+// The ClickHouse a fresh install gets. `upgrade` never changes it on an
+// existing install: the data a newer server writes cannot be read by the old
+// one, so going back means restoring a backup, which is the operator's call.
+// An image from another registry or an unversioned tag is the operator's own.
+export const clickhouseVersion: Check = (install) => {
+  const recommended = clickhouseImageOf(templateCompose);
+  const target = clickhouseRelease(recommended);
+  const current = clickhouseImageOf(install.compose);
+  const release = clickhouseRelease(current);
+  if (!(target && release && isOlderRelease(release, target))) {
+    return null;
+  }
+  return {
+    id: 'compose/clickhouse-version',
+    severity: 'warn',
+    title: `ClickHouse ${current.split(':')[1]} is older than ${recommended.split(':')[1]}, the release new installs get`,
+    detail:
+      'OpenPanel still runs on it. ClickHouse only fixes its newest stable and LTS releases, so an older one stops getting fixes at some point. Moving up is one-way: once the newer server has written data, the old one refuses to start on it.',
+    manual: `Back up the ClickHouse volume, stop the stack, set the op-ch image to ${recommended}, then start it again. To go back, restore the backup.`,
+  };
+};
+
 export const encryptionKey: Check = (install) => {
   const value = install.env.get('ENCRYPTION_KEY');
   if (value && ENCRYPTION_KEY_PATTERN.test(value)) {
@@ -826,6 +870,7 @@ export const checks: Check[] = [
   kafkaBrokers,
   kafkaPartitions,
   externalKafkaVersion,
+  clickhouseVersion,
   encryptionKey,
   cookieSecret,
   authSecret,

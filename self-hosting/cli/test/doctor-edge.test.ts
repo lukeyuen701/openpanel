@@ -14,6 +14,7 @@ import { join } from 'node:path';
 import { parseDocument } from 'yaml';
 import { applyFixes, runDoctor } from '../src/doctor';
 import { loadInstall, writeInstall } from '../src/install';
+import { templates } from '../src/templates';
 
 const V1_FIXTURE = join(import.meta.dir, 'fixtures/v1');
 // Owner read/write only, as `ls -l` shows the last three octal digits.
@@ -141,6 +142,61 @@ describe('external Kafka', () => {
     const dir = v1Copy();
     editEnv(dir, (text) => `${text}KAFKA_BROKERS="op-rp:9092"\n`);
     expect(ids(dir)).not.toContain('env/external-kafka-version');
+  });
+});
+
+describe('ClickHouse version', () => {
+  const clickhouseImage = (dir: string, image: string) =>
+    editCompose(dir, (text) =>
+      text.replace(/clickhouse\/clickhouse-server:[^\s]+/, image)
+    );
+
+  test('a Docker Hub-qualified or -alpine tag is still read', () => {
+    for (const image of [
+      'docker.io/clickhouse/clickhouse-server:25.10.2.65',
+      'clickhouse/clickhouse-server:24.3.2-alpine',
+    ]) {
+      const dir = v1Copy();
+      clickhouseImage(dir, image);
+      expect(ids(dir)).toContain('compose/clickhouse-version');
+    }
+  });
+
+  test('an older official release is a manual step, with nothing to fix', () => {
+    const findings = runDoctor(loadInstall(v1Copy()));
+    const finding = findings.find(
+      (candidate) => candidate.id === 'compose/clickhouse-version'
+    );
+    expect(finding?.severity).toBe('warn');
+    expect(finding?.fix).toBeUndefined();
+    expect(finding?.title).toContain('25.10.2.65');
+    expect(finding?.manual).toContain('Back up the ClickHouse volume');
+  });
+
+  test('the release a fresh install gets, or a newer one, passes', () => {
+    const freshInstall = String(
+      parseDocument(templates.compose).getIn(['services', 'op-ch', 'image'])
+    );
+    for (const image of [
+      freshInstall,
+      'clickhouse/clickhouse-server:99.1.1.1',
+    ]) {
+      const dir = v1Copy();
+      clickhouseImage(dir, image);
+      expect(ids(dir)).not.toContain('compose/clickhouse-version');
+    }
+  });
+
+  test('an image from elsewhere or without a version is left alone', () => {
+    for (const image of [
+      'registry.example.com/clickhouse/clickhouse-server:24.3.2',
+      'clickhouse/clickhouse-server:latest',
+      'clickhouse/clickhouse-server',
+    ]) {
+      const dir = v1Copy();
+      clickhouseImage(dir, image);
+      expect(ids(dir)).not.toContain('compose/clickhouse-version');
+    }
   });
 });
 
