@@ -303,7 +303,10 @@ func TestConsumerStopConsumingWaitsForTheRunningBatchAndStopLeavesTheGroup(t *te
 		return nil
 	}
 	rig.broker.hooks.Assigned([]int32{0})
-	rig.deliver(0, 0, 1)
+	// One message: with two, the batch may run them on parallel goroutines, and
+	// when the second enters the gate first, StopConsuming stops the first before
+	// it starts, leaving no handled prefix to commit.
+	rig.deliver(0, 0)
 	<-entered
 	stopped := make(chan struct{})
 	go func() { rig.consumer.StopConsuming(); close(stopped) }()
