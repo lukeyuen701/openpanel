@@ -10,11 +10,21 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import referrers from '../../../packages/core/src/shared/referrers';
 
-const OUTPUT = join(import.meta.dir, '../internal/worker/jsport/data/referrers.json');
+const OUTPUT = join(
+  import.meta.dir,
+  '../internal/worker/jsport/data/referrers.json'
+);
 const check = process.argv.includes('--check');
 
-const entries = Object.entries(referrers).map(([host, { type, name }]) => [host, type, name]);
-const table = referrers as Record<string, { type?: unknown; name?: unknown } | undefined>;
+const entries = Object.entries(referrers).map(([host, { type, name }]) => [
+  host,
+  type,
+  name,
+]);
+const table = referrers as Record<
+  string,
+  { type?: unknown; name?: unknown } | undefined
+>;
 const prototype = Object.getOwnPropertyNames(Object.prototype)
   .filter((key) => !Object.hasOwn(referrers, key))
   .map((key) => {
@@ -35,7 +45,9 @@ try {
 }
 if (current !== next) {
   if (check) {
-    console.error('stale: internal/worker/jsport/data/referrers.json (run bun run gen:referrers in apps/ingest)');
+    console.error(
+      'stale: internal/worker/jsport/data/referrers.json (run bun run gen:referrers in apps/ingest)'
+    );
     process.exit(1);
   }
   writeFileSync(OUTPUT, next);

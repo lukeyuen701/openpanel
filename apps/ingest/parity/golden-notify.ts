@@ -16,7 +16,10 @@ const save = (name: string, data: unknown, indent = 1) => {
   const path = join(outDir ?? TESTDATA, `${name}.gz`);
   mkdirSync(dirname(path), { recursive: true });
   // gzip writes no mtime or file name, so the same data gives the same bytes.
-  writeFileSync(path, gzipSync(`${JSON.stringify(data, null, indent)}\n`, { level: 9 }));
+  writeFileSync(
+    path,
+    gzipSync(`${JSON.stringify(data, null, indent)}\n`, { level: 9 })
+  );
 };
 
 const redisBase = process.env.REDIS_URL || 'redis://127.0.0.1:23379';

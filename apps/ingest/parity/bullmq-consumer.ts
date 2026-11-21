@@ -19,8 +19,12 @@ const Redis = createRequire(coreRequire.resolve('bullmq'))(
   'ioredis'
 ) as typeof import('ioredis').default;
 
-type JobSpec = { name: string; data: Record<string, unknown>; opts?: object };
-type Config = {
+interface JobSpec {
+  name: string;
+  data: Record<string, unknown>;
+  opts?: object;
+}
+interface Config {
   host: string;
   port: number;
   db: number;
@@ -30,7 +34,7 @@ type Config = {
   concurrency?: number;
   lockDuration?: number;
   stalledInterval?: number;
-};
+}
 
 const [command, rawConfig] = process.argv.slice(2);
 const config = JSON.parse(rawConfig ?? '{}') as Config;
@@ -103,7 +107,9 @@ function work() {
       concurrency: config.concurrency ?? 1,
       // An explicit undefined would override BullMQ's defaults.
       ...(config.lockDuration && { lockDuration: config.lockDuration }),
-      ...(config.stalledInterval && { stalledInterval: config.stalledInterval }),
+      ...(config.stalledInterval && {
+        stalledInterval: config.stalledInterval,
+      }),
     }
   );
   worker.on('error', (error) => console.error('worker error', error.message));
