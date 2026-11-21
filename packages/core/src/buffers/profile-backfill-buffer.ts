@@ -22,7 +22,7 @@ export class ProfileBackfillBuffer extends BaseBuffer {
     this.deps.config.buffers.profileBackfill.batchSize ?? DEFAULT_BATCH_SIZE;
 
   private readonly redisKey = 'profile-backfill-buffer';
-  private redis: Redis;
+  private readonly redis: Redis;
 
   constructor(deps: BufferDeps) {
     super(deps, {
