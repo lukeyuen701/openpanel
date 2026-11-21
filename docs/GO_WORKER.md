@@ -1,0 +1,118 @@
+# Go worker：规划与进度
+
+本文件是 `feat/go-worker` 分支的工作计划，进度记录在文末。
+
+## 0. 结论：合在 Go 接收端里，但分成两个进程
+
+- **同一个 Go 模块、同一个镜像**：沿用 `apps/ingest` 的 `go.mod`，复用已有的 `kafka`（franz-go）、`kv`（rueidis）、`config`、`jsjson`（JS 键序 JSON）、`identity`、`lookups`（Postgres/Redis 缓存读取）、`geo`、metrics。新增 `cmd/worker`（或 `ingest worker` 子命令），和 TS 的 `ROLE=api|worker` 同一个思路。
+- **不同进程、不同容器**，理由：
+  1. `/track` 在 ClickHouse 或 worker 出问题时必须照常接收（事件先进 Kafka），这是升级文档对用户的承诺。worker 卡在 ClickHouse 写入、内存涨满或崩溃时，不能连累接收端。
+  2. 扩容维度不同：接收端按 HTTP 流量扩，worker 按分区扩（默认 24 个分区，副本超过分区数就分不到）。
+  3. 资源特性不同：接收端要低延迟，worker 是批量 IO 和大内存缓冲。
+  4. 发布节奏不同：worker 迁移期要频繁灰度、回滚，接收端已经稳定。
+
+## 1. 范围（TS 非测试代码行数，取自 wc）
+
+| 层 | 内容 | 规模 | Go 化收益 |
+|---|---|---|---|
+| A 消费热路径 | Kafka 消费（partition lanes、同 key 串行、重试、死信、durability window）、incoming-event-handler（项目过滤、会话归属、createEvent、profile upsert、AI 事件、通知规则匹配、首个事件标记）、各 buffer 的写入 | ingest 模块约 4.8k（不含 bots 数据）+ buffers 约 3.0k + event 2.1k + profile 1.8k + session 2.2k + group 1.2k（部分属于 API） | 高：每个事件都走 |
+| B 刷写与会话生命周期 | 8 个 buffer 的 flush（event、session、profile、profileBackfill、bot、replay、group、aiEvent）、session-end、reaper、vacuum、usage 计数 | 含在上面的 buffers/session 里 | 中到高：按批次跑，但持续占 CPU |
+| C 其余 6 个队列 | notification、import、insights、gsc、cohortCompute，以及 cron 里的 salt、organization、onboarding、integration、misc、cohortRefresh 等 | import 3.7k、insight 4.1k、integration 3.1k、organization 2.3k、ai 2.2k、gsc 1.9k、cohort 1.8k、notification 1.0k、misc 0.9k、onboarding 0.6k、salt 0.15k（含 tRPC 也用的 service），另有 23 个 React Email 模板 | 低：量小，主要是业务逻辑和外部 API |
+
+C 层的这些 service 同时服务 tRPC（`ctx.services.cohort/gsc/insight/organization`），任务的生产者也在 TS API 里（import、cohortCompute、gscProjectBackfill）。把 C 层改成 Go 不是"搬走"，而是**同一份业务逻辑永久维护两份**。是否做 C 层由你决定；下面把它放在最后一个阶段，每个队列单独评估。
+
+## 2. 必须保持一致的契约
+
+迁移期 TS 和 Go 会同时读写同一份状态，回滚也靠这一点，所以这些是硬约束：
+
+| 契约 | 现状 | Go 侧要点 |
+|---|---|---|
+| Kafka 输入记录 | `IncomingEventPayload`（`incoming-event.ts`，注释写明是跨版本兼容的线上格式）。生产方有两个：Go 接收端，以及 Bun API（被转发的请求、identify 里带的 track、AI 事件的 `ai` 草稿）；还有旧版本留下的记录（`id` 可能缺失），以及从死信重放回来的记录 | 接收端的 goldens 只覆盖它自己产生的那部分。消费端的 goldens 还要补上 Bun 产生的记录、缺少 `id` 的旧记录，以及 `headers` 里带 request-id 的情况 |
+| 消费组 | 组名 `openpanel-events`，协议名 `RoundRobinAssigner` v0（`kafka.ts:54-61`，沿用 kafkajs 的名字） | franz-go 自带的 RoundRobinBalancer 协议名是 `roundrobin`，会触发 `INCONSISTENT_GROUP_PROTOCOL`。需要自定义 `GroupBalancer`，用同样的名字和标准 ConsumerProtocol 编码。**可行性待实测**：TS 和 Go 成员能否混在一个组里，决定能不能按分区灰度 |
+| 处理语义 | 同 key 串行（`consumer.ts:384`）；先确认 Redis 写入成功再提交 offset（durability window）；失败重试、死信写入一个有上限的 Redis 列表；缓冲超过 `maxBuffered` 就暂停拉取 | 一条一条照搬，以 `consumer.test.ts`（1.2k 行）、`partition-lanes.test.ts` 为规格 |
+| Redis buffer 格式 | event 列表（JSONEachRow 行）；session 的 `session:<project>:<device>`、`session:profile:*`、`session:wallclock:*` 和 `session:projects`；profile、group、replay、bot、aiEvent、profileBackfill 各自的 key；flush 锁（`base-buffer.ts` 里的 Lua） | **长期契约**。已核实 Bun API 也在写其中几个：`ingest.service.ts` 写 replay（490 行）、group（509 行），identify 走 `upsertProfile` 写 profile，机器人流量走 `createBotEvent` 写 bot。所以 Go 的 flush 必须读 TS 写入的格式，这部分 TS 代码会一直保留。消费端写的是 event、profile（来自事件）、aiEvent 和 session；profileBackfill 由 session-end 写 |
+| BullMQ 任务 | 消费路径会往两个 BullMQ 队列写任务：`sessions`（会话结束，jobId 去重、带重试和指数退避）和 `notification`（规则命中后先写 Postgres 的通知行，再入队 `sendNotification`）。任务数据是 `{payload, meta}` 信封 | **建议：由 Go 写一个 Redis Stream 作为中转，仍在运行的 TS worker 再把它转成 BullMQ 任务**，BullMQ 协议只留在 TS 里。据我所知 BullMQ 没有官方 Go 版本，社区库是否可用没有核实。现在的消费端会等入队完成才提交 offset，Go 端要等 Stream 写入成功再提交，语义保持不变。这个 Stream 从 P1 起就作为 TS 和 Go 之间的分界：P3 改为 Go 直接消费它，回滚时重新打开 TS 中转即可 |
+| 其他副作用 | `markFirstEvent`（Postgres）；项目缓存（`cachable:*` 这些 key，接收端已经在读）；实时推送 `publishEvent('events','batch',…)` 在 event buffer 的 **flush** 里（`event-buffer.ts:441`），属于 P2 | 照搬，key 名和消息格式不变 |
+| 指标 | `buffer_*_count`、`<queue>_waiting_count`、消费 lag 等 | 名字和标签不变，`SCALING.md` 和 e2e 压测脚本都读这些 |
+
+## 3. 阶段
+
+每个阶段都写清：怎么切换、怎么回滚、什么条件下进入下一阶段。
+
+### P0 准备（不上线）
+- 在生产 worker 上做一次 CPU profile，确定基线（每秒事件数、每核事件数、lag、buffer 深度）。这是之后判断"Go 化是否达标"的标准，目前没有这个数字。
+- 生成 goldens：用 TS 实现处理一批录制的 Kafka 消息，记录它产生的 Redis 写入、BullMQ 任务和 ClickHouse 行。Go 单元测试对着这些结果比对，做法和接收端的 `golden` 一样。
+- 搭建影子环境：单独的消费组（如 `openpanel-events-shadow`）、单独的 Redis db 或前缀、单独的 ClickHouse 库。中转 Stream、会话结束任务和实时推送**改写到影子命名空间里，不要关掉**（`env.ts` 已有 `QUEUE_NAMESPACE`）。关掉了，影子环境就不会产生 `session_end` 事件，也就没法和生产比对。只有写真实 Postgres 或会发到外部的副作用才替换成空实现：通知行的写入和发送、`markFirstEvent`、用量计数。
+- 写 TS 端的中转：读 Go 写入的 Stream，转成 BullMQ 任务（`sessions`、`notification`），要有去重，同一条记录被投递两次只入队一次，`sessions` 本来就用 jobId 去重。
+- 先验证消费组协议能否混用（见上表），再决定 P1 用按分区灰度还是整体切换。
+- 定下 BullMQ 方案（建议用中转）。
+
+### P1 Go 消费端（A 层）；刷写仍由 TS 负责
+- 实现以下部分：
+  - 消费循环、partition lanes、同 key 串行、durability window、重试和死信。
+  - incoming-event-handler、createEvent、profile upsert、AI 事件。
+  - 通知规则匹配：规则从 Postgres 读并缓存，命中后写 Postgres 通知行，再写中转 Stream。
+  - 会话归属：只用 GET/SET 和 pipeline，`session-buffer.test.ts:424` 规定接收路径不发 EVAL。session 的 Lua 清理脚本属于关闭和回收会话的流程，放到 P3。
+- **切换**：TS worker 的 `ENABLED_QUEUES` 去掉 `events`，只保留 BullMQ 队列；Go worker 加入 `openpanel-events`。如果协议能混用，先加 1 个 Go 副本，让它分到一部分分区。
+- **回滚**：停掉 Go 副本，TS worker 的 `ENABLED_QUEUES` 加回 `events`。前提是 Go 写入的 Redis 状态和 TS 完全一致，这一点在整个迁移期都是不可破的约束。
+- **进入下一阶段的条件**：影子环境连续运行一段时间（建议 7 天以上，覆盖一个完整周），比对没有差异（忽略 `inserted_at` 和随机 id）；生产灰度期间 lag 能回到 0，死信率不升高，ClickHouse 里每个项目每天的事件数、会话数和 TS 期间一致。
+
+### P2 Go 刷写（B 层第一部分）
+- 8 个 buffer 的 flush，写入 ClickHouse 走 HTTP + JSONEachRow，和 TS 发送同样的行。还要实现两节点故障切换（`clickhouse-failover.test.ts`），以及 `BUFFER_ASYNC_INSERTS` 和插入并发配置。
+- profile 的 flush 会先读 ClickHouse 再合并，最容易出偏差，单独比对。
+- **TS 需要一个小改动**：`cron` 队列里所有定时任务共用一个队列，没有按任务关闭的开关。要加一个环境变量（如 `DISABLED_CRON_JOBS=flushEvents,...`），否则只能靠 flush 锁互斥，TS 和 Go 会轮流抢锁。
+- Go 端的调度用定时器加同一把 Redis 锁就够了，不需要 BullMQ。
+- 实时推送 `publishEvent` 随 event buffer 的 flush 一起迁过来。
+- **切换**：按 buffer 逐个进行，先迁 bot、aiEvent、replay 这类简单的，event 和 session 放后面，profile 最后。每迁一个，就把它加进 TS 的 `DISABLED_CRON_JOBS`，同时在 Go 端打开。
+- **回滚**：Go 停止 flush，从 `DISABLED_CRON_JOBS` 里删掉对应任务。两边用的是同一把锁，不会同时 flush。
+- **进入下一阶段的条件**：影子 ClickHouse 库和生产按项目、按天对账，对比各表行数、`uniqExact(id)` 和关键列的校验和，忽略 `inserted_at`；`buffer_*_count` 能回到 0；`buffer_ch_insert_duration_ms` 不比 TS 差；故障切换演练通过（停掉一个 ClickHouse 节点后，buffer 积压但不丢数据，节点恢复后能追平）。
+
+### P3 会话生命周期（B 层第二部分）
+- session-end（生成 `session_end` 事件，并做漏斗类通知规则的检查）、reaper（每 5 分钟）、vacuum（每天）、usage 计数。
+- session 的 Lua 清理脚本（`session-buffer.ts` 里的 `cleanupScript`）在这一阶段迁过来，脚本内容逐字照搬。
+- **切换**：Go 改为直接消费中转 Stream 里的会话结束记录，TS 中转不再处理这一类记录。BullMQ 里剩下的 `sessions` 任务由 TS worker 消费完，在这之前不要关掉 TS 的 `sessions` 队列。reaper 和 vacuum 加进 `DISABLED_CRON_JOBS`。
+- **回滚**：Go 停止消费会话结束记录，重新打开 TS 中转。会话结束记录一直在 Stream 里，不会丢。
+- **进入下一阶段的条件**：按项目、按天对比 `session_end` 事件数和会话数；对比漏斗类通知的触发次数，在影子环境里比较空实现收到的调用；reaper 运行后，`session:wallclock:*` 里没有超时未关闭的会话。
+- 漏斗通知仍然要入队 `notification`，继续经由中转。
+
+### P4 其余队列（C 层，可选，逐个评估）
+- 每个队列单独决定。顺序建议按"小、无外部依赖"在前：salt（146 行，接收端本来就读 salt）→ misc → onboarding → cohortRefresh/cohortCompute（SQL 和仪表盘共用，要两边同步维护）→ insight → organization（涉及计费和数据删除）→ gsc（Google OAuth 和 API）→ integration → import（多个外部数据源）→ notification（发送端依赖 React Email 模板，Go 无法直接渲染，需要预渲染或保留一个 TS 渲染服务）。
+- API 是 import、cohortCompute、gsc 的生产者：要么 Go 能消费 BullMQ，要么改 API 的入队方式，这会改动 TS API。
+- **每个队列的切换**：TS worker 的 `ENABLED_QUEUES` 去掉这个队列（cron 类任务用 `DISABLED_CRON_JOBS`），Go 开始消费。**回滚**：反过来操作。**进入下一个队列的条件**：在影子环境里对同样的输入，对比两边的 Postgres 写入和外部调用（用录制的回放代替真正发出去），运行满一个任务周期（例如 insight 是每周一次）。
+- **我的建议**：P3 结束后，TS worker 只剩低频队列，1 个副本就够；收益主要在 A、B 层。这一阶段做不做由你决定。
+
+## 4. 最终形态（P3 之后）
+
+| 进程 | 语言 | 职责 |
+|---|---|---|
+| op-ingest | Go | `/track` 等热点接收（已上线） |
+| op-worker-go | Go（同一镜像，`worker` 子命令） | Kafka 消费、全部 buffer 刷写、会话生命周期 |
+| op-worker | TS，1 个副本 | notification、import、insights、gsc、cohortCompute 及其余 cron；BullMQ 中转 |
+| op-api / op-dashboard | TS | 不变 |
+
+## 5. 风险
+
+- **fork 维护成本**：upstream 每改一次 buffers、session、event.service、incoming-event-handler，都要同步改 Go。需要一个检查脚本，列出这些文件在 upstream 上的变更，并重新生成 goldens。范围比接收端大得多。
+- **数据正确性**：A、B 层出错的后果是数据写错或丢失，不是变慢。所以每个阶段都要有影子比对和按项目对账，不能只看单元测试。
+- **过渡期两套实现并存**：P1 到 P3 期间 TS 和 Go 同时在线，所有契约都不能变。这段时间 upstream 的相关改动最好先冻结或批量合并。
+- **CPU 兼容性**：镜像用 `CGO_ENABLED=0` 编译，没有设置 `GOAMD64`，默认编译目标不需要 AVX2。你说接收端已经在生产上运行，说明这个镜像能在这台机器上跑；这一点我没有自己验证。
+
+## 6. 开工前需要的信息
+
+- 生产 worker 副本数、每个副本的 CPU 和内存占用、高峰时每秒事件数、Kafka lag 能否回到 0。
+- 生产 ClickHouse 是单节点还是集群（`CLICKHOUSE_CLUSTER`），Redis 是否单实例。
+- Go 接收端上线后的 `ingest_forwarded_total` 各原因占比（看还有多少流量回到 Bun）。
+- BullMQ 方案选哪个（建议用中转）；C 层做不做。
+
+## 7. 进度
+
+| 日期 | 阶段 | 内容 | 结果 |
+|---|---|---|---|
+| 2026-11-22 | P0 | 消费组协议兼容性 spike：本地 Redpanda，6 分区，一个 TS 成员（@platformatic/kafka，协议 `RoundRobinAssigner` v0）加一个 Go 成员（franz-go，`internal/kafka/balancer.go` 的 `EventsGroupBalancer`） | **通过**。TS 做 leader 时把 [0,2,4] 分给 Go，Go 做 leader 时把 [1,3,5] 分给 TS，双方都能正常消费。结论：P1 可以按分区灰度（混合消费组）。注意：Go worker 必须处理 SIGTERM 并主动离开消费组，否则要等会话超时后才会重新分配 |
+
+### 本地无法完成、需要在生产或 staging 上做的门槛
+- 生产 worker 的 CPU profile 和基线
+- 影子环境连续 7 天的比对
+- 生产灰度和切换
+- `CLICKHOUSE_CLUSTER=true` 时的表名和行为（本地是单节点）
+- 在 Ivy Bridge 上运行 Go worker
