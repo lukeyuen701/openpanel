@@ -54,7 +54,7 @@ export function topPagesQuery(input: TopPagesQueryInput): SqlFragment {
   // made the result vary by when the query ran. A page titled only outside
   // the range resolves to ''.
   const titlesCte = sql`
-    SELECT concat(origin, path) as page_key, anyLast(properties['__title']) as title
+    SELECT concat(origin, path) as page_key, argMax(properties['__title'], created_at) as title
     FROM events
     WHERE project_id = ${sql.string(input.projectId)}
       AND name = 'screen_view'

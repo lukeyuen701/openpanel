@@ -260,7 +260,7 @@ export function topPagesQuery(query: {
   search?: string;
 }): SqlFragment {
   return sql`
-    SELECT path, count(*) as count, project_id, first_value(created_at) as first_seen, last_value(properties['__title']) as title, origin
+    SELECT path, count(*) as count, project_id, min(created_at) as first_seen, argMax(properties['__title'], created_at) as title, origin
     FROM ${sql.id(TABLE.events)}
     WHERE name = 'screen_view'
     AND  project_id = ${sql.string(query.projectId)}

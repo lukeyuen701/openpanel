@@ -558,7 +558,7 @@ export interface OrderedEventsQueryInput {
 }
 
 /** The empty ID is shared by unrelated events, so it cannot define a journey. */
-function orderedEventsQuery(input: OrderedEventsQueryInput): SqlFragment {
+function sessionPageViewsQuery(input: OrderedEventsQueryInput): SqlFragment {
   return sql`
     SELECT session_id, concat(origin, path) as path, created_at
     FROM events
@@ -569,28 +569,29 @@ function orderedEventsQuery(input: OrderedEventsQueryInput): SqlFragment {
       AND path IS NOT NULL
       AND ${dateRangeWhere('created_at', input.startDate, input.endDate)}
       ${rawWhere(input.rawFilterWhere)}
-    ORDER BY session_id ASC, created_at ASC
   `;
 }
 
 /**
- * `arrayCompact` drops consecutive repeats in linear time. An `arrayFilter`
- * answer for a tenant with one very long session (see sankey.sql.ts's
- * DEDUPE_CONSECUTIVE).
+ * A session's page views in time order, consecutive repeats dropped. Sorted
+ * here because `GROUP BY` does not keep a subquery's order, and views of one
+ * millisecond tie differently between ClickHouse versions; the path breaks
+ * those ties. `arrayCompact` is linear where an `arrayFilter` is quadratic in
+ * the longest session (see sankey.sql.ts's DEDUPE_CONSECUTIVE).
  */
 function pathsDedupedCte(
   input: OrderedEventsQueryInput,
   steps: number
 ): SqlFragment {
   return sql`
-    WITH ordered_events AS (${orderedEventsQuery(input)})
+    WITH session_page_views AS (${sessionPageViewsQuery(input)})
     SELECT
       session_id,
       arraySlice(
-        arrayCompact(groupArray(path)),
+        arrayCompact(arrayMap(view -> view.2, arraySort(groupArray((created_at, path))))),
         1, ${sql.uint64(steps)}
       ) as paths_deduped
-    FROM ordered_events
+    FROM session_page_views
     GROUP BY session_id
   `;
 }

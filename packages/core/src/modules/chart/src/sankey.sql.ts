@@ -15,14 +15,24 @@ export type SankeyMode = 'after' | 'before' | 'between';
 export const TOP_ENTRY_EVENTS = 3;
 
 /**
- * Consecutive-repeat dedup, shared by every mode. An `arrayFilter` whose
- * lambda indexes its own captured `groupArray` is Theta(n^2) in the longest
- * session's event count — ClickHouse re-materialises the array once per
- * element, which is fatal for a tenant with one very long session.
- * `arrayCompact` is the built-in for exactly this and is linear.
+ * Events of one millisecond are common (a page view and the click on it), and
+ * neither `GROUP BY` nor a sort keeps their order stable: ClickHouse versions
+ * break such ties differently. The bookends go first and last, a page view
+ * before what happens on the page, then the name.
+ */
+const SAME_INSTANT_RANK =
+  "multiIf(event_name = 'session_start', 0, event_name = 'screen_view', 1, event_name = 'session_end', 3, 2)";
+
+/**
+ * A session's events in time order, consecutive repeats dropped; shared by
+ * every mode. An `arrayFilter` whose lambda indexes its own captured
+ * `groupArray` is Theta(n^2) in the longest session's event count —
+ * ClickHouse re-materialises the array once per element, which is fatal for a
+ * tenant with one very long session. `arrayCompact` is the built-in for
+ * exactly this and is linear.
  */
 const DEDUPE_CONSECUTIVE = compiledText(
-  'arrayCompact(groupArray(event_name)) as events_deduped'
+  `arrayCompact(arrayMap(event -> event.3, arraySort(groupArray((created_at, ${SAME_INSTANT_RANK}, event_name))))) as events_deduped`
 );
 
 /**
@@ -169,7 +179,7 @@ export function sankeySessionPathsQuery(input: SankeyPathsInput): SqlFragment {
   const eventsExpr =
     input.mode === 'after' ? TRUNCATE_AT_REPEAT : sql`events_sliced`;
 
-  return sql`WITH ${anchors}events_deduped_cte AS (WITH ordered_events AS (SELECT session_id, name as event_name, created_at FROM ${sql.id(CHART_TABLE.events)} WHERE ${dateRange(input)} AND session_id != ''${eventNameFilter(input)} ORDER BY session_id ASC, created_at ASC) SELECT session_id, ${DEDUPE_CONSECUTIVE} FROM ordered_events GROUP BY session_id), events_sliced_cte AS (SELECT session_id, ${eventsSlice} as events_sliced FROM events_deduped_cte HAVING ${having}) SELECT session_id, ${eventsExpr} as events, events[1] as entry_event FROM events_sliced_cte HAVING length(events) >= ${sql.uint64(MIN_PATH_LENGTH)}`;
+  return sql`WITH ${anchors}events_deduped_cte AS (WITH session_events AS (SELECT session_id, name as event_name, created_at FROM ${sql.id(CHART_TABLE.events)} WHERE ${dateRange(input)} AND session_id != ''${eventNameFilter(input)}) SELECT session_id, ${DEDUPE_CONSECUTIVE} FROM session_events GROUP BY session_id), events_sliced_cte AS (SELECT session_id, ${eventsSlice} as events_sliced FROM events_deduped_cte HAVING ${having}) SELECT session_id, ${eventsExpr} as events, events[1] as entry_event FROM events_sliced_cte HAVING length(events) >= ${sql.uint64(MIN_PATH_LENGTH)}`;
 }
 
 /**
