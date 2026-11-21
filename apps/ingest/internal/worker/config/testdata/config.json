@@ -1,0 +1,2858 @@
+[
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": "worker"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "worker",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": "all"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "all",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": "bogus"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - ROLE: ROLE: unknown value \"bogus\". Accepted values: api, worker, all."
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": " worker "
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "worker",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": ""
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": "worker",
+   "ENABLED_QUEUES": "events"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "worker",
+   "ENABLED_QUEUES": [
+    "events"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": "worker",
+   "ENABLED_QUEUES": "events, sessions ,,cron"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "worker",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": "worker",
+   "ENABLED_QUEUES": "events_kafka"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - ENABLED_QUEUES: ENABLED_QUEUES: \"events_kafka\" was renamed to \"events\" — update ENABLED_QUEUES to use the new name."
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": "worker",
+   "ENABLED_QUEUES": "nope"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - ENABLED_QUEUES: ENABLED_QUEUES: unknown queue \"nope\". Accepted values: events, sessions, cron, notification, import, insights, gsc, cohortCompute."
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": "worker",
+   "ENABLED_QUEUES": ","
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - (root): ROLE=worker consumes queues but ENABLED_QUEUES names none — this process would boot and do nothing."
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": "api",
+   "ENABLED_QUEUES": ","
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": "worker",
+   "ENABLED_QUEUES": "cohortCompute"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "worker",
+   "ENABLED_QUEUES": [
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": "worker",
+   "ENABLED_QUEUES": "sessions"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "worker",
+   "ENABLED_QUEUES": [
+    "sessions"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": "worker",
+   "DISABLE_WORKERS": "false"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "worker",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": true,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": "worker",
+   "DISABLE_WORKERS": "0"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "worker",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": true,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "ROLE": "worker",
+   "DISABLE_WORKERS": "  "
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "worker",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "QUEUE_CLUSTER": "0"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": true,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "QUEUE_CLUSTER": "true"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": true,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "QUEUE_NAMESPACE": "wparity-x"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": "wparity-x",
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "QUEUE_NAMESPACE": "  "
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": "4"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 4,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": "0"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - KAFKA_PARTITIONS_CONCURRENT: Too small: expected number to be >0"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": "-1"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - KAFKA_PARTITIONS_CONCURRENT: Too small: expected number to be >0"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": "1.5"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - KAFKA_PARTITIONS_CONCURRENT: Invalid input: expected int, received number"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": "5000junk"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - KAFKA_PARTITIONS_CONCURRENT: Invalid input: expected number, received NaN"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": "1e2"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 100,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": "0x10"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 16,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": "010"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 10,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": " 7 "
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 7,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": "1_000"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - KAFKA_PARTITIONS_CONCURRENT: Invalid input: expected number, received NaN"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": "Infinity"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - KAFKA_PARTITIONS_CONCURRENT: Invalid input: expected number, received Infinity"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": "+3"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 3,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": "3.0"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 3,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": ".5e1"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 5,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": "0b11"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 3,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_PARTITIONS_CONCURRENT": "0o17"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 15,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_MIN_MESSAGES": "2",
+   "KAFKA_MAX_WAIT_MS": "250",
+   "KAFKA_MAX_MESSAGES_PER_PARTITION": "64"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 2,
+    "maxWaitMs": 250,
+    "maxMessagesPerPartition": 64,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SESSION_TIMEOUT_MS": "10000",
+   "KAFKA_HEARTBEAT_INTERVAL_MS": "10000"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - (root): KAFKA_HEARTBEAT_INTERVAL_MS (10000) must be below KAFKA_SESSION_TIMEOUT_MS (10000) — otherwise every consumer is evicted before its first heartbeat."
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SESSION_TIMEOUT_MS": "10000",
+   "KAFKA_HEARTBEAT_INTERVAL_MS": "9999"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 10000,
+    "heartbeatIntervalMs": 9999,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_HEARTBEAT_INTERVAL_MS": "30000"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - (root): KAFKA_HEARTBEAT_INTERVAL_MS (30000) must be below KAFKA_SESSION_TIMEOUT_MS (30000) — otherwise every consumer is evicted before its first heartbeat."
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_REBALANCE_TIMEOUT_MS": "1000",
+   "KAFKA_REQUEST_TIMEOUT_MS": "100",
+   "KAFKA_CONNECTION_TIMEOUT_MS": "50"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 1000,
+    "requestTimeoutMs": 100,
+    "connectionTimeoutMs": 50,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_HANDLER_MAX_ATTEMPTS": "5",
+   "KAFKA_HANDLER_RETRY_INITIAL_MS": "1",
+   "KAFKA_HANDLER_RETRY_MAX_MS": "2"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 5,
+    "handlerRetryInitialMs": 1,
+    "handlerRetryMaxMs": 2,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_CLIENT_ID": "c",
+   "KAFKA_EVENTS_TOPIC": "wparity-t",
+   "KAFKA_CONSUMER_GROUP": "wparity-g"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "c",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "wparity-t",
+    "consumerGroup": "wparity-g",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": " a:1 , b:2 ,,"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "a:1",
+     "b:2"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SSL": "true"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": true,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SSL": "1"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": true,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SSL": "false"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SSL": "0"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SSL": "yes"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - KAFKA_SSL: must be \"true\" or \"false\" (got \"yes\")"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SSL": "TRUE"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - KAFKA_SSL: must be \"true\" or \"false\" (got \"TRUE\")"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SSL_CA_PATH": "/x.pem"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - (root): KAFKA_SSL_CA_PATH / KAFKA_SSL_REJECT_UNAUTHORIZED require TLS; set KAFKA_SSL=true"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SSL_CA_PATH": "/x.pem",
+   "KAFKA_SSL": "true"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": true,
+    "sslCaPath": "/x.pem",
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SSL_REJECT_UNAUTHORIZED": "false"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - (root): KAFKA_SSL_CA_PATH / KAFKA_SSL_REJECT_UNAUTHORIZED require TLS; set KAFKA_SSL=true"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SSL_REJECT_UNAUTHORIZED": "false",
+   "KAFKA_SSL": "1"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": true,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": false,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SASL_USERNAME": "u"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - (root): Kafka SASL is partially configured: KAFKA_SASL_PASSWORD is missing (both KAFKA_SASL_USERNAME and KAFKA_SASL_PASSWORD are required)"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SASL_PASSWORD": "p"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - (root): Kafka SASL is partially configured: KAFKA_SASL_USERNAME is missing (both KAFKA_SASL_USERNAME and KAFKA_SASL_PASSWORD are required)"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SASL_USERNAME": "u",
+   "KAFKA_SASL_PASSWORD": "p"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": true,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": {
+     "mechanism": "scram-sha-512",
+     "username": "u",
+     "password": "p"
+    }
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SASL_USERNAME": "u",
+   "KAFKA_SASL_PASSWORD": "p",
+   "KAFKA_SSL": "false"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": {
+     "mechanism": "scram-sha-512",
+     "username": "u",
+     "password": "p"
+    }
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SASL_USERNAME": "u",
+   "KAFKA_SASL_PASSWORD": "p",
+   "KAFKA_SASL_MECHANISM": "PLAIN"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": true,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": {
+     "mechanism": "plain",
+     "username": "u",
+     "password": "p"
+    }
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SASL_USERNAME": "u",
+   "KAFKA_SASL_PASSWORD": "p",
+   "KAFKA_SASL_MECHANISM": "scram-sha-256"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": true,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": {
+     "mechanism": "scram-sha-256",
+     "username": "u",
+     "password": "p"
+    }
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SASL_USERNAME": "u",
+   "KAFKA_SASL_PASSWORD": "p",
+   "KAFKA_SASL_MECHANISM": "gssapi"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - KAFKA_SASL_MECHANISM: Unsupported KAFKA_SASL_MECHANISM \"gssapi\". Supported: plain, scram-sha-256, scram-sha-512"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "KAFKA_SASL_MECHANISM": "plain"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - (root): KAFKA_SASL_MECHANISM is set but KAFKA_SASL_USERNAME and KAFKA_SASL_PASSWORD are missing"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "SHUTDOWN_FORCE_EXIT_MS": "5000"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 5000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "SHUTDOWN_FORCE_EXIT_MS": "0"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - SHUTDOWN_FORCE_EXIT_MS: Too small: expected number to be >0"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": "250"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 250,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": "abc"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - REDIS_CACHE_COMMAND_TIMEOUT_MS: Invalid input: expected number, received NaN"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": "10"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 10,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": "-2"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - INGEST_DEAD_LETTER_MAX_ENTRIES: Too small: expected number to be >0"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "API_PORT": "0"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 0,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "API_PORT": "8080"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 8080,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "API_PORT": "-1"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - API_PORT: Too small: expected number to be >=0"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "API_PORT": "x"
+  },
+  "ok": false,
+  "error": "Invalid environment configuration:\n  - API_PORT: Invalid input: expected number, received NaN"
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "LOG_LEVEL": "debug"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "debug",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "localhost:23092",
+   "LOG_LEVEL": "  "
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "api",
+   "ENABLED_QUEUES": [
+    "events",
+    "sessions",
+    "cron",
+    "notification",
+    "import",
+    "insights",
+    "gsc",
+    "cohortCompute"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [
+     "localhost:23092"
+    ],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ },
+ {
+  "env": {
+   "KAFKA_BROKERS": "",
+   "ROLE": "worker",
+   "ENABLED_QUEUES": "events"
+  },
+  "ok": true,
+  "config": {
+   "ROLE": "worker",
+   "ENABLED_QUEUES": [
+    "events"
+   ],
+   "DISABLE_WORKERS": false,
+   "QUEUE_CLUSTER": false,
+   "QUEUE_NAMESPACE": null,
+   "SHUTDOWN_FORCE_EXIT_MS": 20000,
+   "REDIS_CACHE_COMMAND_TIMEOUT_MS": 5000,
+   "INGEST_DEAD_LETTER_MAX_ENTRIES": 1000,
+   "API_PORT": 3000,
+   "LOG_LEVEL": "info",
+   "kafka": {
+    "clientId": "openpanel",
+    "brokers": [],
+    "eventsTopic": "events",
+    "consumerGroup": "openpanel-events",
+    "partitionsConcurrent": 8,
+    "minMessages": 1,
+    "maxWaitMs": 500,
+    "maxMessagesPerPartition": 256,
+    "sessionTimeoutMs": 30000,
+    "heartbeatIntervalMs": 3000,
+    "rebalanceTimeoutMs": 60000,
+    "requestTimeoutMs": 5000,
+    "connectionTimeoutMs": 2000,
+    "handlerMaxAttempts": 3,
+    "handlerRetryInitialMs": 100,
+    "handlerRetryMaxMs": 1000,
+    "sslEnabled": false,
+    "sslCaPath": null,
+    "sslRejectUnauthorized": null,
+    "sasl": null
+   }
+  }
+ }
+]

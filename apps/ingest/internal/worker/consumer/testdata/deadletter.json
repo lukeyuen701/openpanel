@@ -1,0 +1,108 @@
+[
+ {
+  "key": "777061726974792d646576",
+  "value": "7b22626164223a",
+  "headers": [
+   {
+    "name": "x-h",
+    "hex": "6876"
+   }
+  ],
+  "offset": "42",
+  "reason": "parse_error",
+  "error": "Unexpected end",
+  "out": "{\"recordedAt\":\"2026-11-21T17:30:22.556Z\",\"topic\":\"events\",\"partition\":3,\"offset\":\"42\",\"reason\":\"parse_error\",\"error\":\"Unexpected end\",\"key\":\"wparity-dev\",\"value\":\"{\\\"bad\\\":\",\"headers\":{\"x-h\":\"hv\"}}"
+ },
+ {
+  "key": null,
+  "value": null,
+  "headers": [],
+  "offset": "0",
+  "reason": "parse_error",
+  "error": "kafka message has no value",
+  "out": "{\"recordedAt\":\"2026-11-21T17:30:22.556Z\",\"topic\":\"events\",\"partition\":3,\"offset\":\"0\",\"reason\":\"parse_error\",\"error\":\"kafka message has no value\",\"key\":null,\"value\":null,\"headers\":{}}"
+ },
+ {
+  "key": "",
+  "value": "",
+  "headers": [],
+  "offset": "1",
+  "reason": "handler_error",
+  "error": "",
+  "out": "{\"recordedAt\":\"2026-11-21T17:30:22.556Z\",\"topic\":\"events\",\"partition\":3,\"offset\":\"1\",\"reason\":\"handler_error\",\"error\":\"\",\"key\":\"\",\"value\":\"\",\"headers\":{}}"
+ },
+ {
+  "key": "6b",
+  "value": "7b2261223a317d",
+  "headers": [
+   {
+    "name": "b",
+    "hex": "31"
+   },
+   {
+    "name": "10",
+    "hex": "32"
+   },
+   {
+    "name": "2",
+    "hex": "33"
+   },
+   {
+    "name": "a",
+    "hex": "34"
+   },
+   {
+    "name": "b",
+    "hex": "35"
+   },
+   {
+    "name": "01",
+    "hex": "36"
+   },
+   {
+    "name": "4294967294",
+    "hex": "37"
+   },
+   {
+    "name": "4294967295",
+    "hex": "38"
+   }
+  ],
+  "offset": "9007199254740993",
+  "reason": "handler_error",
+  "error": "quote \" and \\ and \n",
+  "out": "{\"recordedAt\":\"2026-11-21T17:30:22.556Z\",\"topic\":\"events\",\"partition\":3,\"offset\":\"9007199254740993\",\"reason\":\"handler_error\",\"error\":\"quote \\\" and \\\\ and \\n\",\"key\":\"k\",\"value\":\"{\\\"a\\\":1}\",\"headers\":{\"2\":\"3\",\"10\":\"2\",\"4294967294\":\"7\",\"b\":\"5\",\"a\":\"4\",\"01\":\"6\",\"4294967295\":\"8\"}}"
+ },
+ {
+  "key": "ff41",
+  "value": "c328e282",
+  "headers": [
+   {
+    "name": "h",
+    "hex": "fffe41"
+   },
+   {
+    "name": "e",
+    "hex": ""
+   }
+  ],
+  "offset": "5",
+  "reason": "handler_error",
+  "error": "invalid bytes",
+  "out": "{\"recordedAt\":\"2026-11-21T17:30:22.556Z\",\"topic\":\"events\",\"partition\":3,\"offset\":\"5\",\"reason\":\"handler_error\",\"error\":\"invalid bytes\",\"key\":\"�A\",\"value\":\"�(�\",\"headers\":{\"h\":\"��A\",\"e\":\"\"}}"
+ },
+ {
+  "key": "c3a9f09f9880",
+  "value": "7b2278223a22e280a82007203c2f7363726970743e227d",
+  "headers": [
+   {
+    "name": "ключ",
+    "hex": "c3a9"
+   }
+  ],
+  "offset": "7",
+  "reason": "parse_error",
+  "error": "  \u0001",
+  "out": "{\"recordedAt\":\"2026-11-21T17:30:22.556Z\",\"topic\":\"events\",\"partition\":3,\"offset\":\"7\",\"reason\":\"parse_error\",\"error\":\"  \\u0001\",\"key\":\"é😀\",\"value\":\"{\\\"x\\\":\\\"  \\u0007 </script>\\\"}\",\"headers\":{\"ключ\":\"é\"}}"
+ }
+]

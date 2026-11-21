@@ -1,0 +1,100 @@
+[
+ {
+  "json": "\"abc\"",
+  "ok": true,
+  "fresh": false,
+  "id": "abc"
+ },
+ {
+  "json": "\"a b/c\"",
+  "ok": true,
+  "fresh": false,
+  "id": "abc"
+ },
+ {
+  "json": "\"!!!\"",
+  "ok": true,
+  "fresh": true,
+  "id": null
+ },
+ {
+  "json": "\"\"",
+  "ok": true,
+  "fresh": true,
+  "id": null
+ },
+ {
+  "json": "\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\"",
+  "ok": true,
+  "fresh": false,
+  "id": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+ },
+ {
+  "json": "\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!b\"",
+  "ok": true,
+  "fresh": false,
+  "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaab"
+ },
+ {
+  "json": "\"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa\"",
+  "ok": true,
+  "fresh": false,
+  "id": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+ },
+ {
+  "json": "\"é-_9\"",
+  "ok": true,
+  "fresh": false,
+  "id": "-_9"
+ },
+ {
+  "json": "\"ключ\"",
+  "ok": true,
+  "fresh": true,
+  "id": null
+ },
+ {
+  "json": "\"A-Z_a-z0-9\"",
+  "ok": true,
+  "fresh": false,
+  "id": "A-Z_a-z0-9"
+ },
+ {
+  "json": "0",
+  "ok": true,
+  "fresh": true,
+  "id": null
+ },
+ {
+  "json": "false",
+  "ok": true,
+  "fresh": true,
+  "id": null
+ },
+ {
+  "json": "null",
+  "ok": true,
+  "fresh": true,
+  "id": null
+ },
+ {
+  "json": "5",
+  "ok": false
+ },
+ {
+  "json": "true",
+  "ok": false
+ },
+ {
+  "json": "{}",
+  "ok": false
+ },
+ {
+  "json": "[]",
+  "ok": false
+ },
+ {
+  "json": "[\"a\"]",
+  "ok": false
+ }
+]

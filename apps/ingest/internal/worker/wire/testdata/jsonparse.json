@@ -1,0 +1,218 @@
+[
+ {
+  "text": "{}",
+  "ok": true
+ },
+ {
+  "text": "[]",
+  "ok": true
+ },
+ {
+  "text": "null",
+  "ok": true
+ },
+ {
+  "text": "0",
+  "ok": true
+ },
+ {
+  "text": "-0",
+  "ok": true
+ },
+ {
+  "text": "1.5e3",
+  "ok": true
+ },
+ {
+  "text": "\"x\"",
+  "ok": true
+ },
+ {
+  "text": "true",
+  "ok": true
+ },
+ {
+  "text": " {\"a\":1} ",
+  "ok": true
+ },
+ {
+  "text": "\n\t\r{}",
+  "ok": true
+ },
+ {
+  "text": "",
+  "ok": false
+ },
+ {
+  "text": " ",
+  "ok": false
+ },
+ {
+  "text": "{",
+  "ok": false
+ },
+ {
+  "text": "{\"a\":}",
+  "ok": false
+ },
+ {
+  "text": "{\"a\":1,}",
+  "ok": false
+ },
+ {
+  "text": "[1,]",
+  "ok": false
+ },
+ {
+  "text": "{a:1}",
+  "ok": false
+ },
+ {
+  "text": "{'a':1}",
+  "ok": false
+ },
+ {
+  "text": "NaN",
+  "ok": false
+ },
+ {
+  "text": "Infinity",
+  "ok": false
+ },
+ {
+  "text": "-Infinity",
+  "ok": false
+ },
+ {
+  "text": "undefined",
+  "ok": false
+ },
+ {
+  "text": "01",
+  "ok": false
+ },
+ {
+  "text": "1.",
+  "ok": false
+ },
+ {
+  "text": ".5",
+  "ok": false
+ },
+ {
+  "text": "+1",
+  "ok": false
+ },
+ {
+  "text": "0x10",
+  "ok": false
+ },
+ {
+  "text": "1e",
+  "ok": false
+ },
+ {
+  "text": "\"\\u00e9\"",
+  "ok": true
+ },
+ {
+  "text": "\"\\ud800\"",
+  "ok": true
+ },
+ {
+  "text": "\"\\udc00x\"",
+  "ok": true
+ },
+ {
+  "text": "\"\\ud83d\\ude00\"",
+  "ok": true
+ },
+ {
+  "text": "\"\\x41\"",
+  "ok": false
+ },
+ {
+  "text": "\"\\'\"",
+  "ok": false
+ },
+ {
+  "text": "\"tab\there\"",
+  "ok": false
+ },
+ {
+  "text": "\"line\nbreak\"",
+  "ok": false
+ },
+ {
+  "text": "\" \"",
+  "ok": true
+ },
+ {
+  "text": "﻿{}",
+  "ok": false
+ },
+ {
+  "text": " {}",
+  "ok": false
+ },
+ {
+  "text": "{\"a\":1}{\"b\":2}",
+  "ok": false
+ },
+ {
+  "text": "{\"a\":1} x",
+  "ok": false
+ },
+ {
+  "text": "{\"a\":1,\"a\":2}",
+  "ok": true
+ },
+ {
+  "text": "{\"__proto__\":{\"x\":1}}",
+  "ok": true
+ },
+ {
+  "text": "[[[[[[[[[[1]]]]]]]]]]",
+  "ok": true
+ },
+ {
+  "text": "1e999",
+  "ok": true
+ },
+ {
+  "text": "-1e999",
+  "ok": true
+ },
+ {
+  "text": "123456789012345678901234567890",
+  "ok": true
+ },
+ {
+  "text": "{\"a\":\"\\u0000\"}",
+  "ok": true
+ },
+ {
+  "text": "{\"a\":\"\u0000\"}",
+  "ok": false
+ },
+ {
+  "text": "tru",
+  "ok": false
+ },
+ {
+  "text": "nul",
+  "ok": false
+ },
+ {
+  "text": "\"abc",
+  "ok": false
+ },
+ {
+  "text": "\u000b{}",
+  "ok": false
+ },
+ {
+  "text": "\f{}",
+  "ok": false
+ }
+]

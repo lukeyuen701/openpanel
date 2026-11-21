@@ -109,6 +109,12 @@ func New(cfg Config) (*Producer, error) {
 	return &Producer{client: client, topic: cfg.Topic}, nil
 }
 
+// TLSConfig builds the client TLS settings, for the consumer.
+func TLSConfig(cfg TLS) (*tls.Config, error) { return tlsConfig(cfg) }
+
+// SASLMechanism builds the SASL login, for the consumer.
+func SASLMechanism(cfg SASL) (sasl.Mechanism, error) { return saslMechanism(cfg) }
+
 func tlsConfig(cfg TLS) (*tls.Config, error) {
 	out := &tls.Config{MinVersion: tls.VersionTLS12}
 	if cfg.CAPath != "" {
