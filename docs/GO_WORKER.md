@@ -114,6 +114,10 @@ C 层的这些 service 同时服务 tRPC（`ctx.services.cohort/gsc/insight/orga
 | 2026-11-22 | P1 | Go 消费端：consumer、wire、config、jsport、projects、notify、bullmq（写入）、events、`cmd/worker` | **rig 比对 TS 对 Go 无差异**：手写语料 19 条，生成语料 1,970 条（4 个分区、7 批）。另外用 `-race` 编译的二进制跑了一遍 rig，没有数据竞争 |
 | 2026-11-22 | P2 | ClickHouse 客户端（请求逐字节对齐 Node 客户端，故障切换，每次重试都重建请求体）、flush 锁（同一段 Lua）、调度器、`GO_WORKER_CRON_JOBS`；bot、ai、replay、group 的 flush | 线上测试：TS 和 Go 写入的行一致；TS 和 Go 的锁互斥 |
 | 2026-11-22 | P3 预备 | Go 版 BullMQ consumer（BullMQ 自带的 Lua） | 和 Bun worker 同时消费一个队列，300 个任务每个只执行一次；进程被杀后，任务由卡住任务检查（stalled check）放回队列 |
+| 2026-11-22 | P2 | event、session、profile、profile-backfill 的 flush；所有 flush 统一锁丢失规则 | 线上比对行数一致：event 4,500 行（同步和异步写入两种），session 13,888 条排队行压缩成 4,224 行，profile 和缓存、backfill 都一致。顺带发现并修复了 TS 的 backfill 缺陷（超过约 245 个会话后每次都失败）|
+| 2026-11-22 | P3 | sessions 队列（Go 和 Bun 可以同时消费）、session-end、reaper、vacuum、用量计数；用量告警邮件交给 Bun 的 `sendUsageAlert` 任务发送 | `parity/p3-diff.ts` 比对无差异 |
+| 2026-11-22 | 端到端 | `worker-parity:full`：每一边都是一个完整的 worker（事件、flush、会话生命周期），比对 ClickHouse 每张表和 Redis、BullMQ、Postgres | 两个语料，TS 对 TS、TS 对 Go 都无差异 |
+| 2026-11-22 | 收尾 | 最终版本上的检查：Go `go vet` 和 `go test`、`gen:check`、typecheck 23/23、core 2411 个通过（2 个失败，见右）、api 60 个通过、接收端 parity 80/80、worker-parity:go 无差异 | core 里失败的 2 个都在 `event-cohort-membership.test.ts`，原因是 hook 超过 5 秒超时；这个文件单独运行 9/9 通过，本分支也没有改动 cohort |
 
 ### 本地无法完成、需要在生产或 staging 上做的门槛
 - 生产 worker 的 CPU profile 和基线
