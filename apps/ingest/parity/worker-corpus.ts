@@ -13,8 +13,11 @@ export const fixtureIds = {
   org: 'wparity-org',
   projectA: 'wparity-a',
   projectB: 'wparity-b',
+  projectC: 'wparity-c',
   client: '0a1a0000-0000-4000-8000-0000000000a1',
   rule: '0a1a0000-0000-4000-8000-0000000000b1',
+  ruleB: '0a1a0000-0000-4000-8000-0000000000b2',
+  ruleC: '0a1a0000-0000-4000-8000-0000000000b3',
 } as const;
 
 /** The event the project filter on project A drops. */
@@ -447,4 +450,462 @@ export function buildCorpus(): CorpusRecord[] {
   return waves.flatMap((specs, index) =>
     specs.map((spec) => build(index, spec))
   );
+}
+
+// ---------------------------------------------------------------------------
+// The generated corpus: ~2,000 records over four partitions, from a seeded
+// generator, so the same call always returns the same records.
+//
+// Ordering rules that keep two correct workers comparable (see worker-diff.ts):
+//  - everything one device does is in one partition and one key, in order;
+//  - an identified user lives on exactly one device, so a profile pointer has
+//    one writer;
+//  - server and AI records that ride a client session come in a later wave
+//    than every client record of that session, and waves wait for lag 0.
+// Within a wave the devices are interleaved at random, which is what makes the
+// four lanes, same-key serialization and micro-batching do real work.
+
+export const GENERATED_PARTITIONS = 4;
+const GENERATED_SEED = 20_261_122;
+const GENERATED_DEVICES = 480;
+const FROM_CHAR = String.fromCharCode;
+
+/** A linear congruential generator: the same on every engine, no bit tricks. */
+const LCG_MULTIPLIER = 1_103_515_245;
+const LCG_INCREMENT = 12_345;
+const LCG_MODULUS = 2_147_483_648;
+function seededRandom(seed: number) {
+  let state = seed % LCG_MODULUS;
+  return () => {
+    state = (state * LCG_MULTIPLIER + LCG_INCREMENT) % LCG_MODULUS;
+    return state / LCG_MODULUS;
+  };
+}
+
+const GEN_PATHS = [
+  'https://wparity.example/home',
+  'https://wparity.example/pricing?plan=team',
+  'https://wparity.example/docs/getting-started#install',
+  'https://Example.COM:443/Mixed/Case?x=1&x=2&y=%C3%BC#frag',
+  'https://wparity.example/日本語/ページ?q=ü&emoji=%F0%9F%8D%8E',
+  'https://wparity.example/a/../b/./c?empty=&=novalue&flag',
+  'https://wparity.example/caf%C3%A9 /with space',
+  'https://wparity.example/pricing?utm_source=newsletter&utm_medium=email&utm_campaign=autumn&utm_content=hero&utm_term=analytics',
+  'https://wparity.example/landing?utm_source=Facebook&utm_medium=social',
+  'https://wparity.example/landing?ref=producthunt',
+  'https://wparity.example/landing?utm_source=&ref=github',
+  'https://wparity.example/landing?utm_source=constructor',
+  'https://wparity.example/landing?utm_referrer=twitter.com',
+  'https://wparity.example/#',
+  'https://wparity.example/x?a[]=1&a[]=2&b=%',
+  '/relative/path?x=1#h',
+  '/pricing',
+  '//cdn.wparity.example/asset?v=1',
+  'Home Screen',
+  'httpfoo',
+  'http://[::1]:8080/ipv6',
+  'https://user:pw@wparity.example/auth',
+  'file:///etc/hosts',
+  `https://wparity.example/${'long/'.repeat(30)}`,
+];
+
+const GEN_REFERRERS = [
+  'https://www.google.com/search?q=wparity',
+  'https://www.google.com/',
+  'https://t.co/abc123',
+  'https://l.facebook.com/l.php?u=https%3A%2F%2Fwparity.example',
+  'https://wparity.example/home',
+  'https://news.ycombinator.com/item?id=1',
+  'android-app://com.google.android.gm',
+  'https://www.bing.com/search?q=x',
+  'not a url',
+  'https://duckduckgo.com',
+  'https://yandex.ru/search/?text=x',
+  'https://unknown-referrer.example/page/',
+];
+
+const GEN_CURRENCIES = ['EUR', 'USD', 'eur', 'GBP', 'JPY'];
+const GEN_REVENUES: unknown[] = [
+  4999,
+  12.5,
+  '12.5',
+  '0.99',
+  'abc',
+  0,
+  '',
+  null,
+  100_000,
+  1e21,
+  '3e2',
+];
+const GEN_UNICODE = [
+  '日本語のテスト — ünïcödé',
+  'Æblegrød 🍎',
+  'emoji 👨‍👩‍👧‍👦 flag 🇸🇪',
+  `${FROM_CHAR(0xd8_3d)} lone high`,
+  `lone low ${FROM_CHAR(0xde_00)}`,
+  `  padded with${FROM_CHAR(0xa0)}nbsp${FROM_CHAR(0xfe_ff)}  `,
+  'tab\there\nnewline',
+  '</script> & "quotes" \\ backslash',
+];
+
+type Rand = () => number;
+const pick = <T>(rand: Rand, items: readonly T[]): T =>
+  items[Math.floor(rand() * items.length)]!;
+const between = (rand: Rand, low: number, high: number) =>
+  low + Math.floor(rand() * (high - low + 1));
+
+function genProperties(rand: Rand, extra: Record<string, unknown> = {}) {
+  const properties: Record<string, unknown> = { ...extra };
+  if (rand() < 0.12) {
+    properties.nested = {
+      team: { name: pick(rand, GEN_UNICODE), size: between(rand, 1, 99) },
+      tags: ['a', 'b', pick(rand, GEN_UNICODE)],
+      deep: { a: { b: { c: [1, 2, { d: true }] } } },
+    };
+  }
+  if (rand() < 0.1) {
+    properties.note = pick(rand, GEN_UNICODE);
+  }
+  if (rand() < 0.06) {
+    properties.numbers = {
+      float: 0.1 + 0.2,
+      big: 123_456_789_012_345_680_000,
+      tiny: 1.5e-7,
+      negative: -42,
+      zero: 0,
+      flag: false,
+    };
+  }
+  if (rand() < 0.04) {
+    properties.json_text = '{"inner":{"x":[1,2,3]}}';
+    properties.malformed = '{not json';
+    properties.blank = '   ';
+  }
+  if (rand() < 0.05) {
+    properties.__query = { first_touch: 'yes', utm_source: 'client-sent' };
+  }
+  return properties;
+}
+
+function genPath(rand: Rand): Record<string, unknown> {
+  if (rand() < 0.03) {
+    // an older SDK: no double underscore
+    return { path: pick(rand, GEN_PATHS), referrer: pick(rand, GEN_REFERRERS) };
+  }
+  const out: Record<string, unknown> = { __path: pick(rand, GEN_PATHS) };
+  if (rand() < 0.4) {
+    out.__referrer = pick(rand, GEN_REFERRERS);
+  }
+  return out;
+}
+
+interface GenDevice {
+  index: number;
+  project: string;
+  agent: Agent;
+  device: string;
+  profileId?: string | number;
+  /** A second identity the device switches to in the first client wave. */
+  switchTo?: string;
+  session: number;
+  clock: number;
+  groups?: string[];
+}
+
+export function buildGeneratedCorpus(): CorpusRecord[] {
+  const rand = seededRandom(GENERATED_SEED);
+  const waves: RecordSpec[][] = [[], [], [], [], [], [], []];
+  const devices: GenDevice[] = [];
+
+  for (let index = 0; index < GENERATED_DEVICES; index++) {
+    const roll = rand();
+    const project =
+      roll < 0.45
+        ? fixtureIds.projectA
+        : roll < 0.8
+          ? fixtureIds.projectB
+          : fixtureIds.projectC;
+    const identified = rand() < 0.35;
+    devices.push({
+      index,
+      project,
+      agent: rand() < 0.3 ? 'mobile' : 'chrome',
+      device: `wparity-gdev-${index}`,
+      profileId: identified
+        ? rand() < 0.1
+          ? 100_000 + index
+          : `wparity-guser-${index}`
+        : undefined,
+      switchTo:
+        identified && rand() < 0.1 ? `wparity-gswitch-${index}` : undefined,
+      session: 0,
+      clock: T0 + between(rand, 0, 40 * MINUTE),
+      groups:
+        rand() < 0.15
+          ? [`wparity-gorg-${index % 7}`, `wparity-gteam-${index % 3}`]
+          : undefined,
+    });
+  }
+
+  const sessionOf = (d: GenDevice) => sessionId(d.project, d.device, d.session);
+  const clientEvent = (
+    d: GenDevice,
+    wave: number,
+    name: string,
+    at: number,
+    properties: Record<string, unknown>,
+    options: Partial<RecordSpec> = {}
+  ) => {
+    const roll = rand();
+    waves[wave]!.push({
+      label: `g${d.index}-w${wave}-${waves[wave]!.length}`,
+      project: d.project,
+      name,
+      at,
+      agent: d.agent,
+      device: d.device,
+      session: sessionOf(d),
+      profileId: d.profileId,
+      groups: d.groups,
+      properties: genProperties(rand, properties),
+      requestId:
+        roll < 0.3
+          ? `wparity-greq-${d.index}-${wave}`
+          : roll < 0.4
+            ? 'a b/c!'
+            : '',
+      noId: rand() < 0.04,
+      isoTimestamp: rand() < 0.05,
+      ...options,
+    });
+  };
+
+  const extraEvent = (d: GenDevice, wave: number, at: number) => {
+    const roll = rand();
+    if (roll < 0.5) {
+      clientEvent(d, wave, 'screen_view', at, genPath(rand));
+    } else if (roll < 0.7) {
+      clientEvent(d, wave, 'button_click', at, {
+        ...genPath(rand),
+        label: pick(rand, GEN_UNICODE),
+      });
+    } else if (roll < 0.78) {
+      clientEvent(d, wave, 'revenue', at, {
+        ...genPath(rand),
+        __revenue: pick(rand, GEN_REVENUES),
+        currency: pick(rand, GEN_CURRENCIES),
+      });
+    } else if (roll < 0.9) {
+      clientEvent(d, wave, NOTIFY_EVENT, at, {
+        ...genPath(rand),
+        plan: pick(rand, ['team', 'free', 'pro']),
+        seats: between(rand, 1, 50),
+      });
+    } else if (roll < 0.93) {
+      clientEvent(d, wave, EXCLUDED_EVENT, at, genPath(rand));
+    } else {
+      clientEvent(d, wave, 'form_submit', at, {
+        form: 'signup',
+        ok: rand() < 0.5,
+      });
+    }
+  };
+
+  // Wave 0: every device lands. Wave 1: more events of the same session, in
+  // order, plus the odd late one.
+  for (const d of devices) {
+    clientEvent(d, 0, 'screen_view', d.clock, genPath(rand));
+    const extras = between(rand, 0, 3);
+    for (let n = 0; n < extras; n++) {
+      d.clock += between(rand, 20_000, 9 * MINUTE);
+      extraEvent(d, 1, d.clock);
+    }
+    if (rand() < 0.08) {
+      extraEvent(d, 1, d.clock - 3 * MINUTE);
+    }
+    if (d.switchTo && rand() < 0.5) {
+      d.clock += 30_000;
+      clientEvent(d, 1, 'screen_view', d.clock, genPath(rand), {
+        profileId: d.switchTo,
+      });
+      d.profileId = d.switchTo;
+    }
+  }
+
+  // Wave 2: some devices come back after an idle gap around the timeout; the
+  // producer mints a new session id when the gap is past it.
+  const gaps = [
+    SESSION_TIMEOUT_MS - 1000,
+    SESSION_TIMEOUT_MS,
+    SESSION_TIMEOUT_MS + 1,
+    SESSION_TIMEOUT_MS + 61_000,
+    2 * HOUR,
+    DAY + 5 * MINUTE,
+  ];
+  for (const d of devices) {
+    if (rand() >= 0.45) {
+      continue;
+    }
+    const gap = pick(rand, gaps);
+    d.clock += gap;
+    if (gap > SESSION_TIMEOUT_MS) {
+      d.session += 1;
+    }
+    clientEvent(d, 2, 'screen_view', d.clock, genPath(rand));
+    if (rand() < 0.5) {
+      d.clock += between(rand, 10_000, 5 * MINUTE);
+      extraEvent(d, 2, d.clock);
+    }
+    if (d.profileId !== undefined && !d.switchTo && rand() < 0.1) {
+      // the user signs in as somebody else on the same device
+      d.clock += 5000;
+      clientEvent(d, 2, 'screen_view', d.clock, genPath(rand), {
+        profileId: `wparity-gother-${d.index}`,
+      });
+    }
+  }
+  // Wave 3: the new session keeps going.
+  for (const d of devices) {
+    if (d.session > 0 && rand() < 0.6) {
+      d.clock += between(rand, 15_000, 12 * MINUTE);
+      extraEvent(d, 3, d.clock);
+    } else if (rand() < 0.1) {
+      // an anonymous device that becomes identified late
+      d.clock += 20_000;
+      clientEvent(d, 3, 'screen_view', d.clock, genPath(rand), {
+        profileId: `wparity-glate-${d.index}`,
+      });
+    }
+  }
+
+  // Wave 4: server events, riding the sessions above. Wave 5: past events.
+  const identified = devices.filter((d) => d.profileId !== undefined);
+  for (const d of identified) {
+    const base = d.clock + MINUTE;
+    if (rand() < 0.5) {
+      const count = between(rand, 1, 3);
+      for (let n = 0; n < count; n++) {
+        waves[4]!.push({
+          label: `g${d.index}-srv-${n}`,
+          project: d.project,
+          name: pick(rand, [
+            'subscription_renewed',
+            'webhook_received',
+            'invoice_paid',
+            NOTIFY_EVENT,
+          ]),
+          at: base + n * 1000,
+          agent: 'server',
+          profileId: d.profileId,
+          groups: rand() < 0.2 ? [`wparity-gorg-${d.index % 7}`] : undefined,
+          properties: genProperties(rand, {
+            plan: pick(rand, ['team', 'pro']),
+            seats: between(rand, 1, 20),
+            amount: 19.99,
+          }),
+          noId: rand() < 0.04,
+        });
+      }
+    }
+    if (rand() < 0.07) {
+      // Its own wave: a past event is keyed by device, server events by
+      // profile, and their rows land in the same device's list, in an order
+      // that depends on which lane gets there first.
+      waves[5]!.push({
+        label: `g${d.index}-past`,
+        project: d.project,
+        name: 'offline_sync',
+        at: T0 - between(rand, 1, 5) * DAY,
+        agent: d.agent,
+        device: d.device,
+        session: sessionOf(d),
+        profileId: d.profileId,
+        past: true,
+        properties: genPath(rand),
+      });
+    }
+  }
+  const anyProject = () =>
+    pick(rand, [fixtureIds.projectA, fixtureIds.projectB, fixtureIds.projectC]);
+  for (let n = 0; n < 40; n++) {
+    waves[4]!.push({
+      label: `gsrv-anon-${n}`,
+      project: anyProject(),
+      name: pick(rand, ['cron_tick', 'queue_drained', NOTIFY_EVENT]),
+      at: T0 + between(rand, 0, 6 * HOUR),
+      agent: 'server',
+      properties: { job: `nightly-${n}`, plan: pick(rand, ['team', 'free']) },
+    });
+  }
+  // A server record that names its device but has no profile.
+  for (let n = 0; n < 20; n++) {
+    const d = pick(rand, devices);
+    waves[4]!.push({
+      label: `gsrv-dev-${n}`,
+      project: d.project,
+      name: 'webhook_received',
+      at: d.clock + 2 * MINUTE,
+      agent: 'server',
+      device: `wparity-gsrvdev-${n}`,
+      session: sessionId(d.project, `wparity-gsrvdev-${n}`, 0),
+      properties: { source: 'stripe', n },
+    });
+  }
+
+  // Wave 6: AI records, after the sessions they ride exist.
+  for (const d of identified) {
+    if (rand() < 0.12) {
+      waves[6]!.push({
+        label: `g${d.index}-ai`,
+        project: d.project,
+        name: 'ai.generation',
+        at: d.clock + 5 * MINUTE,
+        agent: 'server',
+        profileId: d.profileId,
+        properties: { feature: 'summary' },
+        ai: {
+          ...aiDraft,
+          trace_id: `wparity-gtrace-${d.index}`,
+          span_id: rand() < 0.5 ? `wparity-gspan-${d.index}` : '',
+          is_error: rand() < 0.2,
+        },
+      });
+    }
+  }
+  for (let n = 0; n < 15; n++) {
+    waves[6]!.push({
+      label: `gai-anon-${n}`,
+      project: anyProject(),
+      name: 'ai.generation',
+      at: T0 + between(rand, 0, 6 * HOUR),
+      agent: 'server',
+      properties: { feature: 'chat' },
+      ai: { ...aiDraft, trace_id: `wparity-gtrace-anon-${n}` },
+    });
+  }
+
+  // Interleave the devices inside a wave without reordering one device (or one
+  // profile's server records).
+  const out: CorpusRecord[] = [];
+  waves.forEach((specs, wave) => {
+    const groups = new Map<string, RecordSpec[]>();
+    for (const spec of specs) {
+      const owner =
+        spec.agent === 'server' && spec.profileId !== undefined
+          ? `${spec.project}:${spec.profileId}`
+          : `${spec.project}|${spec.device ?? spec.label}`;
+      groups.set(owner, [...(groups.get(owner) ?? []), spec]);
+    }
+    const queues = [...groups.values()];
+    while (queues.length > 0) {
+      const index = Math.floor(rand() * queues.length);
+      const queue = queues[index]!;
+      out.push(build(wave, queue.shift()!));
+      if (queue.length === 0) {
+        queues.splice(index, 1);
+      }
+    }
+  });
+  return out;
 }

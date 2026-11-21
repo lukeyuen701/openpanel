@@ -38,15 +38,25 @@ func TemplateEvent(payload *jsjson.Value, rule Rule) string {
 // values leave the placeholder untouched.
 func placeholderText(value *jsjson.Value, isDate bool) (string, bool) {
 	if isDate {
-		return string(jsjson.Stringify(value)), true
+		return stringifyText(value), true
 	}
 	if !isTruthy(value) {
 		return "", false
 	}
 	if value.Kind == jsjson.Array || value.Kind == jsjson.Object {
-		return string(jsjson.Stringify(value)), true
+		return stringifyText(value), true
 	}
 	return jsjson.JSString(value), true
+}
+
+// stringifyText is JSON.stringify(value) for the values a template reads,
+// keeping unpaired surrogates as escapes.
+func stringifyText(value *jsjson.Value) string {
+	text, err := jsport.Stringify(value)
+	if err != nil {
+		return ""
+	}
+	return text
 }
 
 func splitPath(path string) []string {

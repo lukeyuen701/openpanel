@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"openpanel/ingest/internal/jsjson"
+	"openpanel/ingest/internal/worker/jsport"
 )
 
 const (
@@ -255,10 +256,17 @@ func newNotificationData(item delivery) notificationData {
 func (d *Dispatcher) insert(ctx context.Context, item delivery) error {
 	data := newNotificationData(item)
 	now := d.Clock.Now().UTC().Truncate(rowTimePrecision)
-	_, err := d.DB.Exec(ctx, `INSERT INTO "notifications" ("projectId","title","message","createdAt","updatedAt","sendToApp","sendToEmail","integrationId","notificationRuleId","payload")
+	// jsport keeps an unpaired surrogate as an escape, which jsonb refuses as
+	// it does for the Bun worker; the plain encoder would write U+FFFD and the
+	// row would be stored where TypeScript stores none.
+	payloadText, err := jsport.Stringify(data.payload)
+	if err != nil {
+		return fmt.Errorf("notify: notification payload: %w", err)
+	}
+	_, err = d.DB.Exec(ctx, `INSERT INTO "notifications" ("projectId","title","message","createdAt","updatedAt","sendToApp","sendToEmail","integrationId","notificationRuleId","payload")
 VALUES ($1,$2,$3,$4,$5,$6,$7,$8::text::uuid,$9::text::uuid,$10::text::jsonb)`,
 		data.projectID, data.title, data.message, now, now, data.sendToApp, data.sendToEmail,
-		data.integrationID, data.ruleID, string(jsjson.Stringify(data.payload)))
+		data.integrationID, data.ruleID, payloadText)
 	if err != nil {
 		return fmt.Errorf("notify: insert notification: %w", err)
 	}
@@ -291,7 +299,11 @@ func (d *Dispatcher) enqueue(ctx context.Context, requestID string, item deliver
 	envelope.Set("payload", jsjson.NewObject(inner))
 	envelope.Set("meta", jsjson.NewObject(meta))
 
-	if _, err := d.Queue.Add(ctx, QueueName, JobName, jsjson.Stringify(jsjson.NewObject(envelope)), JobOptions{}); err != nil {
+	body, err := jsport.Stringify(jsjson.NewObject(envelope))
+	if err != nil {
+		return fmt.Errorf("notify: notification job data: %w", err)
+	}
+	if _, err := d.Queue.Add(ctx, QueueName, JobName, []byte(body), JobOptions{}); err != nil {
 		return fmt.Errorf("notify: enqueue notification: %w", err)
 	}
 	return nil
@@ -300,6 +312,9 @@ func (d *Dispatcher) enqueue(ctx context.Context, requestID string, item deliver
 // stripNullChars removes U+0000 from every string value (keys are kept),
 // because jsonb cannot store it.
 func stripNullChars(v *jsjson.Value) *jsjson.Value {
+	if v == nil {
+		return nil
+	}
 	switch v.Kind {
 	case jsjson.String:
 		return jsjson.NewString(strings.ReplaceAll(v.Str, "\x00", ""))

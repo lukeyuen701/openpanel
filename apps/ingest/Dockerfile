@@ -12,7 +12,8 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY cmd ./cmd
 COPY internal ./internal
-RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/ingest ./cmd/ingest
+RUN CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/ingest ./cmd/ingest \
+ && CGO_ENABLED=0 go build -trimpath -ldflags="-s -w" -o /out/worker ./cmd/worker
 
 # The GeoLite databases, from the same sources packages/core's codegen uses:
 # the public redistribution, or MaxMind directly when a license key is passed
@@ -34,6 +35,9 @@ RUN --mount=type=secret,id=maxmind_license_key,required=false \
 
 FROM gcr.io/distroless/static-debian12:nonroot
 COPY --from=build /out/ingest /app/ingest
+# The events consumer; run it with the command /app/worker (the image's own
+# entrypoint and healthcheck are the receiver's).
+COPY --from=build /out/worker /app/worker
 COPY --from=geo /geo/*.mmdb /app/geo/
 ENV INGEST_GEO_DIR=/app/geo \
     INGEST_PORT=3000 \

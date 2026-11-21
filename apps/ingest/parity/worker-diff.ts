@@ -14,14 +14,18 @@
 // wparity-*; the rule, client and notification ids are uuid columns, so those
 // use fixed uuids and go away with the organization.
 import { SQL, spawn } from 'bun';
+import { existsSync } from 'node:fs';
 import { tmpdir } from 'node:os';
+import { resolve } from 'node:path';
 import { Producer } from '../../../packages/core/node_modules/@platformatic/kafka/dist/index.js';
 import { eventsPartitioner } from '../../../packages/core/src/modules/ingest/src/partitioner';
 import Redis from '../../../packages/redis/node_modules/ioredis';
 import {
   buildCorpus,
+  buildGeneratedCorpus,
   EXCLUDED_EVENT,
   fixtureIds,
+  GENERATED_PARTITIONS,
   NOTIFY_EVENT,
   SESSION_TIMEOUT_MS,
 } from './worker-corpus';
@@ -31,8 +35,13 @@ const args = process.argv.slice(2);
 const flag = (name: string) =>
   args.includes(name) ? args[args.indexOf(name) + 1] : undefined;
 const SIDES = [flag('--a') ?? 'ts', flag('--b') ?? 'ts'] as const;
-const GO_BIN = flag('--go-bin') ?? `${ROOT}apps/ingest/bin/worker`;
-const GO_ARGS = (flag('--go-args') ?? 'worker').split(' ').filter(Boolean);
+// The binary, relative to the working directory or to the repository root.
+const GO_BIN_FLAG = flag('--go-bin') ?? 'apps/ingest/bin/worker';
+const GO_BIN =
+  [resolve(GO_BIN_FLAG), resolve(ROOT, GO_BIN_FLAG)].find((path) =>
+    existsSync(path)
+  ) ?? resolve(ROOT, GO_BIN_FLAG);
+const GO_ARGS = (flag('--go-args') ?? '').split(' ').filter(Boolean);
 const OUT_DIR = process.env.WPARITY_OUT ?? tmpdir();
 const RUN = Date.now().toString(36);
 
@@ -58,6 +67,29 @@ const STOP_TIMEOUT_MS = 30_000;
 const TTL_BUCKET_SECONDS = 60;
 const MAX_REPORTED_DIFFS = Number(flag('--max-diffs') ?? 60);
 const MAX_VALUE_CHARS = 300;
+
+// The two corpora: a small hand-written one (one partition, every branch once)
+// and a generated one (four partitions, ~2,000 records) for lanes, same-key
+// serialization, micro-batching and the long tail of JavaScript semantics.
+type CorpusKind = 'basic' | 'generated';
+interface Corpus {
+  kind: CorpusKind;
+  partitions: number;
+  records: ReturnType<typeof buildCorpus>;
+}
+function loadCorpus(kind: CorpusKind): Corpus {
+  return kind === 'basic'
+    ? { kind, partitions: 1, records: buildCorpus() }
+    : {
+        kind,
+        partitions: GENERATED_PARTITIONS,
+        records: buildGeneratedCorpus(),
+      };
+}
+const CORPUS_FLAG = flag('--corpus') ?? 'all';
+const CORPUS_KINDS: CorpusKind[] =
+  CORPUS_FLAG === 'all' ? ['basic', 'generated'] : [CORPUS_FLAG as CorpusKind];
+let corpus: Corpus = loadCorpus(CORPUS_KINDS[0]!);
 
 const dbUrl = (process.env.DATABASE_URL ?? '').split('?')[0]!;
 const sql = new SQL(dbUrl);
@@ -110,25 +142,31 @@ async function describeGroup(
 ): Promise<GroupState> {
   const { out } = await rpk('group', 'describe', group);
   const state = /^STATE\s+(\S+)/m.exec(out)?.[1] ?? 'Unknown';
-  const row = out
+  const rows = out
     .split('\n')
     .map((line) => line.trim().split(/\s+/))
-    .find((cols) => cols[0] === topic && /^\d+$/.test(cols[1] ?? ''));
+    .filter((cols) => cols[0] === topic && /^\d+$/.test(cols[1] ?? ''));
   const num = (v: string | undefined) => (v && /^\d+$/.test(v) ? Number(v) : 0);
+  const sum = (column: number) =>
+    rows.reduce((total, cols) => total + num(cols[column]), 0);
+  // A partition with no committed offset prints '-': it is all lag.
   return {
     state,
-    current: num(row?.[2]),
-    end: num(row?.[4]),
-    lag: row ? num(row[5]) : Number.POSITIVE_INFINITY,
+    current: sum(2),
+    end: sum(4),
+    lag: rows.length >= corpus.partitions ? sum(5) : Number.POSITIVE_INFINITY,
   };
 }
 
 // ---------- fixtures ----------
-const PROJECT_IDS = [fixtureIds.projectA, fixtureIds.projectB];
-
+const PROJECT_IDS = [
+  fixtureIds.projectA,
+  fixtureIds.projectB,
+  fixtureIds.projectC,
+];
 async function teardownFixtures() {
   await sql`DELETE FROM notifications WHERE "projectId" IN ${sql(PROJECT_IDS)}`;
-  await sql`DELETE FROM notification_rules WHERE id = ${fixtureIds.rule}::uuid`;
+  await sql`DELETE FROM notification_rules WHERE "projectId" IN ${sql(PROJECT_IDS)}`;
   await sql`DELETE FROM clients WHERE id = ${fixtureIds.client}::uuid`;
   await sql`DELETE FROM projects WHERE id IN ${sql(PROJECT_IDS)}`;
   await sql`DELETE FROM organizations WHERE id = ${fixtureIds.org}`;
@@ -142,6 +180,7 @@ async function setupFixtures() {
   ];
   await sql`INSERT INTO projects (id, name, "organizationId", cors, filters) VALUES (${fixtureIds.projectA}, 'Worker parity A', ${fixtureIds.org}, ${'{*}'}::text[], ${JSON.stringify(filters)}::text::jsonb)`;
   await sql`INSERT INTO projects (id, name, "organizationId", cors) VALUES (${fixtureIds.projectB}, 'Worker parity B', ${fixtureIds.org}, ${'{*}'}::text[])`;
+  await sql`INSERT INTO projects (id, name, "organizationId", cors) VALUES (${fixtureIds.projectC}, 'Worker parity C', ${fixtureIds.org}, ${'{*}'}::text[])`;
   await sql`INSERT INTO clients (id, name, secret, "projectId", "organizationId", "ignoreCorsAndSecret") VALUES (${fixtureIds.client}::uuid, 'wparity', NULL, ${fixtureIds.projectA}, ${fixtureIds.org}, true)`;
   const config = {
     type: 'events',
@@ -155,6 +194,51 @@ async function setupFixtures() {
     ],
   };
   await sql`INSERT INTO notification_rules (id, name, "projectId", "sendToApp", "sendToEmail", config, template) VALUES (${fixtureIds.rule}::uuid, 'wparity rule', ${fixtureIds.projectA}, true, false, ${JSON.stringify(config)}::text::jsonb, 'Event {{name}} on {{path}}')`;
+  // Project B: an email delivery behind a property filter, with a template that
+  // reads nested payload paths and the rule name.
+  const configB = {
+    type: 'events',
+    events: [
+      {
+        id: 'wparity-rule-b-event',
+        name: NOTIFY_EVENT,
+        segment: 'event',
+        filters: [
+          { id: '1', name: 'properties.plan', operator: 'is', value: ['team'] },
+        ],
+      },
+    ],
+  };
+  await sql`INSERT INTO notification_rules (id, name, "projectId", "sendToApp", "sendToEmail", config, template) VALUES (${fixtureIds.ruleB}::uuid, 'wparity rule b', ${fixtureIds.projectB}, false, true, ${JSON.stringify(configB)}::text::jsonb, '{{properties.plan}} plan on $EVENT_NAME ({{rule_name}}) {{properties.seats}}')`;
+  // Project C: every event name, filtered on the path (also matches the derived
+  // session_start rows), and a regex filter on revenue.
+  const configC = {
+    type: 'events',
+    events: [
+      {
+        id: 'wparity-rule-c-any',
+        name: '*',
+        segment: 'event',
+        filters: [
+          { id: '1', name: 'path', operator: 'contains', value: ['pricing'] },
+        ],
+      },
+      {
+        id: 'wparity-rule-c-revenue',
+        name: 'revenue',
+        segment: 'event',
+        filters: [
+          {
+            id: '2',
+            name: 'properties.currency',
+            operator: 'regex',
+            value: ['/^(EUR|usd)$/'],
+          },
+        ],
+      },
+    ],
+  };
+  await sql`INSERT INTO notification_rules (id, name, "projectId", "sendToApp", "sendToEmail", config, template) VALUES (${fixtureIds.ruleC}::uuid, 'wparity rule c', ${fixtureIds.projectC}, true, false, ${JSON.stringify(configC)}::text::jsonb, NULL)`;
 }
 
 async function resetFixtureState() {
@@ -299,6 +383,16 @@ async function redisFingerprint(index: number): Promise<string> {
   return Bun.hash(JSON.stringify(stable)).toString();
 }
 
+// The one error the corpus provokes on purpose and the TS worker logs: a
+// notification whose payload holds an unpaired surrogate cannot be stored in a
+// jsonb column (the generated corpus carries a few such property values), and
+// the delivery is dropped without failing the event. The Go worker logs a failed
+// notification check at Warn, not Error, so parity of what such a failure leaves
+// behind rests on the Postgres and BullMQ dumps, not on this log filter.
+const EXPECTED_ERRORS = [
+  /notification\.create.*invalid input syntax for type json/,
+];
+
 // ---------- worker processes ----------
 interface SideContext {
   side: string;
@@ -330,6 +424,8 @@ function workerEnv(ctx: SideContext): Record<string, string> {
     AUTH_SECRET:
       process.env.AUTH_SECRET ?? 'wparity-auth-secret-0123456789abcdef',
     SELF_HOSTED: 'false',
+    ROLE: 'worker',
+    ENABLED_QUEUES: 'events',
   };
 }
 
@@ -363,7 +459,7 @@ async function startWorker(kind: string, ctx: SideContext) {
           'src/main.ts',
         ],
         cwd: `${ROOT}apps/api`,
-        env: { ...env, ROLE: 'worker', ENABLED_QUEUES: 'events' },
+        env,
         stdout,
         stderr,
       }),
@@ -437,7 +533,15 @@ async function runSide(kind: string, ctx: SideContext): Promise<SideResult> {
   cleanups.push(async () => {
     await flushRedisIndex(ctx.redisIndex);
   });
-  const created = await rpk('topic', 'create', ctx.topic, '-p', '1', '-r', '1');
+  const created = await rpk(
+    'topic',
+    'create',
+    ctx.topic,
+    '-p',
+    String(corpus.partitions),
+    '-r',
+    '1'
+  );
   if (created.code !== 0) {
     throw new Error(`topic create failed: ${created.out}${created.err}`);
   }
@@ -473,11 +577,12 @@ async function runSide(kind: string, ctx: SideContext): Promise<SideResult> {
     return (await describeGroup(ctx.group, ctx.topic)).state === 'Stable';
   });
 
-  const corpus = buildCorpus();
-  const waves = [...new Set(corpus.map((record) => record.wave))].sort();
+  const waves = [
+    ...new Set(corpus.records.map((record) => record.wave)),
+  ].sort();
   let produced = 0;
   for (const wave of waves) {
-    const records = corpus.filter((record) => record.wave === wave);
+    const records = corpus.records.filter((record) => record.wave === wave);
     await produceWave(producer, ctx.topic, records);
     produced += records.length;
     await until(`wave ${wave} to be consumed`, DRAIN_TIMEOUT_MS, async () => {
@@ -511,7 +616,8 @@ async function runSide(kind: string, ctx: SideContext): Promise<SideResult> {
   const logText = await Bun.file(log).text();
   const logErrors = logText
     .split('\n')
-    .filter((line) => /"level":(50|60)\b/.test(line));
+    .filter((line) => /"level":(50|60|"ERROR")/.test(line))
+    .filter((line) => !EXPECTED_ERRORS.some((pattern) => pattern.test(line)));
   await Bun.write(
     `${OUT_DIR}/wparity-${RUN}-${ctx.name}.dump.json`,
     JSON.stringify({ redis, postgres }, null, 1)
@@ -555,7 +661,7 @@ interface KnownValues {
 function knownValues(): KnownValues {
   const ids = new Set<string>(Object.values(fixtureIds));
   const requestIds = new Set<string>();
-  for (const record of buildCorpus()) {
+  for (const record of corpus.records) {
     const payload = JSON.parse(record.value);
     if (payload.id) {
       ids.add(payload.id);
@@ -657,32 +763,109 @@ function normalizeEntry(
   if (entry.type === 'zset' && redisKey.startsWith('session:wallclock:')) {
     return {
       ...entry,
-      value: (entry.value as [string, number][]).map(([member]) => [
-        member,
-        WALLCLOCK,
-      ]),
+      // Scores are the wall clock, so the order they give is arrival order.
+      value: (entry.value as [string, number][])
+        .map(([member]) => [member, WALLCLOCK])
+        .sort((x, y) => (x[0]! < y[0]! ? -1 : 1)),
     };
   }
   if (entry.type === 'stream') {
     const entries = entry.value as [string, string[]][];
+    // Entries arrive in the order lanes reached their messages: compare them
+    // as a multiset.
     return {
       ...entry,
-      value: entries.map(([, fields]) => [
-        WALLCLOCK,
-        maskDeep(fields, '', redisKey, known),
-      ]),
+      value: entries
+        .map(([, fields]) => [WALLCLOCK, maskDeep(fields, '', redisKey, known)])
+        .sort((x, y) => (JSON.stringify(x) < JSON.stringify(y) ? -1 : 1)),
     };
   }
   return { ...entry, value: maskDeep(entry.value, '', redisKey, known) };
 }
 
-export function normalize(dump: RedisDump): RedisDump {
+// Decision 3 (docs/GO_WORKER.md section 8): the Go worker only reads the shared
+// cachable:* entries and never writes them, while the TS worker caches what it
+// loads (SETEX on a miss). Whether such a key exists is an implementation
+// detail of the cache, not state either side hands on, so both dumps drop them.
+// The DEL after the first event is the one write the worker makes to them; it
+// observable only through later reads, so it is covered by the stale-read
+// behaviour of the next messages, not by a key comparison.
+const CACHABLE_PREFIX = 'cachable:';
+
+// BullMQ numbers jobs with an INCR counter, so which job gets which number
+// depends on which message a lane reached first. A numbered job is therefore
+// named by what it holds (queue, job name, masked data) instead, and the lists
+// that point at job numbers are sorted by that name. Custom job ids
+// (sessionEnd:v2:...) are stable and stay as they are.
+const NUMBERED_JOB_KEY = /^(bull:[^:]+:)(\d+)$/;
+const BULL_ID_LISTS =
+  /^bull:[^:]+:(wait|paused|active|completed|failed|prioritized|delayed)$/;
+
+function rekeyNumberedJobs(dump: RedisDump, known: KnownValues): RedisDump {
+  const names = new Map<string, string>();
+  const seen = new Map<string, number>();
+  for (const [key, entry] of Object.entries(dump)) {
+    const match = NUMBERED_JOB_KEY.exec(key);
+    if (!match || entry.type !== 'hash') {
+      continue;
+    }
+    const fields = entry.value as Record<string, unknown>;
+    const content = JSON.stringify([
+      fields.name,
+      maskDeep(tryParse(fields.data), '', key, known),
+    ]);
+    const digest = Bun.hash(content).toString(36);
+    const count = (seen.get(`${match[1]}${digest}`) ?? 0) + 1;
+    seen.set(`${match[1]}${digest}`, count);
+    names.set(key, `${match[1]}job-${digest}-${count}`);
+  }
+  const out: RedisDump = {};
+  for (const [key, entry] of Object.entries(dump)) {
+    const renamed = names.get(key);
+    if (renamed) {
+      out[renamed] = entry;
+      continue;
+    }
+    const prefix = BULL_ID_LISTS.exec(key)
+      ? key.slice(0, key.lastIndexOf(':') + 1)
+      : '';
+    if (prefix && entry.type === 'list') {
+      const mapped = (entry.value as string[]).map(
+        (id) => names.get(`${prefix}${id}`) ?? id
+      );
+      out[key] = { ...entry, value: mapped.sort() };
+      continue;
+    }
+    if (entry.type === 'stream' && key.endsWith(':events')) {
+      const queuePrefix = key.slice(0, key.lastIndexOf(':') + 1);
+      const entries = entry.value as [string, string[]][];
+      out[key] = {
+        ...entry,
+        value: entries.map(([id, fields]) => [
+          id,
+          fields.map((field, index) =>
+            fields[index - 1] === 'jobId'
+              ? (names
+                  .get(`${queuePrefix}${field}`)
+                  ?.slice(queuePrefix.length) ?? field)
+              : field
+          ),
+        ]),
+      };
+      continue;
+    }
+    out[key] = entry;
+  }
+  return out;
+}
+
+export function normalize(rawDump: RedisDump): RedisDump {
   const known = knownValues();
+  const dump = rekeyNumberedJobs(rawDump, known);
   return Object.fromEntries(
-    Object.entries(dump).map(([key, entry]) => [
-      key,
-      normalizeEntry(key, entry, known),
-    ])
+    Object.entries(dump)
+      .filter(([key]) => !key.startsWith(CACHABLE_PREFIX))
+      .map(([key, entry]) => [key, normalizeEntry(key, entry, known)])
   );
 }
 
@@ -778,20 +961,30 @@ export function diffDumps(a: SideResult, b: SideResult): string[] {
 export function sanity(result: SideResult): string[] {
   const problems: string[] = [];
   const keys = Object.keys(result.redis);
-  const corpus = buildCorpus();
   const listEvents = Object.values(result.redis)
     .filter((entry) => entry.type === 'list')
     .flatMap((entry) => entry.value as string[]);
   const eventRows = listEvents.filter(
     (row) => row.includes('"project_id"') && row.includes('"device_id"')
   );
-  const expectMin = corpus.length - 1;
+  const excluded = corpus.records.filter(
+    (record) =>
+      record.value.includes(`"name":"${EXCLUDED_EVENT}"`) &&
+      record.value.includes(`"projectId":"${fixtureIds.projectA}"`)
+  ).length;
+  const expectMin = corpus.records.length - excluded;
   if (eventRows.length < expectMin) {
     problems.push(
       `only ${eventRows.length} event rows in Redis lists, expected at least ${expectMin}`
     );
   }
-  if (eventRows.some((row) => row.includes(`"name":"${EXCLUDED_EVENT}"`))) {
+  if (
+    eventRows.some(
+      (row) =>
+        row.includes(`"name":"${EXCLUDED_EVENT}"`) &&
+        row.includes(`"project_id":"${fixtureIds.projectA}"`)
+    )
+  ) {
     problems.push('the project-filtered event reached the event buffer');
   }
   const known = knownValues();
@@ -826,8 +1019,16 @@ export function sanity(result: SideResult): string[] {
     id: string;
     firstEventSet: boolean;
   }[];
-  if (!projects.every((project) => project.firstEventSet)) {
-    problems.push('firstEventAt not set on both projects');
+  const projectsWithEvents = new Set(
+    corpus.records.map((record) => JSON.parse(record.value).projectId as string)
+  );
+  const unmarked = projects
+    .filter((project) => projectsWithEvents.has(project.id))
+    .filter((project) => !project.firstEventSet);
+  if (unmarked.length > 0) {
+    problems.push(
+      `firstEventAt not set on ${unmarked.map((project) => project.id).join(', ')}`
+    );
   }
   if (result.postgres.notifications.length === 0) {
     problems.push('no notification row');
@@ -858,35 +1059,44 @@ async function main() {
     report(results, false);
     return;
   }
-  const indexes = await pickRedisIndexes(2);
-  const sides: SideContext[] = SIDES.map((kind, i) => ({
-    side: kind,
-    name: `${i === 0 ? 'a' : 'b'}-${kind}`,
-    topic: `wparity-${RUN}-${i === 0 ? 'a' : 'b'}`,
-    group: `wparity-${RUN}-${i === 0 ? 'a' : 'b'}`,
-    redisIndex: indexes[i]!,
-    namespace: `wparity-${RUN}`,
-    clickhouseDb: `openpanel_wparity_${i === 0 ? 'a' : 'b'}`,
-    httpPort: WORKER_HTTP_PORT_BASE + i,
-  }));
   await setupFixtures();
   cleanups.push(teardownFixtures);
 
-  const results: SideResult[] = [];
-  for (const ctx of sides) {
+  for (const kind of CORPUS_KINDS) {
+    corpus = loadCorpus(kind);
     console.log(
-      `running ${ctx.name} (topic ${ctx.topic}, redis db ${ctx.redisIndex})`
+      `corpus ${kind}: ${corpus.records.length} records, ${corpus.partitions} partition(s)`
     );
-    results.push(await runSide(ctx.side, ctx));
-    console.log(
-      `  done in ${(results.at(-1)!.durationMs / 1000).toFixed(1)}s, ${Object.keys(results.at(-1)!.redis).length} redis keys`
-    );
+    const indexes = await pickRedisIndexes(2);
+    const sides: SideContext[] = SIDES.map((side, i) => ({
+      side,
+      name: `${kind}-${i === 0 ? 'a' : 'b'}-${side}`,
+      topic: `wparity-${RUN}-${kind}-${i === 0 ? 'a' : 'b'}`,
+      group: `wparity-${RUN}-${kind}-${i === 0 ? 'a' : 'b'}`,
+      redisIndex: indexes[i]!,
+      namespace: `wparity-${RUN}`,
+      clickhouseDb: `openpanel_wparity_${i === 0 ? 'a' : 'b'}`,
+      httpPort: WORKER_HTTP_PORT_BASE + i,
+    }));
+    const results: SideResult[] = [];
+    for (const ctx of sides) {
+      console.log(
+        `running ${ctx.name} (topic ${ctx.topic}, redis db ${ctx.redisIndex})`
+      );
+      results.push(await runSide(ctx.side, ctx));
+      console.log(
+        `  done in ${(results.at(-1)!.durationMs / 1000).toFixed(1)}s, ${Object.keys(results.at(-1)!.redis).length} redis keys`
+      );
+    }
+    report(results, true, kind);
   }
-
-  report(results, true);
 }
 
-function report(results: SideResult[], checkSanity: boolean) {
+function report(
+  results: SideResult[],
+  checkSanity: boolean,
+  kind = 'saved dumps'
+) {
   let failed = false;
   for (const result of checkSanity ? results : []) {
     const problems = sanity(result);
@@ -908,9 +1118,9 @@ function report(results: SideResult[], checkSanity: boolean) {
       console.error(`  ... ${diffs.length - MAX_REPORTED_DIFFS} more`);
     }
   } else {
-    console.log('no differences');
+    console.log(`[${kind}] no differences`);
   }
-  process.exitCode = failed ? 1 : 0;
+  process.exitCode = failed ? 1 : (process.exitCode ?? 0);
 }
 
 try {
