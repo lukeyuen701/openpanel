@@ -530,7 +530,7 @@ export const clickhouseVersion: Check = (install) => {
     severity: 'warn',
     title: `ClickHouse ${current.split(':')[1]} is older than ${recommended.split(':')[1]}, the release new installs get`,
     detail:
-      'OpenPanel still runs on it. ClickHouse only fixes its newest stable and LTS releases, so an older one stops getting fixes at some point. Moving up is one-way: once the newer server has written data, the old one refuses to start on it.',
+      'OpenPanel still runs on it. ClickHouse only fixes its newest stable and LTS releases, so an older one stops getting fixes at some point. Moving up is one-way: an older server cannot read the data a newer one has written.',
     manual: `Back up the ClickHouse volume, stop the stack, set the op-ch image to ${recommended}, then start it again. To go back, restore the backup.`,
   };
 };

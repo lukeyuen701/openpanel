@@ -179,6 +179,7 @@ describe('ClickHouse version', () => {
     );
     for (const image of [
       freshInstall,
+      'clickhouse/clickhouse-server:26.8.42.13',
       'clickhouse/clickhouse-server:99.1.1.1',
     ]) {
       const dir = v1Copy();
