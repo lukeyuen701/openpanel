@@ -12,7 +12,6 @@ import (
 
 	"openpanel/ingest/internal/jsjson"
 	"openpanel/ingest/internal/worker/chclient"
-	"openpanel/ingest/internal/worker/config"
 	"openpanel/ingest/internal/worker/flush"
 	"openpanel/ingest/internal/worker/jsport"
 )
@@ -574,56 +573,15 @@ func TestBackfillSkipsEntriesWithoutThreeStrings(t *testing.T) {
 	}
 }
 
-// A flush that lost its lock must not trim: another flush has taken the lock
-// over and may have read the same rows, and a second trim of the same count
-// would remove rows nobody wrote.
-func TestALostLockLeavesTheRowsInRedis(t *testing.T) {
-	cases := []struct {
-		name  string
-		build func(r *rig, cfg config.BuffersConfig) flush.Flusher
-		key   string
-		row   string
-	}{
-		{"event", func(r *rig, cfg config.BuffersConfig) flush.Flusher { return NewEvent(cfg, r.deps, Overrides{}) }, EventKey, eventLine(1, "p")},
-		{"session", func(r *rig, cfg config.BuffersConfig) flush.Flusher { return NewSession(cfg, r.deps, Overrides{}) }, SessionKey, sessionRow("a", 1, 1)},
-		{"profile", func(r *rig, cfg config.BuffersConfig) flush.Flusher { return NewProfile(cfg, r.deps, Overrides{}) }, ProfileKey, profileLine("a", "A", "")},
-		{"profile-backfill", func(r *rig, cfg config.BuffersConfig) flush.Flusher {
-			return NewProfileBackfill(cfg, r.deps, Overrides{})
-		}, ProfileBackfillKey, `{"projectId":"p","sessionId":"s","profileId":"u"}`},
-	}
-	for _, c := range cases {
-		t.Run(c.name, func(t *testing.T) {
-			r := newRig()
-			r.redis.Push(c.key, c.row)
-			r.ch.onInsert = func() {
-				r.redis.FailOnce("extend", errors.New("connection refused"))
-				time.Sleep(30 * time.Millisecond)
-			}
-			// The backfill sends no insert: stall its command instead.
-			if c.name == "profile-backfill" {
-				r.deps.CH = &stallingCommands{fakeCH: r.ch, redis: r.redis}
-			}
-			observation := r.flushWithClock(t, c.build(r, buffersConfig(t, nil)), lossClock{})
-			if observation.Result != flush.ResultError || !strings.Contains(fmt.Sprint(observation.Err), "lock lost") {
-				t.Fatalf("observation %+v", observation)
-			}
-			if got := r.redis.List(c.key); len(got) != 1 {
-				t.Fatalf("%d rows left, want 1", len(got))
-			}
-		})
-	}
-}
-
-// stallingCommands lets the keepalive run while an UPDATE is in flight.
-type stallingCommands struct {
+// commandHook lets the keepalive run while an UPDATE is in flight.
+type commandHook struct {
 	*fakeCH
-	redis *memRedis
+	hook func()
 }
 
-func (s *stallingCommands) CommandWithParams(ctx context.Context, statement string, params []chclient.Param, settings chclient.Settings) error {
-	s.redis.FailOnce("extend", errors.New("connection refused"))
-	time.Sleep(30 * time.Millisecond)
-	return s.fakeCH.CommandWithParams(ctx, statement, params, settings)
+func (c *commandHook) CommandWithParams(ctx context.Context, statement string, params []chclient.Param, settings chclient.Settings) error {
+	c.hook()
+	return c.fakeCH.CommandWithParams(ctx, statement, params, settings)
 }
 
 func TestBuffersAreTheFourCronJobs(t *testing.T) {

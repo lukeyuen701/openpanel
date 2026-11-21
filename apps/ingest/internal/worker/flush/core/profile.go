@@ -110,7 +110,7 @@ func (p *profile) processBatch(ctx context.Context, run *flush.Run) (int, error)
 	if len(unique) == 0 {
 		// Nothing but unreadable rows: MGET without keys is an error, and the
 		// rows would block the list for good.
-		if err := p.trim(ctx, run, len(raw)); err != nil {
+		if err := trimHead(ctx, p.deps.Redis, p.listKey, len(raw)); err != nil {
 			return 0, err
 		}
 		run.Report(len(raw), flush.Phases{LRange: lrange})
@@ -146,15 +146,15 @@ func (p *profile) processBatch(ctx context.Context, run *flush.Run) (int, error)
 		writes[i] = CacheWrite{Key: profileCacheKey(incoming), Value: line}
 	}
 
+	if err := run.EnsureLock(); err != nil {
+		return 0, err
+	}
 	insertStart := run.Now()
 	if err := insertLines(ctx, p.deps.CH, chclient.TableProfiles, lines, p.chunk, p.concurrency, p.settings); err != nil {
 		return 0, err
 	}
 	insert := run.Since(insertStart)
 
-	if err := checkLock(run, p.name); err != nil {
-		return 0, err
-	}
 	trimStart := run.Now()
 	commitCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), trimTimeout)
 	defer cancel()
@@ -163,13 +163,6 @@ func (p *profile) processBatch(ctx context.Context, run *flush.Run) (int, error)
 	}
 	run.Report(len(raw), flush.Phases{LRange: lrange, CHFetch: fetch, CHInsert: insert, Trim: run.Since(trimStart)})
 	return len(raw), nil
-}
-
-func (p *profile) trim(ctx context.Context, run *flush.Run, count int) error {
-	if err := checkLock(run, p.name); err != nil {
-		return err
-	}
-	return trimHead(ctx, p.deps.Redis, p.listKey, count)
 }
 
 // mergeWithinBatch folds the rows of one profile into one, in first-appearance

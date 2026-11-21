@@ -148,9 +148,35 @@ func TestDrainStopsOnceTheLockIsNoLongerItsOwn(t *testing.T) {
 	}
 }
 
-func TestAFailedExtensionStopsTheNextBatchButNotTheOneInFlight(t *testing.T) {
+func TestATransportErrorOnExtendIsRetriedAndDoesNotStopTheDrain(t *testing.T) {
 	redis := NewMemoryRedis()
 	redis.FailOnce("extend", errors.New("connection refused"))
+	const wantBatches = 4
+	batches := 0
+	runner := newRunner(t, redis, nil, func(ctx context.Context, run *Run) error {
+		return run.Drain(ctx, testBatchSize, func(context.Context) (int, error) {
+			batches++
+			time.Sleep(testLockTTL * 4 / 10)
+			if batches == wantBatches {
+				return 0, nil
+			}
+			return testBatchSize, nil
+		})
+	})
+	if err := runner.TryFlush(context.Background(), TriggerCron); err != nil {
+		t.Fatal(err)
+	}
+	if batches != wantBatches {
+		t.Fatalf("%d batches, want %d", batches, wantBatches)
+	}
+	if got := redis.CallCount("extend"); got < 2 {
+		t.Fatalf("%d extend calls: the failed one was not retried", got)
+	}
+}
+
+func TestTransportErrorsUntilTheTTLStopTheNextBatchButNotTheOneInFlight(t *testing.T) {
+	redis := NewMemoryRedis()
+	redis.FailTimes("extend", -1, errors.New("connection refused"))
 	batches := 0
 	runner := newRunner(t, redis, nil, func(ctx context.Context, run *Run) error {
 		return run.Drain(ctx, testBatchSize, func(context.Context) (int, error) {
@@ -162,8 +188,8 @@ func TestAFailedExtensionStopsTheNextBatchButNotTheOneInFlight(t *testing.T) {
 	if err := runner.TryFlush(context.Background(), TriggerCron); err != nil {
 		t.Fatal(err)
 	}
-	if batches != 1 {
-		t.Fatalf("%d batches", batches)
+	if batches != 2 {
+		t.Fatalf("%d batches, want 2: the lock is unconfirmed for one TTL, then lost", batches)
 	}
 }
 

@@ -94,6 +94,9 @@ func (p *passthrough) processBatch(ctx context.Context, run *flush.Run) (int, er
 		return 0, nil
 	}
 
+	if err := run.EnsureLock(); err != nil {
+		return 0, err
+	}
 	insertStart := run.Now()
 	if err := insertChunks(ctx, p.deps, p.table, items, p.chunk); err != nil {
 		return 0, err

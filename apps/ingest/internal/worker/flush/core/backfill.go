@@ -133,6 +133,9 @@ func (b *profileBackfill) Flush(ctx context.Context, run *flush.Run) error {
 		return nil
 	}
 
+	if err := run.EnsureLock(); err != nil {
+		return err
+	}
 	updateStart := run.Now()
 	for _, chunk := range flush.Chunks(parseBackfillEntries(raw), backfillChunkSize) {
 		statement, params := BackfillStatement(b.clustered, chunk)
@@ -142,9 +145,6 @@ func (b *profileBackfill) Flush(ctx context.Context, run *flush.Run) error {
 	}
 	update := run.Since(updateStart)
 
-	if err := checkLock(run, b.name); err != nil {
-		return err
-	}
 	trimStart := run.Now()
 	if err := trimHead(ctx, b.deps.Redis, b.listKey, len(raw)); err != nil {
 		return err

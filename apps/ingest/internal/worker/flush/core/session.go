@@ -205,15 +205,15 @@ func (s *session) processBatch(ctx context.Context, run *flush.Run) (int, error)
 	}
 	transform := run.Since(transformStart)
 
+	if err := run.EnsureLock(); err != nil {
+		return 0, err
+	}
 	insertStart := run.Now()
 	if err := insertLines(ctx, s.deps.CH, chclient.TableSessions, lines, s.chunk, s.concurrency, nil); err != nil {
 		return 0, err
 	}
 	insert := run.Since(insertStart)
 
-	if err := checkLock(run, s.name); err != nil {
-		return 0, err
-	}
 	trimStart := run.Now()
 	if err := trimHead(ctx, s.deps.Redis, s.listKey, len(raw)); err != nil {
 		return 0, err

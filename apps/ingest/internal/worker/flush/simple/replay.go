@@ -60,6 +60,9 @@ func (r *replay) Flush(ctx context.Context, run *flush.Run) (err error) {
 		phases = phases.Add(flush.Phases{LRange: run.Since(lrangeStart)})
 
 		if len(items) > 0 {
+			if err := run.EnsureLock(); err != nil {
+				return err
+			}
 			insertStart := run.Now()
 			if err := insertChunks(ctx, r.deps, chclient.TableReplayChunks, items, r.chunk); err != nil {
 				return err

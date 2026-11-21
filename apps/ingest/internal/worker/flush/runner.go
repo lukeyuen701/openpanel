@@ -6,6 +6,14 @@
 // `lock:<name>` key and the same Lua, so a buffer can move from one process to
 // the other tick by tick.
 //
+// The lock counts as lost only when the extend script answers that another
+// owner holds it (or the key is gone), or when a transport error on extend
+// could not be retried into an answer before the TTL, counted from the last
+// confirmation, ran out. A flush that lost the lock inserts no further batch
+// (Run.EnsureLock); a batch whose insert already landed is still trimmed, since
+// leaving it would insert it twice, and the drain stops. The TypeScript flush
+// trims regardless and checks the flag only between batches.
+//
 // A buffer plugs in by implementing Flusher (its name, its list and what to do
 // under the lock; Run.Drain, Run.Report and ParallelLimit are the BaseBuffer
 // helpers), wrapping it in a Runner, and handing the Runner to NewJob under the
@@ -38,9 +46,17 @@ const (
 	// lockKeepalivesPerTTL: the lock is extended this many times per TTL.
 	lockKeepalivesPerTTL = 3
 	// releaseTimeout bounds the lock release that runs after shutdown cancelled the flush.
-	releaseTimeout   = 5 * time.Second
-	secureIDAlphabet = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	releaseTimeout = 5 * time.Second
+	// DefaultLockRetryBackoff is the first wait before an extend that failed
+	// on the wire is sent again; it doubles up to maxLockRetryBackoff.
+	DefaultLockRetryBackoff = 500 * time.Millisecond
+	maxLockRetryBackoff     = 5 * time.Second
+	secureIDAlphabet        = "_-0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 )
+
+// ErrLockLost is what a flush returns instead of inserting a batch once the
+// lock is lost. Rows that already landed are still trimmed.
+var ErrLockLost = errors.New("lock lost")
 
 // Trigger is what invoked a flush. Only the cron does; "add" is the
 // vestigial value of the TypeScript type.
@@ -132,6 +148,8 @@ type Deps struct {
 	// LockTTL and DrainBudget default to DefaultLockTTL and DefaultDrainBudget.
 	LockTTL     time.Duration
 	DrainBudget time.Duration
+	// LockRetryBackoff defaults to DefaultLockRetryBackoff.
+	LockRetryBackoff time.Duration
 }
 
 // Runner runs one Flusher's tryFlush.
@@ -160,6 +178,9 @@ func NewRunner(f Flusher, deps Deps) (*Runner, error) {
 	}
 	if deps.DrainBudget == 0 {
 		deps.DrainBudget = DefaultDrainBudget
+	}
+	if deps.LockRetryBackoff == 0 {
+		deps.LockRetryBackoff = DefaultLockRetryBackoff
 	}
 	return &Runner{flusher: f, deps: deps, lockKey: lockKeyPrefix + f.Name()}, nil
 }
@@ -214,6 +235,7 @@ func (r *Runner) TryFlush(ctx context.Context, trigger Trigger) error {
 	defer r.inFlight.Store(false)
 
 	lockID := newLockID()
+	acquiredAt := r.deps.Clock.Now()
 	acquired, err := r.deps.Redis.SetNXEx(ctx, r.lockKey, lockID, r.deps.LockTTL)
 	if err != nil {
 		return fmt.Errorf("flush %s: acquire lock: %w", r.flusher.Name(), err)
@@ -224,7 +246,7 @@ func (r *Runner) TryFlush(ctx context.Context, trigger Trigger) error {
 	}
 
 	run := &Run{runner: r}
-	stopKeepalive := r.keepLockAlive(ctx, lockID, run)
+	stopKeepalive := r.keepLockAlive(ctx, lockID, run, acquiredAt)
 	flushStarted := r.deps.Clock.Now()
 	flushErr := r.flusher.Flush(ctx, run)
 	obs.Rows, obs.Phases = run.rows, run.phases
@@ -248,34 +270,27 @@ func (r *Runner) TryFlush(ctx context.Context, trigger Trigger) error {
 
 // keepLockAlive extends the lock every TTL/3 until the returned function is
 // called, which also waits for a renewal in flight so it cannot touch the next
-// flush's lock. A failed or refused renewal marks the run's lock lost: the
-// batch in flight finishes, no new one starts.
-func (r *Runner) keepLockAlive(ctx context.Context, lockID string, run *Run) (stop func()) {
+// flush's lock. The lock is marked lost on the run only when the extend script
+// answers that another owner holds it or the key is gone, or when ownership
+// could not be confirmed before the TTL ran out (see extendLock); the batch in
+// flight finishes, no new one starts.
+func (r *Runner) keepLockAlive(ctx context.Context, lockID string, run *Run, acquiredAt time.Time) (stop func()) {
 	ticks, stopTicker := r.deps.Clock.Tick(r.deps.LockTTL / lockKeepalivesPerTTL)
 	keepaliveCtx, cancel := context.WithCancel(context.WithoutCancel(ctx))
 	done := make(chan struct{})
-	ttl := fmt.Sprint(int64(r.deps.LockTTL / time.Second))
 	go func() {
 		defer close(done)
+		confirmedAt := acquiredAt
 		for {
 			select {
 			case <-keepaliveCtx.Done():
 				return
 			case <-ticks:
 			}
-			extended, err := extendLockScript.Run(keepaliveCtx, r.deps.Redis, []string{r.lockKey}, []string{lockID, ttl})
-			if keepaliveCtx.Err() != nil {
-				return
-			}
-			switch {
-			case err != nil:
-				// A failed call says nothing about ownership: keep renewing for
-				// the batch in flight and start no new one.
+			var lost bool
+			confirmedAt, lost = r.extendLock(keepaliveCtx, lockID, confirmedAt)
+			if lost {
 				run.lockLost.Store(true)
-				r.deps.Logger.Error("flush lock could not be extended; stopping before the next batch", "err", err, "lockKey", r.lockKey)
-			case extended != 1:
-				run.lockLost.Store(true)
-				r.deps.Logger.Error("flush lock lost mid-flush; stopping before the next batch", "lockKey", r.lockKey)
 				return
 			}
 		}
@@ -284,6 +299,41 @@ func (r *Runner) keepLockAlive(ctx context.Context, lockID string, run *Run) (st
 		cancel()
 		stopTicker()
 		<-done
+	}
+}
+
+// extendLock sends the extend script once. An answer settles ownership: the
+// lock is lost when the script says so. A transport error settles nothing, so
+// the call is retried with backoff for as long as the TTL counted from the
+// last confirmation has not run out; after that the key may have expired and
+// been taken, and the lock counts as lost. It returns the time of the latest
+// confirmation, and ok false (lost) otherwise.
+func (r *Runner) extendLock(ctx context.Context, lockID string, confirmedAt time.Time) (time.Time, bool) {
+	ttl := fmt.Sprint(int64(r.deps.LockTTL / time.Second))
+	backoff := r.deps.LockRetryBackoff
+	for {
+		attemptedAt := r.deps.Clock.Now()
+		extended, err := extendLockScript.Run(ctx, r.deps.Redis, []string{r.lockKey}, []string{lockID, ttl})
+		if ctx.Err() != nil {
+			return confirmedAt, false
+		}
+		if err == nil {
+			if extended == 1 {
+				return attemptedAt, false
+			}
+			r.deps.Logger.Error("flush lock lost mid-flush; stopping before the next batch", "lockKey", r.lockKey)
+			return confirmedAt, true
+		}
+		remaining := confirmedAt.Add(r.deps.LockTTL).Sub(r.deps.Clock.Now())
+		if remaining <= 0 {
+			r.deps.Logger.Error("flush lock ownership not confirmed before its TTL ran out; treating it as lost", "err", err, "lockKey", r.lockKey)
+			return confirmedAt, true
+		}
+		r.deps.Logger.Warn("flush lock could not be extended; retrying", "err", err, "lockKey", r.lockKey)
+		if r.deps.Clock.Sleep(ctx, min(backoff, remaining)) != nil {
+			return confirmedAt, false
+		}
+		backoff = min(backoff*2, maxLockRetryBackoff)
 	}
 }
 
@@ -322,8 +372,19 @@ type Run struct {
 	phases   Phases
 }
 
-// LockLost reports whether the keepalive found the lock expired or taken.
+// LockLost reports whether the keepalive found the lock expired or taken, or
+// could not confirm it before its TTL ran out.
 func (r *Run) LockLost() bool { return r.lockLost.Load() }
+
+// EnsureLock is the guard before an insert: with the lock lost another flush
+// may be writing the same rows, so none is sent and the batch stays for the
+// next tick. A batch that already landed is trimmed regardless.
+func (r *Run) EnsureLock() error {
+	if r.LockLost() {
+		return fmt.Errorf("flush %s: %w before the insert; leaving the batch for the next tick", r.runner.flusher.Name(), ErrLockLost)
+	}
+	return nil
+}
 
 // Report adds a batch's row count and timings to the flush's totals.
 func (r *Run) Report(rows int, phases Phases) {

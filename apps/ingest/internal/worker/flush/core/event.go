@@ -115,6 +115,9 @@ func (e *event) processBatch(ctx context.Context, run *flush.Run) (int, error) {
 
 	counts := countByProject(lines)
 
+	if err := run.EnsureLock(); err != nil {
+		return 0, err
+	}
 	insertStart := run.Now()
 	if err := insertLines(ctx, e.deps.CH, chclient.TableEvents, lines, e.chunk, e.concurrency, e.settings); err != nil {
 		return 0, err
@@ -123,9 +126,6 @@ func (e *event) processBatch(ctx context.Context, run *flush.Run) (int, error) {
 
 	e.publish(ctx, counts)
 
-	if err := checkLock(run, e.name); err != nil {
-		return 0, err
-	}
 	trimStart := run.Now()
 	if err := trimHead(ctx, e.deps.Redis, e.listKey, len(lines)); err != nil {
 		return 0, err

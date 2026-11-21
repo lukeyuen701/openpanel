@@ -132,21 +132,3 @@ func trimHead(ctx context.Context, redis flush.Redis, key string, count int) err
 	defer cancel()
 	return redis.LTrim(ctx, key, int64(count), -1)
 }
-
-// lockLostError stops a batch whose trim could remove rows that another flush,
-// which took the lock over, has read and not yet written: the rows stay and are
-// written again next tick (a duplicate, never a loss). The TypeScript flush
-// trims regardless.
-type lockLostError struct{ buffer string }
-
-func (e lockLostError) Error() string {
-	return "flush " + e.buffer + ": lock lost before the trim; leaving the batch for the next tick"
-}
-
-// checkLock is the guard before a trim.
-func checkLock(run *flush.Run, buffer string) error {
-	if run.LockLost() {
-		return lockLostError{buffer: buffer}
-	}
-	return nil
-}

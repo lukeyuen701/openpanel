@@ -20,7 +20,7 @@ type MemoryRedis struct {
 	cached  map[string]string // sha -> lua text, what SCRIPT LOAD / EVAL cached
 
 	// failures, by command name, returned once then cleared.
-	failures map[string]error
+	failures map[string]*failure
 	calls    map[string]int
 }
 
@@ -28,17 +28,29 @@ func NewMemoryRedis() *MemoryRedis {
 	return &MemoryRedis{
 		lists: map[string][]string{}, strings: map[string]string{}, expires: map[string]time.Time{},
 		hashes: map[string]map[string]string{}, cached: map[string]string{},
-		failures: map[string]error{}, calls: map[string]int{},
+		failures: map[string]*failure{}, calls: map[string]int{},
 	}
 }
 
 func (r *MemoryRedis) enter(command string) error {
 	r.calls[command]++
-	if err := r.failures[command]; err != nil {
-		delete(r.failures, command)
-		return err
+	failure := r.failures[command]
+	if failure == nil {
+		return nil
 	}
-	return nil
+	if failure.left > 0 {
+		failure.left--
+		if failure.left == 0 {
+			delete(r.failures, command)
+		}
+	}
+	return failure.err
+}
+
+type failure struct {
+	err error
+	// left is how many calls still fail; negative fails every call.
+	left int
 }
 
 // FailOnce makes the next call of command (llen, lrange, ltrim, set, hexists,
@@ -46,7 +58,22 @@ func (r *MemoryRedis) enter(command string) error {
 func (r *MemoryRedis) FailOnce(command string, err error) {
 	r.mutex.Lock()
 	defer r.mutex.Unlock()
-	r.failures[command] = err
+	r.failures[command] = &failure{err: err, left: 1}
+}
+
+// FailTimes makes the next times calls of command fail with err; a negative
+// times fails every call until ClearFailures.
+func (r *MemoryRedis) FailTimes(command string, times int, err error) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	r.failures[command] = &failure{err: err, left: times}
+}
+
+// ClearFailures drops the failures queued for command.
+func (r *MemoryRedis) ClearFailures(command string) {
+	r.mutex.Lock()
+	defer r.mutex.Unlock()
+	delete(r.failures, command)
 }
 
 // CallCount is how many times command was called.
