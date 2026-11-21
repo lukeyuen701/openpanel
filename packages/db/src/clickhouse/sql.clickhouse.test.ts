@@ -344,15 +344,21 @@ describeAgainstClickhouse('Identifier positional matrix', () => {
     ).toBe(1);
   });
 
-  it('fails inside a SETTINGS clause, for any param type', async () => {
-    await expect(
-      chQuery(sql`SELECT 1 SETTINGS session_timezone = ${sql.string('UTC')}`)
-    ).rejects.toThrow(/Syntax error/);
+  it('is not portable inside a SETTINGS clause', async () => {
+    // 25.10 and 26.1 reject any param there as a syntax error while 26.8
+    // accepts a String one, so settings travel beside the query instead.
+    const stringParam = await chQuery(
+      sql`SELECT 1 SETTINGS session_timezone = ${sql.string('UTC')}`
+    ).then(
+      () => 'accepted',
+      (error: Error) => error.message
+    );
+    expect(stringParam).toMatch(/^accepted$|Syntax error/);
     await expect(
       chQuery(
         sql`SELECT 1 SETTINGS session_timezone = ${sql.identifier('UTC')}`
       )
-    ).rejects.toThrow(/Syntax error/);
+    ).rejects.toThrow(/Syntax error|Unknown data type family: Identifier/);
 
     // The supported route: settings travel beside the query.
     expect(
