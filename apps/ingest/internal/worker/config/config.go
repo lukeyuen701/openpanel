@@ -86,6 +86,12 @@ type Config struct {
 	// leaving the module's own defaults (100 and 10 ms) to the buffer.
 	EventBufferMicroBatchSize int
 	EventBufferMicroBatchWait time.Duration
+
+	ClickHouse ClickHouseConfig
+	Buffers    BuffersConfig
+	// GoWorkerCronJobs is GO_WORKER_CRON_JOBS: the cron job ids this process
+	// runs. Empty runs none.
+	GoWorkerCronJobs []string
 }
 
 // KafkaConfig is every KAFKA_* setting of the consumer path.
@@ -284,6 +290,9 @@ func Load(getenv func(string) string) (Config, error) {
 		EventBufferMicroBatchSize: l.optionalPositiveInt("EVENT_BUFFER_MICRO_BATCH_SIZE"),
 		EventBufferMicroBatchWait: millis(l.optionalPositiveInt("EVENT_BUFFER_MICRO_BATCH_MS")),
 		Kafka:                     l.kafka(),
+		ClickHouse:                l.clickhouse(),
+		Buffers:                   l.buffers(),
+		GoWorkerCronJobs:          l.goWorkerCronJobs(),
 	}
 	if len(cfg.EnabledQueues) == 0 && cfg.Role != RoleAPI {
 		l.problem("ROLE=%s consumes queues but ENABLED_QUEUES names none — this process would boot and do nothing.", cfg.Role)

@@ -1,0 +1,379 @@
+[
+ {
+  "env": {},
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "BUFFER_ASYNC_INSERTS": "false"
+  },
+  "buffers": {
+   "asyncInserts": true,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "BUFFER_ASYNC_INSERTS": "0"
+  },
+  "buffers": {
+   "asyncInserts": true,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "BUFFER_ASYNC_INSERTS": "  "
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "BUFFER_CH_INSERT_CONCURRENCY": "3"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "chInsertConcurrency": 3,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "BUFFER_CH_INSERT_CONCURRENCY": "abc"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "BUFFER_CH_INSERT_CONCURRENCY": "0"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "BUFFER_CH_INSERT_CONCURRENCY": "-4"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "EVENT_BUFFER_BATCH_SIZE": "123",
+   "EVENT_BUFFER_CHUNK_SIZE": "45"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {},
+   "event": {
+    "batchSize": 123,
+    "chunkSize": 45
+   },
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "SESSION_BUFFER_BATCH_SIZE": "77",
+   "SESSION_BUFFER_SQUASH": "false"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "batchSize": 77,
+    "squash": false
+   }
+  }
+ },
+ {
+  "env": {
+   "SESSION_BUFFER_SQUASH": "0"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": false
+   }
+  }
+ },
+ {
+  "env": {
+   "SESSION_BUFFER_SQUASH": "no"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "PROFILE_BUFFER_BATCH_SIZE": "11",
+   "PROFILE_BUFFER_CHUNK_SIZE": "12",
+   "PROFILE_BUFFER_FETCH_CHUNK_SIZE": "13",
+   "PROFILE_BUFFER_TTL_IN_SECONDS": "14"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {
+    "batchSize": 11,
+    "chunkSize": 12,
+    "ttlSeconds": 14,
+    "fetchChunkSize": 13
+   },
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "PROFILE_BACKFILL_BUFFER_BATCH_SIZE": "15"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {
+    "batchSize": 15
+   },
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "BOT_BUFFER_BATCH_SIZE": "16"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {
+    "batchSize": 16
+   },
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "REPLAY_BUFFER_BATCH_SIZE": "17",
+   "REPLAY_BUFFER_CHUNK_SIZE": "18"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {
+    "batchSize": 17,
+    "chunkSize": 18
+   },
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "GROUP_BUFFER_BATCH_SIZE": "19",
+   "GROUP_BUFFER_CHUNK_SIZE": "20",
+   "GROUP_BUFFER_TTL_IN_SECONDS": "21"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {},
+   "event": {},
+   "group": {
+    "batchSize": 19,
+    "chunkSize": 20,
+    "ttlSeconds": 21
+   },
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "AI_EVENT_BUFFER_BATCH_SIZE": "22",
+   "AI_EVENT_BUFFER_CHUNK_SIZE": "x"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {},
+   "event": {},
+   "group": {},
+   "aiEvent": {
+    "batchSize": 22
+   },
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {},
+   "session": {
+    "squash": true
+   }
+  }
+ },
+ {
+  "env": {
+   "REPLAY_BUFFER_BATCH_SIZE": "1e2",
+   "BOT_BUFFER_BATCH_SIZE": "0x10"
+  },
+  "buffers": {
+   "asyncInserts": false,
+   "bot": {
+    "batchSize": 16
+   },
+   "event": {},
+   "group": {},
+   "aiEvent": {},
+   "profile": {},
+   "profileBackfill": {},
+   "replay": {
+    "batchSize": 100
+   },
+   "session": {
+    "squash": true
+   }
+  }
+ }
+]

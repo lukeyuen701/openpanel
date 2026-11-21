@@ -1,0 +1,911 @@
+[
+ {
+  "name": "defaults",
+  "env": {},
+  "url": "/mydb",
+  "calls": [
+   {
+    "op": "insert",
+    "table": "events_bots",
+    "lines": [
+     "{\"a\":1}",
+     "{\"b\":\"é\"}"
+    ],
+    "settings": [
+     [
+      "async_insert",
+      1
+     ],
+     [
+      "wait_for_async_insert",
+      0
+     ],
+     [
+      "parallel_view_processing",
+      1
+     ]
+    ]
+   },
+   {
+    "op": "insert",
+    "table": "sessions",
+    "objects": [
+     {
+      "x": 1
+     }
+    ]
+   },
+   {
+    "op": "insert",
+    "table": "groups",
+    "lines": [
+     "{\"id\":\"g\"}"
+    ],
+    "settings": []
+   },
+   {
+    "op": "query",
+    "query": "SELECT {p1:String} AS a, {p2:Array(String)} AS b",
+    "params": [
+     [
+      "p1",
+      "x y\t'\\\n"
+     ],
+     [
+      "p2",
+      [
+       "a",
+       "b'c\\"
+      ]
+     ]
+    ]
+   },
+   {
+    "op": "command",
+    "query": "ALTER TABLE events UPDATE a = 1 WHERE b = 2",
+    "settings": [
+     [
+      "allow_experimental_lightweight_update",
+      1
+     ],
+     [
+      "foo",
+      "a b"
+     ]
+    ]
+   }
+  ],
+  "requests": [
+   {
+    "method": "POST",
+    "path": "/",
+    "pairs": [
+     [
+      "query_id",
+      "<id>"
+     ],
+     [
+      "distributed_product_mode",
+      "allow"
+     ],
+     [
+      "date_time_input_format",
+      "best_effort"
+     ],
+     [
+      "async_insert",
+      "1"
+     ],
+     [
+      "query_plan_convert_any_join_to_semi_or_anti_join",
+      "0"
+     ],
+     [
+      "max_execution_time",
+      "300"
+     ],
+     [
+      "max_insert_block_size",
+      "500000"
+     ],
+     [
+      "max_http_get_redirects",
+      "0"
+     ],
+     [
+      "input_format_parallel_parsing",
+      "1"
+     ],
+     [
+      "send_progress_in_http_headers",
+      "1"
+     ],
+     [
+      "http_headers_progress_interval_ms",
+      "50000"
+     ],
+     [
+      "wait_end_of_query",
+      "1"
+     ],
+     [
+      "wait_for_async_insert",
+      "0"
+     ],
+     [
+      "parallel_view_processing",
+      "1"
+     ],
+     [
+      "database",
+      "mydb"
+     ],
+     [
+      "query",
+      "INSERT INTO events_bots FORMAT JSONEachRow"
+     ]
+    ],
+    "authorization": "Basic dTpw",
+    "contentEncoding": "gzip",
+    "body": "{\"a\":1}\n{\"b\":\"é\"}\n"
+   },
+   {
+    "method": "POST",
+    "path": "/",
+    "pairs": [
+     [
+      "query_id",
+      "<id>"
+     ],
+     [
+      "distributed_product_mode",
+      "allow"
+     ],
+     [
+      "date_time_input_format",
+      "best_effort"
+     ],
+     [
+      "async_insert",
+      "0"
+     ],
+     [
+      "query_plan_convert_any_join_to_semi_or_anti_join",
+      "0"
+     ],
+     [
+      "max_execution_time",
+      "300"
+     ],
+     [
+      "max_insert_block_size",
+      "500000"
+     ],
+     [
+      "max_http_get_redirects",
+      "0"
+     ],
+     [
+      "input_format_parallel_parsing",
+      "1"
+     ],
+     [
+      "send_progress_in_http_headers",
+      "1"
+     ],
+     [
+      "http_headers_progress_interval_ms",
+      "50000"
+     ],
+     [
+      "wait_end_of_query",
+      "1"
+     ],
+     [
+      "database",
+      "mydb"
+     ],
+     [
+      "query",
+      "INSERT INTO sessions FORMAT JSONEachRow"
+     ]
+    ],
+    "authorization": "Basic dTpw",
+    "contentEncoding": "gzip",
+    "body": "{\"x\":1}\n"
+   },
+   {
+    "method": "POST",
+    "path": "/",
+    "pairs": [
+     [
+      "query_id",
+      "<id>"
+     ],
+     [
+      "distributed_product_mode",
+      "allow"
+     ],
+     [
+      "date_time_input_format",
+      "best_effort"
+     ],
+     [
+      "async_insert",
+      "0"
+     ],
+     [
+      "query_plan_convert_any_join_to_semi_or_anti_join",
+      "0"
+     ],
+     [
+      "max_execution_time",
+      "300"
+     ],
+     [
+      "max_insert_block_size",
+      "500000"
+     ],
+     [
+      "max_http_get_redirects",
+      "0"
+     ],
+     [
+      "input_format_parallel_parsing",
+      "1"
+     ],
+     [
+      "send_progress_in_http_headers",
+      "1"
+     ],
+     [
+      "http_headers_progress_interval_ms",
+      "50000"
+     ],
+     [
+      "wait_end_of_query",
+      "1"
+     ],
+     [
+      "database",
+      "mydb"
+     ],
+     [
+      "query",
+      "INSERT INTO groups FORMAT JSONEachRow"
+     ]
+    ],
+    "authorization": "Basic dTpw",
+    "contentEncoding": "gzip",
+    "body": "{\"id\":\"g\"}\n"
+   },
+   {
+    "method": "POST",
+    "path": "/",
+    "pairs": [
+     [
+      "query_id",
+      "<id>"
+     ],
+     [
+      "param_p1",
+      "x y\\t\\'\\\\\\n"
+     ],
+     [
+      "param_p2",
+      "['a','b\\'c\\\\']"
+     ],
+     [
+      "distributed_product_mode",
+      "allow"
+     ],
+     [
+      "date_time_input_format",
+      "best_effort"
+     ],
+     [
+      "async_insert",
+      "0"
+     ],
+     [
+      "query_plan_convert_any_join_to_semi_or_anti_join",
+      "0"
+     ],
+     [
+      "default_format",
+      "JSON"
+     ],
+     [
+      "database",
+      "mydb"
+     ]
+    ],
+    "authorization": "Basic dTpw",
+    "contentEncoding": null,
+    "body": "SELECT {p1:String} AS a, {p2:Array(String)} AS b"
+   },
+   {
+    "method": "POST",
+    "path": "/",
+    "pairs": [
+     [
+      "query_id",
+      "<id>"
+     ],
+     [
+      "distributed_product_mode",
+      "allow"
+     ],
+     [
+      "date_time_input_format",
+      "best_effort"
+     ],
+     [
+      "async_insert",
+      "0"
+     ],
+     [
+      "query_plan_convert_any_join_to_semi_or_anti_join",
+      "0"
+     ],
+     [
+      "allow_experimental_lightweight_update",
+      "1"
+     ],
+     [
+      "foo",
+      "a b"
+     ],
+     [
+      "database",
+      "mydb"
+     ]
+    ],
+    "authorization": "Basic dTpw",
+    "contentEncoding": "gzip",
+    "body": "ALTER TABLE events UPDATE a = 1 WHERE b = 2"
+   }
+  ]
+ },
+ {
+  "name": "no-credentials-no-database",
+  "env": {},
+  "url": "",
+  "calls": [
+   {
+    "op": "insert",
+    "table": "events",
+    "lines": [
+     "{}"
+    ]
+   }
+  ],
+  "requests": [
+   {
+    "method": "POST",
+    "path": "/",
+    "pairs": [
+     [
+      "query_id",
+      "<id>"
+     ],
+     [
+      "distributed_product_mode",
+      "allow"
+     ],
+     [
+      "date_time_input_format",
+      "best_effort"
+     ],
+     [
+      "async_insert",
+      "0"
+     ],
+     [
+      "query_plan_convert_any_join_to_semi_or_anti_join",
+      "0"
+     ],
+     [
+      "max_execution_time",
+      "300"
+     ],
+     [
+      "max_insert_block_size",
+      "500000"
+     ],
+     [
+      "max_http_get_redirects",
+      "0"
+     ],
+     [
+      "input_format_parallel_parsing",
+      "1"
+     ],
+     [
+      "send_progress_in_http_headers",
+      "1"
+     ],
+     [
+      "http_headers_progress_interval_ms",
+      "50000"
+     ],
+     [
+      "wait_end_of_query",
+      "1"
+     ],
+     [
+      "query",
+      "INSERT INTO events FORMAT JSONEachRow"
+     ]
+    ],
+    "authorization": "Basic ZGVmYXVsdDo=",
+    "contentEncoding": "gzip",
+    "body": "{}\n"
+   }
+  ]
+ },
+ {
+  "name": "credentials-and-default-database",
+  "env": {},
+  "url": "/default",
+  "calls": [
+   {
+    "op": "insert",
+    "table": "events",
+    "lines": [
+     "{}"
+    ]
+   }
+  ],
+  "requests": [
+   {
+    "method": "POST",
+    "path": "/",
+    "pairs": [
+     [
+      "query_id",
+      "<id>"
+     ],
+     [
+      "distributed_product_mode",
+      "allow"
+     ],
+     [
+      "date_time_input_format",
+      "best_effort"
+     ],
+     [
+      "async_insert",
+      "0"
+     ],
+     [
+      "query_plan_convert_any_join_to_semi_or_anti_join",
+      "0"
+     ],
+     [
+      "max_execution_time",
+      "300"
+     ],
+     [
+      "max_insert_block_size",
+      "500000"
+     ],
+     [
+      "max_http_get_redirects",
+      "0"
+     ],
+     [
+      "input_format_parallel_parsing",
+      "1"
+     ],
+     [
+      "send_progress_in_http_headers",
+      "1"
+     ],
+     [
+      "http_headers_progress_interval_ms",
+      "50000"
+     ],
+     [
+      "wait_end_of_query",
+      "1"
+     ],
+     [
+      "query",
+      "INSERT INTO events FORMAT JSONEachRow"
+     ]
+    ],
+    "authorization": "Basic dTpw",
+    "contentEncoding": "gzip",
+    "body": "{}\n"
+   }
+  ]
+ },
+ {
+  "name": "compression-off",
+  "env": {
+   "CLICKHOUSE_REQUEST_COMPRESSION": "0"
+  },
+  "url": "/mydb",
+  "calls": [
+   {
+    "op": "insert",
+    "table": "ai_events",
+    "lines": [
+     "{\"id\":1}",
+     "{\"id\":2}"
+    ]
+   }
+  ],
+  "requests": [
+   {
+    "method": "POST",
+    "path": "/",
+    "pairs": [
+     [
+      "query_id",
+      "<id>"
+     ],
+     [
+      "distributed_product_mode",
+      "allow"
+     ],
+     [
+      "date_time_input_format",
+      "best_effort"
+     ],
+     [
+      "async_insert",
+      "0"
+     ],
+     [
+      "query_plan_convert_any_join_to_semi_or_anti_join",
+      "0"
+     ],
+     [
+      "max_execution_time",
+      "300"
+     ],
+     [
+      "max_insert_block_size",
+      "500000"
+     ],
+     [
+      "max_http_get_redirects",
+      "0"
+     ],
+     [
+      "input_format_parallel_parsing",
+      "1"
+     ],
+     [
+      "send_progress_in_http_headers",
+      "1"
+     ],
+     [
+      "http_headers_progress_interval_ms",
+      "50000"
+     ],
+     [
+      "wait_end_of_query",
+      "1"
+     ],
+     [
+      "database",
+      "mydb"
+     ],
+     [
+      "query",
+      "INSERT INTO ai_events FORMAT JSONEachRow"
+     ]
+    ],
+    "authorization": "Basic dTpw",
+    "contentEncoding": null,
+    "body": "{\"id\":1}\n{\"id\":2}\n"
+   }
+  ]
+ },
+ {
+  "name": "settings-override",
+  "env": {
+   "CLICKHOUSE_SETTINGS": "{\"async_insert\":1,\"max_threads\":4,\"date_time_input_format\":\"basic\",\"flag\":true}"
+  },
+  "url": "/mydb",
+  "calls": [
+   {
+    "op": "insert",
+    "table": "events",
+    "lines": [
+     "{}"
+    ]
+   },
+   {
+    "op": "query",
+    "query": "SELECT 1",
+    "params": []
+   }
+  ],
+  "requests": [
+   {
+    "method": "POST",
+    "path": "/",
+    "pairs": [
+     [
+      "query_id",
+      "<id>"
+     ],
+     [
+      "distributed_product_mode",
+      "allow"
+     ],
+     [
+      "date_time_input_format",
+      "basic"
+     ],
+     [
+      "async_insert",
+      "1"
+     ],
+     [
+      "query_plan_convert_any_join_to_semi_or_anti_join",
+      "0"
+     ],
+     [
+      "max_threads",
+      "4"
+     ],
+     [
+      "flag",
+      "1"
+     ],
+     [
+      "max_execution_time",
+      "300"
+     ],
+     [
+      "max_insert_block_size",
+      "500000"
+     ],
+     [
+      "max_http_get_redirects",
+      "0"
+     ],
+     [
+      "input_format_parallel_parsing",
+      "1"
+     ],
+     [
+      "send_progress_in_http_headers",
+      "1"
+     ],
+     [
+      "http_headers_progress_interval_ms",
+      "50000"
+     ],
+     [
+      "wait_end_of_query",
+      "1"
+     ],
+     [
+      "database",
+      "mydb"
+     ],
+     [
+      "query",
+      "INSERT INTO events FORMAT JSONEachRow"
+     ]
+    ],
+    "authorization": "Basic dTpw",
+    "contentEncoding": "gzip",
+    "body": "{}\n"
+   },
+   {
+    "method": "POST",
+    "path": "/",
+    "pairs": [
+     [
+      "query_id",
+      "<id>"
+     ],
+     [
+      "distributed_product_mode",
+      "allow"
+     ],
+     [
+      "date_time_input_format",
+      "basic"
+     ],
+     [
+      "async_insert",
+      "1"
+     ],
+     [
+      "query_plan_convert_any_join_to_semi_or_anti_join",
+      "0"
+     ],
+     [
+      "max_threads",
+      "4"
+     ],
+     [
+      "flag",
+      "1"
+     ],
+     [
+      "default_format",
+      "JSON"
+     ],
+     [
+      "database",
+      "mydb"
+     ]
+    ],
+    "authorization": "Basic dTpw",
+    "contentEncoding": null,
+    "body": "SELECT 1"
+   }
+  ]
+ },
+ {
+  "name": "remove-convert-any-join",
+  "env": {
+   "CLICKHOUSE_SETTINGS_REMOVE_CONVERT_ANY_JOIN": "1"
+  },
+  "url": "/mydb",
+  "calls": [
+   {
+    "op": "insert",
+    "table": "events",
+    "lines": [
+     "{}"
+    ]
+   }
+  ],
+  "requests": [
+   {
+    "method": "POST",
+    "path": "/",
+    "pairs": [
+     [
+      "query_id",
+      "<id>"
+     ],
+     [
+      "distributed_product_mode",
+      "allow"
+     ],
+     [
+      "date_time_input_format",
+      "best_effort"
+     ],
+     [
+      "async_insert",
+      "0"
+     ],
+     [
+      "max_execution_time",
+      "300"
+     ],
+     [
+      "max_insert_block_size",
+      "500000"
+     ],
+     [
+      "max_http_get_redirects",
+      "0"
+     ],
+     [
+      "input_format_parallel_parsing",
+      "1"
+     ],
+     [
+      "send_progress_in_http_headers",
+      "1"
+     ],
+     [
+      "http_headers_progress_interval_ms",
+      "50000"
+     ],
+     [
+      "wait_end_of_query",
+      "1"
+     ],
+     [
+      "database",
+      "mydb"
+     ],
+     [
+      "query",
+      "INSERT INTO events FORMAT JSONEachRow"
+     ]
+    ],
+    "authorization": "Basic dTpw",
+    "contentEncoding": "gzip",
+    "body": "{}\n"
+   }
+  ]
+ },
+ {
+  "name": "settings-invalid-json",
+  "env": {
+   "CLICKHOUSE_SETTINGS": "not json"
+  },
+  "url": "/mydb",
+  "calls": [
+   {
+    "op": "insert",
+    "table": "events",
+    "lines": [
+     "{}"
+    ]
+   }
+  ],
+  "requests": [
+   {
+    "method": "POST",
+    "path": "/",
+    "pairs": [
+     [
+      "query_id",
+      "<id>"
+     ],
+     [
+      "distributed_product_mode",
+      "allow"
+     ],
+     [
+      "date_time_input_format",
+      "best_effort"
+     ],
+     [
+      "async_insert",
+      "0"
+     ],
+     [
+      "query_plan_convert_any_join_to_semi_or_anti_join",
+      "0"
+     ],
+     [
+      "max_execution_time",
+      "300"
+     ],
+     [
+      "max_insert_block_size",
+      "500000"
+     ],
+     [
+      "max_http_get_redirects",
+      "0"
+     ],
+     [
+      "input_format_parallel_parsing",
+      "1"
+     ],
+     [
+      "send_progress_in_http_headers",
+      "1"
+     ],
+     [
+      "http_headers_progress_interval_ms",
+      "50000"
+     ],
+     [
+      "wait_end_of_query",
+      "1"
+     ],
+     [
+      "database",
+      "mydb"
+     ],
+     [
+      "query",
+      "INSERT INTO events FORMAT JSONEachRow"
+     ]
+    ],
+    "authorization": "Basic dTpw",
+    "contentEncoding": "gzip",
+    "body": "{}\n"
+   }
+  ]
+ }
+]

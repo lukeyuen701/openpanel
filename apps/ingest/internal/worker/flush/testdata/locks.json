@@ -1,0 +1,24 @@
+{
+ "release": {
+  "lua": "\nif redis.call(\"get\", KEYS[1]) == ARGV[1] then\n  return redis.call(\"del\", KEYS[1])\nelse\n  return 0\nend\n",
+  "sha": "cf972413788d8931d54c9f61cb33b747d51d82e6"
+ },
+ "extend": {
+  "lua": "\nif redis.call(\"get\", KEYS[1]) == ARGV[1] then\n  return redis.call(\"expire\", KEYS[1], ARGV[2])\nelse\n  return 0\nend\n",
+  "sha": "7cbccba428280df6f72446dd351d230c6dd4c382"
+ },
+ "keepaliveIntervalMs": 20000,
+ "lockTtlSeconds": 60,
+ "intervals": {
+  "flushEvents": 10000,
+  "flushBots": 30000,
+  "flushProfiles": 10000,
+  "flushProfileBackfill": 30000,
+  "flushGroups": 10000,
+  "flushAiEvents": 10000,
+  "flushSessions": 10000,
+  "flushReplay": 10000,
+  "sessionReaper": 300000,
+  "flushExports": 60000
+ }
+}
