@@ -799,6 +799,19 @@ ENABLED_QUEUES=events,sessions,cron
 `events` is the Kafka-based events consumer — there is only one events transport now, so there is no separate `events_kafka` queue name. If you're upgrading from a version that used `ENABLED_QUEUES=events_kafka`, rename it to `ENABLED_QUEUES=events`; the old name is now rejected at boot. See the [Event Streaming (Kafka)](#event-streaming-kafka) section for the full configuration. A common high-throughput layout is to run one worker pool with `ENABLED_QUEUES=events` and another pool with everything else.
 </Callout>
 
+### DISABLED_CRON_JOBS
+
+**Type**: `string` (comma-separated)
+**Required**: No
+**Default**: None, every scheduled job runs
+
+Comma-separated names of scheduled jobs on the `cron` queue that this worker skips. A disabled job's ticks still arrive but complete immediately without doing anything, so another process can own that job while the rest of the queue keeps running here. Remove the name and restart to resume it. Accepted jobs: `flushEvents`, `flushBots`, `flushProfiles`, `flushProfileBackfill`, `flushSessions`, `flushReplay`, `flushGroups`, `flushAiEvents`, `flushExports`, `sessionReaper`, `sessionVacuum`, `cohortRefresh`, `gscSync`, `insightsDaily`, `insightCleanup`, `weeklyDigest`, `onboarding`, `delete`, `windDown`, `salt`, `ping`, `dataHealth`. An unknown name fails startup.
+
+**Example**:
+```bash
+DISABLED_CRON_JOBS=flushEvents,flushSessions
+```
+
 ### CRON_CONCURRENCY
 
 **Type**: `number`
