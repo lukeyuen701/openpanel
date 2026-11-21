@@ -116,3 +116,13 @@ C 层的这些 service 同时服务 tRPC（`ctx.services.cohort/gsc/insight/orga
 - 生产灰度和切换
 - `CLICKHOUSE_CLUSTER=true` 时的表名和行为（本地是单节点）
 - 在 Ivy Bridge 上运行 Go worker
+
+## 8. 实现决定（2026-11-22，P1 开工前）
+
+规格：`docs/GO_WORKER_CONTRACTS.md`（P1）、`docs/GO_WORKER_CONTRACTS_FLUSH.md`（P2/P3）。
+
+1. **对 TS 的缺陷保持一致（faithful）。** 规格 P1.17 和 P2.10 列出的缺陷，Go 先原样照搬，以保证 TS 和 Go 逐字节一致，回滚时状态也能互通。会造成数据丢失的缺陷（P1.17 #2，以及 P2 的重试时请求体为空），之后在 TS 和 Go 两边同时修，作为单独的 fix 提交。唯一的例外是，Go 不得引入新的丢数据路径。
+2. **BullMQ 改为由 Go 直接写入，不再用 Redis Stream 中转（取代第 2 节的建议）。** 规格 P1.9 已经抓到 BullMQ 6.7.8 `addStandardJob` 的完整调用，包括 Lua 的 SHA 和 msgpack 参数。Go 用 `gen` 从已安装的 bullmq 包里生成 Lua 脚本，`gen:check` 会在 bullmq 升级时报错，做法和 UA 表一样。这样不用新增 TS 中转进程。到 P3，Go 用同一批 BullMQ Lua 脚本消费 `sessions` 队列，TS 和 Go 的 worker 可以同时消费同一个队列（和 Kafka 混合消费组一样），切换和回滚都只是改配置。入队和 TS 一样，等写入完成再继续，Redis 故障时重试等待，直到进程关闭。
+3. **`cachable:*` 只读不写。** Go 读共享的项目缓存，没命中就查 Postgres，并放进进程内的 LRU（60 秒），但不写回 Redis，和接收端的做法一致。首个事件写入后照样 `DEL` 对应的 key。差异测试的 rig 比对时忽略 `cachable:*` key 是否存在。
+4. **正则用 Go `regexp`。** RE2J（re2js）本身就是从 Go 的 regexp 移植过去的，语义最接近，再用真实规则的样例做兼容性测试。**URL 解析**必须遵循 WHATWG 标准：先评估现成的 Go 实现，用 Bun `URL` 生成的 goldens 验收；如果没有合格的实现，就自己实现规格 P1.16 用到的那部分。
+5. **代码位置。** 放在 `apps/ingest` 模块下：`cmd/worker`、`internal/worker/...`。接收端已有的包只复用，不改它们的行为。
