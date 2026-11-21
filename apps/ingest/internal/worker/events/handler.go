@@ -266,7 +266,7 @@ func (h *Handler) createEventAndNotify(ctx context.Context, sc scope, payload *e
 	// sees the payload with its profile id already filled in. When the prefix
 	// throws, TypeScript has also started the check; Go does not, because a
 	// failed message is redelivered and checked again.
-	prepared, err := h.prepareEvent(payload)
+	prepared, err := h.prepareEvent(payload, true)
 	if err != nil {
 		return nil, err
 	}

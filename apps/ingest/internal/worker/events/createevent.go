@@ -17,7 +17,7 @@ type preparedEvent struct {
 // prepareEvent is the synchronous prefix of createEvent: the profile id falls
 // back to the device id (in the caller's payload, which the notification check
 // then sees), the row is built and handed to the event buffer.
-func (h *Handler) prepareEvent(payload *eventPayload) (*preparedEvent, error) {
+func (h *Handler) prepareEvent(payload *eventPayload, redeliverable bool) (*preparedEvent, error) {
 	o := payload.obj
 	if !isTruthy(get(o, "profileId")) && isTruthy(get(o, "deviceId")) {
 		o.Set("profileId", get(o, "deviceId"))
@@ -81,7 +81,7 @@ func (h *Handler) prepareEvent(payload *eventPayload) (*preparedEvent, error) {
 	}
 	// Redeliverable: a failed write drops the row and relies on the Kafka batch
 	// being redelivered, so a retry never leaves a second copy behind.
-	h.Events.Add(line, true)
+	h.Events.Add(line, redeliverable)
 
 	prepared := &preparedEvent{row: row}
 	name := stringOf(get(o, "name"))

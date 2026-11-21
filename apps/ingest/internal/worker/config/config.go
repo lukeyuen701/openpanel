@@ -92,6 +92,16 @@ type Config struct {
 	// GoWorkerCronJobs is GO_WORKER_CRON_JOBS: the cron job ids this process
 	// runs. Empty runs none.
 	GoWorkerCronJobs []string
+	// GoWorkerQueues is GO_WORKER_QUEUES: the BullMQ queues this process consumes.
+	GoWorkerQueues []string
+	// QueueConcurrency is <QUEUE>_CONCURRENCY per consumed queue.
+	QueueConcurrency map[string]int
+	Sessions         SessionsConfig
+	// SelfHosted is SELF_HOSTED: no billing limits, no usage alerts.
+	SelfHosted bool
+	// PeriodsDisabled is SELF_HOSTED being exactly "true", which the Prisma
+	// client reads for the billing period (SelfHosted also takes "1").
+	PeriodsDisabled bool
 }
 
 // KafkaConfig is every KAFKA_* setting of the consumer path.
@@ -293,8 +303,13 @@ func Load(getenv func(string) string) (Config, error) {
 		ClickHouse:                l.clickhouse(),
 		Buffers:                   l.buffers(),
 		GoWorkerCronJobs:          l.goWorkerCronJobs(),
+		GoWorkerQueues:            l.goWorkerQueues(),
+		SelfHosted:                l.selfHosted(),
+		PeriodsDisabled:           l.getenv("SELF_HOSTED") == "true",
 	}
-	if len(cfg.EnabledQueues) == 0 && cfg.Role != RoleAPI {
+	cfg.QueueConcurrency = l.queueConcurrency(cfg.GoWorkerQueues)
+	cfg.Sessions = l.sessions(cfg.SessionTimeout)
+	if len(cfg.EnabledQueues) == 0 && cfg.Role != RoleAPI && len(cfg.GoWorkerQueues) == 0 && len(cfg.GoWorkerCronJobs) == 0 {
 		l.problem("ROLE=%s consumes queues but ENABLED_QUEUES names none — this process would boot and do nothing.", cfg.Role)
 	}
 	if cfg.Kafka.HeartbeatInterval >= cfg.Kafka.SessionTimeout {

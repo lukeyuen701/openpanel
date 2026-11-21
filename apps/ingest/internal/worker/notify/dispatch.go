@@ -173,6 +173,12 @@ func (d *Dispatcher) deliveries(payload *jsjson.Value, rule Rule, projectID, pro
 	if projectName != "" {
 		base.message = "Project: " + projectName
 	}
+	return destinations(base, rule)
+}
+
+// destinations fans a match out: one delivery per integration, then the
+// dashboard, then email.
+func destinations(base delivery, rule Rule) []delivery {
 	var out []delivery
 	for _, id := range rule.IntegrationIDs {
 		item := base

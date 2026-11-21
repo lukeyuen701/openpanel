@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	"openpanel/ingest/internal/worker/clock"
@@ -47,11 +48,54 @@ func Interval(job string) (time.Duration, bool) {
 // (the Bun worker waits up to 60 s for its active cron jobs).
 const DefaultShutdownGrace = 60 * time.Second
 
-// Job is one flush: its cron job id, its schedule and what to run.
+// Job is one cron job: its id, its schedule and what to run. A flush has a
+// Runner; any other job (the session reaper and vacuum) has a Task.
 type Job struct {
 	Name     string
 	Interval time.Duration
 	Runner   *Runner
+	// Task runs instead of Runner. Next, when set, picks the next tick instead
+	// of the multiple of Interval.
+	Task func(ctx context.Context) error
+	Next func(now time.Time) time.Time
+
+	taskRunning *atomic.Bool
+	paused      PauseCheck
+}
+
+// NewTaskJob is a cron job that is not a buffer flush. A tick that finds the
+// previous run still going does nothing, and a paused cron queue skips it,
+// as for a flush.
+func NewTaskJob(name string, interval time.Duration, next func(now time.Time) time.Time, paused PauseCheck, task func(ctx context.Context) error) Job {
+	return Job{Name: name, Interval: interval, Task: task, Next: next, taskRunning: &atomic.Bool{}, paused: paused}
+}
+
+func (j Job) nextTick(now time.Time) time.Time {
+	if j.Next != nil {
+		return j.Next(now)
+	}
+	return nextTick(now, j.Interval)
+}
+
+func (j Job) stop() {
+	if j.Runner != nil {
+		j.Runner.Stop()
+	}
+}
+
+func (j Job) tick(ctx context.Context) error {
+	if j.Runner != nil {
+		return j.Runner.TryFlush(ctx, TriggerCron)
+	}
+	paused, err := j.paused(ctx)
+	if err != nil || paused {
+		return err
+	}
+	if !j.taskRunning.CompareAndSwap(false, true) {
+		return nil
+	}
+	defer j.taskRunning.Store(false)
+	return j.Task(ctx)
 }
 
 // NewJob pairs runner with the standard interval of the cron job name.
@@ -159,7 +203,7 @@ func (s *Scheduler) Run(ctx context.Context) {
 	}
 	loops.Wait()
 	for _, job := range s.jobs {
-		job.Runner.Stop()
+		job.stop()
 	}
 	finished := make(chan struct{})
 	go func() { flushes.Wait(); close(finished) }()
@@ -175,14 +219,14 @@ func (s *Scheduler) Run(ctx context.Context) {
 func (s *Scheduler) loop(ctx, flushCtx context.Context, job Job, flushes *sync.WaitGroup) {
 	for {
 		now := s.deps.Clock.Now()
-		if err := s.deps.Clock.Sleep(ctx, nextTick(now, job.Interval).Sub(now)); err != nil {
+		if err := s.deps.Clock.Sleep(ctx, job.nextTick(now).Sub(now)); err != nil {
 			return
 		}
 		flushes.Add(1)
 		go func() {
 			defer flushes.Done()
-			if err := job.Runner.TryFlush(flushCtx, TriggerCron); err != nil {
-				s.logger.Error("flush job failed", "job", job.Name, "err", err)
+			if err := job.tick(flushCtx); err != nil {
+				s.logger.Error("cron job failed", "job", job.Name, "err", err)
 			}
 		}()
 	}

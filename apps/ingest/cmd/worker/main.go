@@ -1,7 +1,8 @@
-// Command worker is OpenPanel's Go events consumer: the Kafka consumer path of
-// the Bun worker started with ROLE=worker ENABLED_QUEUES=events (incomingEvent,
-// the Redis buffers it writes, the BullMQ jobs it adds). It reads the same
-// environment as that worker and serves the same ops routes on API_PORT.
+// Command worker is OpenPanel's Go worker. Any subset of three parts runs in
+// one process: the Kafka events consumer (ROLE=worker, ENABLED_QUEUES with
+// events), the BullMQ queues listed in GO_WORKER_QUEUES, and the cron jobs
+// listed in GO_WORKER_CRON_JOBS. It reads the same environment as the Bun
+// worker and serves the same ops routes on API_PORT.
 package main
 
 import (
@@ -27,8 +28,9 @@ import (
 
 	"openpanel/ingest/internal/config"
 	"openpanel/ingest/internal/worker/bullmq"
+	"openpanel/ingest/internal/worker/chclient"
+	"openpanel/ingest/internal/worker/clock"
 	workerconfig "openpanel/ingest/internal/worker/config"
-	"openpanel/ingest/internal/worker/consumer"
 	"openpanel/ingest/internal/worker/events"
 	"openpanel/ingest/internal/worker/notify"
 	"openpanel/ingest/internal/worker/projects"
@@ -103,6 +105,9 @@ type state struct {
 	booting      atomic.Bool
 	shuttingDown atomic.Bool
 	lastActivity atomic.Int64
+	// heartbeatRequired is set when this process runs the Kafka consumer, whose
+	// loop is what ticks; a process without one has nothing to go stale.
+	heartbeatRequired bool
 }
 
 func (s *state) markActivity() { s.lastActivity.Store(time.Now().UnixMilli()) }
@@ -117,7 +122,7 @@ func (s *state) readiness(now time.Time) (bool, string) {
 		return false, "booting"
 	}
 	idle := now.UnixMilli() - s.lastActivity.Load()
-	if idle > heartbeatStale.Milliseconds() {
+	if s.heartbeatRequired && idle > heartbeatStale.Milliseconds() {
 		return false, "events consumer heartbeat stale"
 	}
 	return true, ""
@@ -128,14 +133,15 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	if !cfg.ConsumesEvents() {
-		return errors.New("this process runs the events consumer: set ROLE=worker (or all) and ENABLED_QUEUES=events")
+	plan := planOf(cfg)
+	if plan.nothing() {
+		return errors.New("nothing to run: set ROLE=worker (or all) with ENABLED_QUEUES=events, GO_WORKER_QUEUES or GO_WORKER_CRON_JOBS")
 	}
 	logger := newLogger(cfg.LogLevel)
 	ctx, stop := signal.NotifyContext(context.Background(), syscall.SIGINT, syscall.SIGTERM)
 	defer stop()
 
-	status := &state{}
+	status := &state{heartbeatRequired: plan.events}
 	status.booting.Store(true)
 	status.markActivity()
 
@@ -170,9 +176,17 @@ func run() error {
 	if err != nil {
 		return err
 	}
+	chClient, err := chclient.New(chclient.FromWorkerConfig(cfg), chclient.Deps{Clock: clock.System{}, Logger: logger})
+	if err != nil {
+		return fmt.Errorf("clickhouse: %w", err)
+	}
 
 	registry := prometheus.NewRegistry()
 	registry.MustRegister(collectors.NewGoCollector(), collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}))
+	// The flush series live in a registry of their own: its buffer_add_*
+	// families are the ones the events metrics register, and stay empty here.
+	flushRegistry := prometheus.NewRegistry()
+	gatherer := prometheus.Gatherers{registry, flushRegistry}
 
 	queues := []bullmq.Queue{bullmq.SessionsQueue(), bullmq.NotificationQueue()}
 	for _, name := range metaOnlyQueues {
@@ -195,7 +209,7 @@ func run() error {
 	}
 
 	metrics := events.NewPromMetrics(registry)
-	clock := events.SystemClock{}
+	eventClock := events.SystemClock{}
 	eventBuffer := events.NewEventBuffer(redis, events.EventBufferConfig{
 		MaxSize: cfg.EventBufferMicroBatchSize,
 		MaxWait: cfg.EventBufferMicroBatchWait,
@@ -203,7 +217,7 @@ func run() error {
 	events.RegisterScrapeGauges(registry, redis, eventBuffer, cfg.QueueNamespace, cfg.QueueCluster)
 
 	matcher := notify.NewMatcher(logger)
-	projectStore := projects.NewStore(redis, db, clock, matcher, logger)
+	projectStore := projects.NewStore(redis, db, eventClock, matcher, logger)
 	dispatcher := &notify.Dispatcher{
 		Matcher:  matcher,
 		Projects: projectStore,
@@ -211,17 +225,17 @@ func run() error {
 		Profiles: notify.NewProfileStore(redis, clickhouse),
 		DB:       db,
 		Queue:    events.NotificationQueue{Producer: producer},
-		Clock:    clock,
+		Clock:    eventClock,
 	}
 	handler := events.NewHandler(events.HandlerConfig{
 		Events:   eventBuffer,
-		Sessions: events.NewSessionBuffer(redis, clock, cfg.SessionTimeout, logger),
+		Sessions: events.NewSessionBuffer(redis, eventClock, cfg.SessionTimeout, logger),
 		Profiles: events.NewProfileBuffer(redis, metrics, logger),
 		AI:       events.NewAIEventBuffer(redis, logger),
 		Projects: projectStore,
 		Notifier: dispatcher,
 		Queue:    producer,
-		Clock:    clock,
+		Clock:    eventClock,
 		IDs:      events.RandomIDs{},
 		Metrics:  metrics,
 		Logger:   logger,
@@ -229,10 +243,10 @@ func run() error {
 
 	admin := &http.Server{
 		Addr:              net.JoinHostPort("", strconv.Itoa(cfg.APIPort)),
-		Handler:           adminHandler(registry, status),
+		Handler:           adminHandler(gatherer, status),
 		ReadHeaderTimeout: readHeaderTimeout,
 	}
-	// The server listens before the consumer starts, as the Bun worker does
+	// The server listens before anything is consumed, as the Bun worker does
 	// (readiness answers 503 while booting), and a port that is taken fails the
 	// boot before any group is joined.
 	listener, err := net.Listen("tcp", admin.Addr)
@@ -246,45 +260,34 @@ func run() error {
 		}
 	}()
 
-	kafkaConfig := cfg.Kafka
-	running, err := consumer.Start(ctx, consumer.Config{
-		NewBroker: consumer.NewKafkaBrokerFactory(consumer.KafkaConfig{
-			Brokers:                 kafkaConfig.Brokers,
-			ClientID:                kafkaConfig.ClientID,
-			Topic:                   kafkaConfig.EventsTopic,
-			Group:                   kafkaConfig.ConsumerGroup,
-			SessionTimeout:          kafkaConfig.SessionTimeout,
-			HeartbeatInterval:       kafkaConfig.HeartbeatInterval,
-			RebalanceTimeout:        kafkaConfig.RebalanceTimeout,
-			RequestTimeout:          kafkaConfig.RequestTimeout,
-			ConnectionTimeout:       kafkaConfig.ConnectionTimeout,
-			MaxWait:                 kafkaConfig.MaxWait,
-			MinMessages:             kafkaConfig.MinMessages,
-			MaxMessagesPerPartition: kafkaConfig.MaxMessagesPerPartition,
-			TLS:                     kafkaConfig.TLS,
-			SASL:                    kafkaConfig.SASL,
-		}),
-		Handler:              handler.Handle,
-		DeadLetter:           consumer.NewRedisDeadLetter(consumer.NewRueidisListStore(redisClient, cfg.RedisCacheCommandTimeout), consumer.SystemClock{}, cfg.DeadLetterMaxEntries),
-		Durability:           eventBuffer,
-		Logger:               logger,
-		Metrics:              consumer.NewPromMetrics(registry),
-		Clock:                consumer.SystemClock{},
-		OnActivity:           status.markActivity,
-		Topic:                kafkaConfig.EventsTopic,
-		PartitionsConcurrent: kafkaConfig.PartitionsConcurrent,
-		MaxMessagesPerBatch:  kafkaConfig.MaxMessagesPerPartition,
-		PollTimeout:          kafkaConfig.MaxWait,
-		MaxAttempts:          kafkaConfig.HandlerMaxAttempts,
-		InitialRetry:         kafkaConfig.HandlerRetryInitial,
-		MaxRetry:             kafkaConfig.HandlerRetryMax,
-	})
-	if err != nil {
-		return fmt.Errorf("kafka consumer: %w", err)
+	lifecycle := &sessionLifecycle{
+		cfg: cfg, logger: logger, registry: registry, redisClient: redisClient, redis: redis,
+		db: db, chClient: chClient, handler: handler, eventBuffer: eventBuffer, metrics: metrics,
+		dispatcher: dispatcher, producer: producer,
+	}
+	running := &runningParts{}
+	if plan.events {
+		running.kafka, err = startEventsConsumer(ctx, cfg, logger, registry, redisClient, handler, eventBuffer, status)
+		if err != nil {
+			return fmt.Errorf("kafka consumer: %w", err)
+		}
+	}
+	if len(plan.queues) > 0 {
+		running.queueWorker, err = lifecycle.startSessionsWorker(ctx)
+		if err != nil {
+			return err
+		}
+	}
+	if len(plan.cron) > 0 {
+		running.scheduler, err = lifecycle.startScheduler(ctx, flushRegistry, plan.cron)
+		if err != nil {
+			return err
+		}
 	}
 	status.markActivity()
 	status.booting.Store(false)
-	logger.Info("worker running", slog.String("admin", admin.Addr), slog.String("topic", kafkaConfig.EventsTopic), slog.String("group", kafkaConfig.ConsumerGroup))
+	logger.Info("worker running", slog.String("admin", admin.Addr), slog.Bool("events", plan.events),
+		slog.Any("queues", plan.queues), slog.Any("cronJobs", plan.cron))
 
 	select {
 	case err := <-serveErrors:
@@ -295,10 +298,13 @@ func run() error {
 	return shutdown(cfg, status, admin, running, eventBuffer, logger)
 }
 
-// shutdown stops taking work, makes what was taken durable, leaves the group
-// and only then lets go of Redis. A buffer that cannot be flushed aborts
-// without leaving the group, so the broker redelivers what was not committed.
-func shutdown(cfg workerconfig.Config, status *state, admin *http.Server, running *consumer.Consumer, buffer *events.EventBuffer, logger *slog.Logger) error {
+// shutdownOrder stops taking work in the order the work arrives: Kafka
+// first (nothing new reaches the buffers), then the schedulers and the queue
+// worker (the jobs running finish), then what was taken is made durable, the
+// group is left and only then the clients close (deferred in run). A buffer that
+// cannot be flushed aborts without leaving the group, so the broker redelivers
+// what was not committed.
+func shutdown(cfg workerconfig.Config, status *state, admin *http.Server, running *runningParts, buffer *events.EventBuffer, logger *slog.Logger) error {
 	status.shuttingDown.Store(true)
 	forceExit := time.AfterFunc(cfg.ShutdownForceExit, func() {
 		logger.Error("shutdown did not finish in time, forcing exit")
@@ -309,20 +315,26 @@ func shutdown(cfg workerconfig.Config, status *state, admin *http.Server, runnin
 	httpCtx, cancel := context.WithTimeout(context.Background(), httpShutdownWait)
 	defer cancel()
 	httpErr := admin.Shutdown(httpCtx)
-	running.StopConsuming()
+	if running.kafka != nil {
+		running.kafka.StopConsuming()
+	}
+	running.stopScheduler()
+	running.stopQueueWorker()
 
 	flushCtx, cancelFlush := context.WithTimeout(context.Background(), cfg.ShutdownForceExit)
 	defer cancelFlush()
 	if err := buffer.FlushPendingOrThrow(flushCtx, buffer.DroppedThrough()); err != nil {
 		return fmt.Errorf("event buffer could not be flushed, not leaving the group: %w", err)
 	}
-	running.Stop()
+	if running.kafka != nil {
+		running.kafka.Stop()
+	}
 	return httpErr
 }
 
 // adminHandler is liveness, readiness, metrics and profiling, on a port the
 // edge does not route to.
-func adminHandler(registry *prometheus.Registry, status *state) http.Handler {
+func adminHandler(registry prometheus.Gatherer, status *state) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz/live", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)

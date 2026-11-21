@@ -229,3 +229,63 @@ func TestShutdownLetsAFlushFinishWithinTheGrace(t *testing.T) {
 		t.Fatal("lock left behind")
 	}
 }
+
+func TestTaskJobsRunAtTheirOwnNextTickAndNeverOverlap(t *testing.T) {
+	clock := newManualClock(time.Date(2026, 6, 8, 3, 59, 0, 0, time.UTC))
+	var runs atomic.Int32
+	release := make(chan struct{})
+	next := func(now time.Time) time.Time {
+		at := time.Date(now.Year(), now.Month(), now.Day(), 4, 0, 0, 0, time.UTC)
+		if !at.After(now) {
+			at = at.AddDate(0, 0, 1)
+		}
+		return at
+	}
+	job := NewTaskJob("sessionVacuum", 24*time.Hour, next, NeverPaused, func(context.Context) error {
+		runs.Add(1)
+		<-release
+		return nil
+	})
+	scheduler, err := NewScheduler([]Job{job}, []string{"sessionVacuum"}, SchedulerDeps{Clock: clock, ShutdownGrace: time.Second})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ctx, cancel := context.WithCancel(context.Background())
+	done := make(chan struct{})
+	go func() { scheduler.Run(ctx); close(done) }()
+	for clock.sleepers() == 0 {
+		time.Sleep(time.Millisecond)
+	}
+	clock.advance(time.Minute)
+	deadline := time.Now().Add(2 * time.Second)
+	for runs.Load() == 0 && time.Now().Before(deadline) {
+		time.Sleep(time.Millisecond)
+	}
+	if runs.Load() != 1 {
+		t.Fatalf("runs = %d, want the task to run at 04:00", runs.Load())
+	}
+	if !job.taskRunning.Load() {
+		t.Fatal("the task should be marked running")
+	}
+	close(release)
+	cancel()
+	<-done
+}
+
+func TestRegisteredJobsMergeSourcesAndRefuseADuplicate(t *testing.T) {
+	ResetRegistry()
+	defer ResetRegistry()
+	one := func(name string) JobSource {
+		return func(Deps) ([]Job, error) { return []Job{{Name: name}}, nil }
+	}
+	Register("a", one("flushEvents"))
+	Register("b", one("sessionReaper"))
+	jobs, err := RegisteredJobs(Deps{})
+	if err != nil || len(jobs) != 2 {
+		t.Fatalf("jobs = %v, err = %v", jobs, err)
+	}
+	Register("c", one("flushEvents"))
+	if _, err := RegisteredJobs(Deps{}); err == nil || !strings.Contains(err.Error(), "defined by both a and c") {
+		t.Fatalf("err = %v", err)
+	}
+}
