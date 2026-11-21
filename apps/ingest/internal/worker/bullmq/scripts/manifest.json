@@ -1,0 +1,10 @@
+{
+ "bullmq": "6.7.8",
+ "scripts": {
+  "addStandardJob": {
+   "file": "addStandardJob.lua",
+   "keys": 9,
+   "sha1": "5ab432e88830d573e2fa33392ffbd4ad25a9b100"
+  }
+ }
+}

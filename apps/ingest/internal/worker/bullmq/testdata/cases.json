@@ -1,0 +1,105 @@
+{
+ "nowMs": 1767225600000,
+ "cases": [
+  {
+   "namespace": "wparity",
+   "cluster": false,
+   "requestId": "wparity-req-1",
+   "queue": "sessions",
+   "job": "session",
+   "payloadJson": "{\"event\":{\"name\":\"screen_view\",\"profileId\":\"d1\",\"projectId\":\"p1\",\"deviceId\":\"d1\",\"sessionId\":\"sess1\",\"properties\":{\"a\":\"b\",\"unicode\":\"héllo ☃ 😀 \\\"q\\\" \\\\ /\"},\"createdAt\":\"2026-01-01T00:00:00.123Z\",\"groups\":[],\"duration\":0,\"path\":\"/x\",\"origin\":\"\"},\"snapshot\":{\"id\":\"sess1\",\"project_id\":\"p1\",\"device_id\":\"d1\",\"profile_id\":\"d1\",\"ended_at\":\"2026-01-01 00:00:00.000\"}}",
+   "options": {
+    "jobId": "sessionEnd:v2:sess1",
+    "attempts": 3,
+    "backoff": {
+     "type": "exponential",
+     "delay": 200
+    }
+   }
+  },
+  {
+   "namespace": "wparity",
+   "cluster": false,
+   "requestId": "wparity-req-1",
+   "queue": "sessions",
+   "job": "session",
+   "payloadJson": "{\"event\":{\"name\":\"screen_view\",\"profileId\":\"d1\",\"projectId\":\"p1\",\"deviceId\":\"d1\",\"sessionId\":\"sess1\",\"properties\":{\"a\":\"b\",\"unicode\":\"héllo ☃ 😀 \\\"q\\\" \\\\ /\"},\"createdAt\":\"2026-01-01T00:00:00.123Z\",\"groups\":[],\"duration\":0,\"path\":\"/x\",\"origin\":\"\"},\"snapshot\":{\"id\":\"sess1\",\"project_id\":\"p1\",\"device_id\":\"d1\",\"profile_id\":\"d1\",\"ended_at\":\"2026-01-01 00:00:00.000\"}}",
+   "options": {
+    "jobId": "sessionEnd:v2:sess1",
+    "attempts": 3,
+    "backoff": {
+     "type": "exponential",
+     "delay": 200
+    }
+   }
+  },
+  {
+   "namespace": "wparity",
+   "cluster": false,
+   "requestId": "wparity-req-1",
+   "queue": "notification",
+   "job": "sendNotification",
+   "payloadJson": "{\"notification\":{\"title\":\"first\",\"message\":\"m\",\"projectId\":\"p1\",\"payload\":{\"type\":\"event\",\"event\":{\"name\":\"screen_view\",\"profileId\":\"d1\",\"projectId\":\"p1\",\"deviceId\":\"d1\",\"sessionId\":\"s2\",\"properties\":{\"a\":\"b\",\"unicode\":\"héllo ☃ 😀 \\\"q\\\" \\\\ /\"},\"createdAt\":\"2026-01-01T00:00:00.123Z\",\"groups\":[],\"duration\":0,\"path\":\"/x\",\"origin\":\"\"}},\"integrationId\":null,\"sendToApp\":true,\"sendToEmail\":false,\"notificationRuleId\":\"r1\"}}",
+   "options": null
+  },
+  {
+   "namespace": "wparity",
+   "cluster": false,
+   "requestId": "wparity-req-1",
+   "queue": "notification",
+   "job": "sendNotification",
+   "payloadJson": "{\"notification\":{\"title\":\"second\",\"message\":\"m\",\"projectId\":\"p1\",\"payload\":{\"type\":\"event\",\"event\":{\"name\":\"screen_view\",\"profileId\":\"d1\",\"projectId\":\"p1\",\"deviceId\":\"d1\",\"sessionId\":\"s2\",\"properties\":{\"a\":\"b\",\"unicode\":\"héllo ☃ 😀 \\\"q\\\" \\\\ /\"},\"createdAt\":\"2026-01-01T00:00:00.123Z\",\"groups\":[],\"duration\":0,\"path\":\"/x\",\"origin\":\"\"}},\"integrationId\":null,\"sendToApp\":true,\"sendToEmail\":false,\"notificationRuleId\":\"r1\"}}",
+   "options": null
+  },
+  {
+   "namespace": "",
+   "cluster": false,
+   "requestId": "",
+   "queue": "sessions",
+   "job": "session",
+   "payloadJson": "{\"event\":{\"name\":\"screen_view\",\"profileId\":\"d1\",\"projectId\":\"p1\",\"deviceId\":\"d1\",\"sessionId\":\"sess1\",\"properties\":{\"a\":\"b\",\"unicode\":\"héllo ☃ 😀 \\\"q\\\" \\\\ /\"},\"createdAt\":\"2026-01-01T00:00:00.123Z\",\"groups\":[],\"duration\":0,\"path\":\"/x\",\"origin\":\"\"},\"snapshot\":{\"id\":\"sess1\",\"project_id\":\"p1\",\"device_id\":\"d1\",\"profile_id\":\"d1\",\"ended_at\":\"2026-01-01 00:00:00.000\"}}",
+   "options": {
+    "jobId": "sessionEnd:v2:sess2",
+    "attempts": 3,
+    "backoff": {
+     "type": "exponential",
+     "delay": 200
+    }
+   }
+  },
+  {
+   "namespace": "",
+   "cluster": false,
+   "requestId": "",
+   "queue": "notification",
+   "job": "sendNotification",
+   "payloadJson": "{\"notification\":{\"title\":\"plain\",\"message\":\"m\",\"projectId\":\"p1\",\"payload\":{\"type\":\"event\",\"event\":{\"name\":\"screen_view\",\"profileId\":\"d1\",\"projectId\":\"p1\",\"deviceId\":\"d1\",\"sessionId\":\"s2\",\"properties\":{\"a\":\"b\",\"unicode\":\"héllo ☃ 😀 \\\"q\\\" \\\\ /\"},\"createdAt\":\"2026-01-01T00:00:00.123Z\",\"groups\":[],\"duration\":0,\"path\":\"/x\",\"origin\":\"\"}},\"integrationId\":null,\"sendToApp\":true,\"sendToEmail\":false,\"notificationRuleId\":\"r1\"}}",
+   "options": null
+  },
+  {
+   "namespace": "wparity",
+   "cluster": true,
+   "requestId": "wparity-req-3",
+   "queue": "sessions",
+   "job": "session",
+   "payloadJson": "{\"event\":{\"name\":\"screen_view\",\"profileId\":\"d1\",\"projectId\":\"p1\",\"deviceId\":\"d1\",\"sessionId\":\"sess1\",\"properties\":{\"a\":\"b\",\"unicode\":\"héllo ☃ 😀 \\\"q\\\" \\\\ /\"},\"createdAt\":\"2026-01-01T00:00:00.123Z\",\"groups\":[],\"duration\":0,\"path\":\"/x\",\"origin\":\"\"},\"snapshot\":{\"id\":\"sess1\",\"project_id\":\"p1\",\"device_id\":\"d1\",\"profile_id\":\"d1\",\"ended_at\":\"2026-01-01 00:00:00.000\"}}",
+   "options": {
+    "jobId": "sessionEnd:v2:sess3",
+    "attempts": 3,
+    "backoff": {
+     "type": "exponential",
+     "delay": 200
+    }
+   }
+  }
+ ],
+ "ids": [
+  "sessionEnd:v2:sess1",
+  "sessionEnd:v2:sess1",
+  "1",
+  "2",
+  "sessionEnd:v2:sess2",
+  "1",
+  "sessionEnd:v2:sess3"
+ ]
+}

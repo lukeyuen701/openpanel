@@ -2,9 +2,10 @@
 // packages the Bun API runs, so the two cannot drift: ua-parser-js's regex
 // map, the bot list and the datacenter ASNs. `bun run gen` rewrites them;
 // `bun run gen --check` fails when a committed copy is stale.
-import { readFileSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import datacenterAsns from '../../../packages/core/src/clients/datacenter-asns';
 import bots from '../../../packages/core/src/modules/ingest/src/bots/bots';
 
@@ -121,16 +122,61 @@ function botTables() {
   });
 }
 
-const outputs: [string, unknown][] = [
-  ['internal/useragent/data/regexes.json', uaTables()],
-  ['internal/bots/data/bots.json', botTables()],
-  ['internal/geo/data/datacenter-asns.json', [...datacenterAsns]],
+// The Lua the Go BullMQ producer sends, exactly as the bullmq package the
+// worker runs ships it (includes already inlined), with the SHA ioredis would
+// compute so a test can pin what EVALSHA addresses.
+const BULLMQ_SCRIPTS = ['addStandardJob'] as const;
+const BULLMQ_DIR = 'internal/worker/bullmq/scripts';
+
+function bullmqScripts(): [string, string][] {
+  const coreRequire = createRequire(
+    join(import.meta.dir, '../../../packages/core/package.json')
+  );
+  const root = join(dirname(coreRequire.resolve('bullmq')), '../..');
+  const { version } = JSON.parse(
+    readFileSync(join(root, 'package.json'), 'utf8')
+  ) as { version: string };
+  const manifest: Record<string, unknown> = {};
+  const files: [string, string][] = [];
+  for (const name of BULLMQ_SCRIPTS) {
+    const dir = join(root, 'dist/cjs/scripts');
+    const file = readdirSync(dir).find((entry) =>
+      new RegExp(`^${name}-\\d+\\.js$`).test(entry)
+    );
+    if (!file) {
+      throw new Error(`bullmq ${version} ships no script ${name}`);
+    }
+    const script = coreRequire(join(dir, file))[name] as {
+      content: string;
+      keys: number;
+    };
+    manifest[name] = {
+      file: `${name}.lua`,
+      keys: script.keys,
+      sha1: createHash('sha1').update(script.content).digest('hex'),
+    };
+    files.push([`${BULLMQ_DIR}/${name}.lua`, script.content]);
+  }
+  return [
+    ...files,
+    [
+      `${BULLMQ_DIR}/manifest.json`,
+      `${JSON.stringify({ bullmq: version, scripts: manifest }, null, 1)}\n`,
+    ],
+  ];
+}
+
+const json = (data: unknown): string => `${JSON.stringify(data, null, 1)}\n`;
+const outputs: [string, string][] = [
+  ['internal/useragent/data/regexes.json', json(uaTables())],
+  ['internal/bots/data/bots.json', json(botTables())],
+  ['internal/geo/data/datacenter-asns.json', json([...datacenterAsns])],
+  ...bullmqScripts(),
 ];
 
 let stale = 0;
-for (const [relative, data] of outputs) {
+for (const [relative, next] of outputs) {
   const path = join(ROOT, relative);
-  const next = `${JSON.stringify(data, null, 1)}\n`;
   let current = '';
   try {
     current = readFileSync(path, 'utf8');
@@ -145,6 +191,7 @@ for (const [relative, data] of outputs) {
     stale += 1;
     continue;
   }
+  mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, next);
   console.log(`wrote ${relative}`);
 }

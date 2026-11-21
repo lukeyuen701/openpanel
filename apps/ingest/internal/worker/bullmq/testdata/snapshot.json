@@ -1,0 +1,279 @@
+{
+ "bull:notification-wparity:1": {
+  "hash": {
+   "data": "{\"payload\":{\"notification\":{\"title\":\"first\",\"message\":\"m\",\"projectId\":\"p1\",\"payload\":{\"type\":\"event\",\"event\":{\"name\":\"screen_view\",\"profileId\":\"d1\",\"projectId\":\"p1\",\"deviceId\":\"d1\",\"sessionId\":\"s2\",\"properties\":{\"a\":\"b\",\"unicode\":\"héllo ☃ 😀 \\\"q\\\" \\\\ /\"},\"createdAt\":\"2026-01-01T00:00:00.123Z\",\"groups\":[],\"duration\":0,\"path\":\"/x\",\"origin\":\"\"}},\"integrationId\":null,\"sendToApp\":true,\"sendToEmail\":false,\"notificationRuleId\":\"r1\"}},\"meta\":{\"requestId\":\"wparity-req-1\"}}",
+   "name": "sendNotification",
+   "timestamp": "1767225600000",
+   "delay": "0",
+   "opts": "{\"removeOnComplete\":10,\"removeOnFail\":{\"age\":86400,\"count\":100},\"attempts\":0}",
+   "priority": "0"
+  }
+ },
+ "bull:notification-wparity:2": {
+  "hash": {
+   "data": "{\"payload\":{\"notification\":{\"title\":\"second\",\"message\":\"m\",\"projectId\":\"p1\",\"payload\":{\"type\":\"event\",\"event\":{\"name\":\"screen_view\",\"profileId\":\"d1\",\"projectId\":\"p1\",\"deviceId\":\"d1\",\"sessionId\":\"s2\",\"properties\":{\"a\":\"b\",\"unicode\":\"héllo ☃ 😀 \\\"q\\\" \\\\ /\"},\"createdAt\":\"2026-01-01T00:00:00.123Z\",\"groups\":[],\"duration\":0,\"path\":\"/x\",\"origin\":\"\"}},\"integrationId\":null,\"sendToApp\":true,\"sendToEmail\":false,\"notificationRuleId\":\"r1\"}},\"meta\":{\"requestId\":\"wparity-req-1\"}}",
+   "name": "sendNotification",
+   "timestamp": "1767225600000",
+   "delay": "0",
+   "opts": "{\"removeOnComplete\":10,\"removeOnFail\":{\"age\":86400,\"count\":100},\"attempts\":0}",
+   "priority": "0"
+  }
+ },
+ "bull:notification-wparity:events": {
+  "stream": [
+   [
+    "event",
+    "added",
+    "jobId",
+    "1",
+    "name",
+    "sendNotification"
+   ],
+   [
+    "event",
+    "waiting",
+    "jobId",
+    "1"
+   ],
+   [
+    "event",
+    "added",
+    "jobId",
+    "2",
+    "name",
+    "sendNotification"
+   ],
+   [
+    "event",
+    "waiting",
+    "jobId",
+    "2"
+   ]
+  ]
+ },
+ "bull:notification-wparity:id": {
+  "string": "2"
+ },
+ "bull:notification-wparity:marker": {
+  "zset": [
+   "0",
+   "0"
+  ]
+ },
+ "bull:notification-wparity:meta": {
+  "hash": {
+   "opts.maxLenEvents": "10000",
+   "version": "bullmq:6.7.8"
+  }
+ },
+ "bull:notification-wparity:wait": {
+  "list": [
+   "2",
+   "1"
+  ]
+ },
+ "bull:notification:1": {
+  "hash": {
+   "data": "{\"payload\":{\"notification\":{\"title\":\"plain\",\"message\":\"m\",\"projectId\":\"p1\",\"payload\":{\"type\":\"event\",\"event\":{\"name\":\"screen_view\",\"profileId\":\"d1\",\"projectId\":\"p1\",\"deviceId\":\"d1\",\"sessionId\":\"s2\",\"properties\":{\"a\":\"b\",\"unicode\":\"héllo ☃ 😀 \\\"q\\\" \\\\ /\"},\"createdAt\":\"2026-01-01T00:00:00.123Z\",\"groups\":[],\"duration\":0,\"path\":\"/x\",\"origin\":\"\"}},\"integrationId\":null,\"sendToApp\":true,\"sendToEmail\":false,\"notificationRuleId\":\"r1\"}},\"meta\":{}}",
+   "name": "sendNotification",
+   "timestamp": "1767225600000",
+   "delay": "0",
+   "opts": "{\"removeOnComplete\":10,\"removeOnFail\":{\"age\":86400,\"count\":100},\"attempts\":0}",
+   "priority": "0"
+  }
+ },
+ "bull:notification:events": {
+  "stream": [
+   [
+    "event",
+    "added",
+    "jobId",
+    "1",
+    "name",
+    "sendNotification"
+   ],
+   [
+    "event",
+    "waiting",
+    "jobId",
+    "1"
+   ]
+  ]
+ },
+ "bull:notification:id": {
+  "string": "1"
+ },
+ "bull:notification:marker": {
+  "zset": [
+   "0",
+   "0"
+  ]
+ },
+ "bull:notification:meta": {
+  "hash": {
+   "opts.maxLenEvents": "10000",
+   "version": "bullmq:6.7.8"
+  }
+ },
+ "bull:notification:wait": {
+  "list": [
+   "1"
+  ]
+ },
+ "bull:sessions-wparity:events": {
+  "stream": [
+   [
+    "event",
+    "added",
+    "jobId",
+    "sessionEnd:v2:sess1",
+    "name",
+    "session"
+   ],
+   [
+    "event",
+    "waiting",
+    "jobId",
+    "sessionEnd:v2:sess1"
+   ],
+   [
+    "event",
+    "duplicated",
+    "jobId",
+    "sessionEnd:v2:sess1"
+   ]
+  ]
+ },
+ "bull:sessions-wparity:id": {
+  "string": "2"
+ },
+ "bull:sessions-wparity:marker": {
+  "zset": [
+   "0",
+   "0"
+  ]
+ },
+ "bull:sessions-wparity:meta": {
+  "hash": {
+   "opts.maxLenEvents": "10000",
+   "version": "bullmq:6.7.8"
+  }
+ },
+ "bull:sessions-wparity:sessionEnd:v2:sess1": {
+  "hash": {
+   "timestamp": "1767225600000",
+   "name": "session",
+   "data": "{\"payload\":{\"event\":{\"name\":\"screen_view\",\"profileId\":\"d1\",\"projectId\":\"p1\",\"deviceId\":\"d1\",\"sessionId\":\"sess1\",\"properties\":{\"a\":\"b\",\"unicode\":\"héllo ☃ 😀 \\\"q\\\" \\\\ /\"},\"createdAt\":\"2026-01-01T00:00:00.123Z\",\"groups\":[],\"duration\":0,\"path\":\"/x\",\"origin\":\"\"},\"snapshot\":{\"id\":\"sess1\",\"project_id\":\"p1\",\"device_id\":\"d1\",\"profile_id\":\"d1\",\"ended_at\":\"2026-01-01 00:00:00.000\"}},\"meta\":{\"requestId\":\"wparity-req-1\"}}",
+   "delay": "0",
+   "opts": "{\"removeOnFail\":{\"age\":86400,\"count\":1000},\"jobId\":\"sessionEnd:v2:sess1\",\"removeOnComplete\":true,\"backoff\":{\"delay\":200,\"type\":\"exponential\"},\"attempts\":3}",
+   "priority": "0"
+  }
+ },
+ "bull:sessions-wparity:wait": {
+  "list": [
+   "sessionEnd:v2:sess1"
+  ]
+ },
+ "bull:sessions:events": {
+  "stream": [
+   [
+    "event",
+    "added",
+    "jobId",
+    "sessionEnd:v2:sess2",
+    "name",
+    "session"
+   ],
+   [
+    "event",
+    "waiting",
+    "jobId",
+    "sessionEnd:v2:sess2"
+   ]
+  ]
+ },
+ "bull:sessions:id": {
+  "string": "1"
+ },
+ "bull:sessions:marker": {
+  "zset": [
+   "0",
+   "0"
+  ]
+ },
+ "bull:sessions:meta": {
+  "hash": {
+   "opts.maxLenEvents": "10000",
+   "version": "bullmq:6.7.8"
+  }
+ },
+ "bull:sessions:sessionEnd:v2:sess2": {
+  "hash": {
+   "data": "{\"payload\":{\"event\":{\"name\":\"screen_view\",\"profileId\":\"d1\",\"projectId\":\"p1\",\"deviceId\":\"d1\",\"sessionId\":\"sess1\",\"properties\":{\"a\":\"b\",\"unicode\":\"héllo ☃ 😀 \\\"q\\\" \\\\ /\"},\"createdAt\":\"2026-01-01T00:00:00.123Z\",\"groups\":[],\"duration\":0,\"path\":\"/x\",\"origin\":\"\"},\"snapshot\":{\"id\":\"sess1\",\"project_id\":\"p1\",\"device_id\":\"d1\",\"profile_id\":\"d1\",\"ended_at\":\"2026-01-01 00:00:00.000\"}},\"meta\":{}}",
+   "name": "session",
+   "timestamp": "1767225600000",
+   "delay": "0",
+   "opts": "{\"removeOnFail\":{\"age\":86400,\"count\":1000},\"jobId\":\"sessionEnd:v2:sess2\",\"removeOnComplete\":true,\"backoff\":{\"delay\":200,\"type\":\"exponential\"},\"attempts\":3}",
+   "priority": "0"
+  }
+ },
+ "bull:sessions:wait": {
+  "list": [
+   "sessionEnd:v2:sess2"
+  ]
+ },
+ "bull:{notification-wparity}:meta": {
+  "hash": {
+   "opts.maxLenEvents": "10000",
+   "version": "bullmq:6.7.8"
+  }
+ },
+ "bull:{sessions-wparity}:events": {
+  "stream": [
+   [
+    "event",
+    "added",
+    "jobId",
+    "sessionEnd:v2:sess3",
+    "name",
+    "session"
+   ],
+   [
+    "event",
+    "waiting",
+    "jobId",
+    "sessionEnd:v2:sess3"
+   ]
+  ]
+ },
+ "bull:{sessions-wparity}:id": {
+  "string": "1"
+ },
+ "bull:{sessions-wparity}:marker": {
+  "zset": [
+   "0",
+   "0"
+  ]
+ },
+ "bull:{sessions-wparity}:meta": {
+  "hash": {
+   "opts.maxLenEvents": "10000",
+   "version": "bullmq:6.7.8"
+  }
+ },
+ "bull:{sessions-wparity}:sessionEnd:v2:sess3": {
+  "hash": {
+   "data": "{\"payload\":{\"event\":{\"name\":\"screen_view\",\"profileId\":\"d1\",\"projectId\":\"p1\",\"deviceId\":\"d1\",\"sessionId\":\"sess1\",\"properties\":{\"a\":\"b\",\"unicode\":\"héllo ☃ 😀 \\\"q\\\" \\\\ /\"},\"createdAt\":\"2026-01-01T00:00:00.123Z\",\"groups\":[],\"duration\":0,\"path\":\"/x\",\"origin\":\"\"},\"snapshot\":{\"id\":\"sess1\",\"project_id\":\"p1\",\"device_id\":\"d1\",\"profile_id\":\"d1\",\"ended_at\":\"2026-01-01 00:00:00.000\"}},\"meta\":{\"requestId\":\"wparity-req-3\"}}",
+   "name": "session",
+   "timestamp": "1767225600000",
+   "delay": "0",
+   "opts": "{\"removeOnFail\":{\"age\":86400,\"count\":1000},\"jobId\":\"sessionEnd:v2:sess3\",\"removeOnComplete\":true,\"backoff\":{\"delay\":200,\"type\":\"exponential\"},\"attempts\":3}",
+   "priority": "0"
+  }
+ },
+ "bull:{sessions-wparity}:wait": {
+  "list": [
+   "sessionEnd:v2:sess3"
+  ]
+ }
+}
