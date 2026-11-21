@@ -9,6 +9,7 @@
     "test": "go vet ./... && go test ./...",
     "gen": "bun scripts/gen-tables.ts",
     "gen:check": "bun scripts/gen-tables.ts --check",
+    "worker-parity": "dotenv -e ../../.env -- bun parity/worker-diff.ts",
     "golden": "bun parity/golden-core.ts",
     "parity": "go build -o bin/ingest ./cmd/ingest && dotenv -e ../../.env -- bun parity/diff.ts",
     "loadgen": "go run ./cmd/loadgen"
