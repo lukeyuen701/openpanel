@@ -16,6 +16,22 @@
 //
 //   bun x dotenv -e ../../.env -- bun parity/worker-diff.ts --a ts --b go --full --go-bin <worker>
 //
+// --mixed <scenario> compares a plain Bun --full run (side a) with a mixed
+// deployment (side b): Bun and Go workers sharing one Redis db, one consumer
+// group, one BullMQ namespace and one ClickHouse database, as the runbook
+// (docs/GO_WORKER.md section 9, P1 to P3) has them during a rollout:
+//
+//   bun x dotenv -e ../../.env -- bun parity/worker-diff.ts --mixed handover --corpus generated --go-bin <worker>
+//   ... --baseline <wparity-*-generated-a-ts.dump.json>   (reuse an earlier side a)
+//
+//   shared          a Go worker (events + sessions) and a Bun worker from the start
+//   handover        Go joins and leaves the events group in the middle of a wave;
+//                   then Go is the only sessions consumer, Bun joins it mid-drain
+//                   and takes the queue back when Go is stopped
+//   flush-handover  Go takes flushEvents (collect phase, with traffic) and then
+//                   flushSessions (flush phase) from Bun, which lists them in
+//                   DISABLED_CRON_JOBS
+//
 // Needs the local stack (Postgres, Redis, Redpanda). Fixture rows are named
 // wparity-*; the rule, client and notification ids are uuid columns, so those
 // use fixed uuids and go away with the organization.
@@ -42,7 +58,19 @@ const ROOT = new URL('../../..', import.meta.url).pathname;
 const args = process.argv.slice(2);
 const flag = (name: string) =>
   args.includes(name) ? args[args.indexOf(name) + 1] : undefined;
-const SIDES = [flag('--a') ?? 'ts', flag('--b') ?? 'ts'] as const;
+const MIXED_SCENARIOS = ['shared', 'handover', 'flush-handover'] as const;
+type MixedScenario = (typeof MIXED_SCENARIOS)[number];
+const MIXED = args.includes('--mixed')
+  ? (flag('--mixed') as MixedScenario)
+  : undefined;
+if (args.includes('--mixed') && !MIXED_SCENARIOS.includes(MIXED!)) {
+  throw new Error(`--mixed needs one of ${MIXED_SCENARIOS.join(', ')}`);
+}
+// A saved side a (the dump an earlier --full run wrote), to skip re-running Bun.
+const BASELINE = flag('--baseline');
+const SIDES: readonly [string, string] = MIXED
+  ? ['ts', 'mixed']
+  : [flag('--a') ?? 'ts', flag('--b') ?? 'ts'];
 // The binary, relative to the working directory or to the repository root.
 const GO_BIN_FLAG = flag('--go-bin') ?? 'apps/ingest/bin/worker';
 const GO_BIN =
@@ -52,7 +80,7 @@ const GO_BIN =
 const GO_ARGS = (flag('--go-args') ?? '').split(' ').filter(Boolean);
 const OUT_DIR = process.env.WPARITY_OUT ?? tmpdir();
 const RUN = Date.now().toString(36);
-const FULL = args.includes('--full');
+const FULL = args.includes('--full') || MIXED !== undefined;
 // --full needs sessions to end within the run: SESSION_TIMEOUT_MS is also the
 // wall-clock deadman of the session reaper, so a short value is what lets the
 // reaper close the last session of every device. It also moves the worker's
@@ -491,12 +519,16 @@ async function startWorker(
   kind: string,
   ctx: SideContext,
   part?: FullPart,
-  phase?: FullPhase
+  phase?: FullPhase,
+  custom?: { env: Record<string, string>; label: string }
 ) {
-  const env = part && phase ? fullEnv(ctx, part, phase) : workerEnv(ctx);
-  const label = [ctx.name, part === 'companion' ? 'bun' : '', phase ?? '']
-    .filter(Boolean)
-    .join('-');
+  const env =
+    custom?.env ?? (part && phase ? fullEnv(ctx, part, phase) : workerEnv(ctx));
+  const label =
+    custom?.label ??
+    [ctx.name, part === 'companion' ? 'bun' : '', phase ?? '']
+      .filter(Boolean)
+      .join('-');
   const stdout = Bun.file(`${OUT_DIR}/wparity-${RUN}-${label}.log`);
   const stderr = Bun.file(`${OUT_DIR}/wparity-${RUN}-${label}.err`);
   if (kind === 'ts' || part === 'companion') {
@@ -539,7 +571,8 @@ async function stopWorker(proc: ReturnType<typeof spawn>) {
 async function until<T>(
   what: string,
   timeoutMs: number,
-  probe: () => Promise<T | undefined | false>
+  probe: () => Promise<T | undefined | false>,
+  pollMs = POLL_MS
 ): Promise<T> {
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
@@ -547,7 +580,7 @@ async function until<T>(
     if (value) {
       return value;
     }
-    await Bun.sleep(POLL_MS);
+    await Bun.sleep(pollMs);
   }
   throw new Error(`timed out waiting for ${what}`);
 }
@@ -570,6 +603,8 @@ async function produceWave(
 // ---------- one side ----------
 export interface SideResult {
   side: string;
+  /** Findings of a --mixed run about the run itself (a process that never took part). */
+  problems?: string[];
   redis: RedisDump;
   postgres: PostgresDump;
   clickhouse?: ClickhouseDump;
@@ -1729,10 +1764,7 @@ async function unexpectedErrors(logs: string[]): Promise<string[]> {
   return lines;
 }
 
-async function runFullSide(
-  kind: string,
-  ctx: SideContext
-): Promise<SideResult> {
+async function prepareFullSide(ctx: SideContext) {
   const started = Date.now();
   await resetFixtureState();
   await flushRedisIndex(ctx.redisIndex);
@@ -1757,6 +1789,87 @@ async function runFullSide(
     await rpk('topic', 'delete', ctx.topic, `${ctx.topic}-dlq`);
     await rpk('group', 'delete', ctx.group);
   });
+  return { started, devRowsBefore };
+}
+
+async function awaitPipelineIdle(
+  ctx: SideContext,
+  workers: { proc: ReturnType<typeof spawn>; log: string }[],
+  logs: string[],
+  phase: FullPhase,
+  produced: number
+) {
+  const client = redisClient(ctx.redisIndex);
+  let idleSince = 0;
+  let lastWhy = '';
+  try {
+    await until(`the ${phase} phase to finish`, IDLE_TIMEOUT_MS, async () => {
+      for (const worker of workers) {
+        if (worker.proc.exitCode !== null) {
+          throw new Error(
+            `worker died (${worker.proc.exitCode}); see ${worker.log}`
+          );
+        }
+      }
+      // A flush ClickHouse rejects is retried for ever with the same rows,
+      // so the run would only wait out its timeout.
+      const errors = await unexpectedErrors(logs);
+      if (errors.length > 0) {
+        throw new Error(`worker error: ${errors[0]!.slice(0, 600)}`);
+      }
+      const state = await fullIdle(ctx, client, produced, phase);
+      if (!state.idle) {
+        idleSince = 0;
+        lastWhy = state.why;
+        return false;
+      }
+      idleSince ||= Date.now();
+      return Date.now() - idleSince >= IDLE_HOLD_MS;
+    }).catch((error) => {
+      throw new Error(`${error.message} (last: ${lastWhy})`);
+    });
+  } finally {
+    client.disconnect();
+  }
+}
+
+async function collectFullResult(
+  ctx: SideContext,
+  started: number,
+  devRowsBefore: number,
+  logs: string[]
+): Promise<SideResult> {
+  const redis = await dumpRedis(ctx.redisIndex);
+  const postgres = await dumpPostgres();
+  const clickhouse = await dumpClickhouse(ctx.clickhouseDb);
+  const devRowsAfter = await devClickhouseWparityRows();
+  const logErrors: string[] = [];
+  if (devRowsAfter !== devRowsBefore) {
+    logErrors.push(
+      `the dev ClickHouse database '${DEV_CLICKHOUSE_DB}' gained ${devRowsAfter - devRowsBefore} wparity rows`
+    );
+  }
+  logErrors.push(...(await unexpectedErrors(logs)));
+  await Bun.write(
+    `${OUT_DIR}/wparity-${RUN}-${ctx.name}.dump.json`,
+    JSON.stringify({ redis, postgres, clickhouse }, null, 1)
+  );
+  await chRequest(undefined, `DROP DATABASE IF EXISTS ${ctx.clickhouseDb}`);
+  return {
+    side: ctx.name,
+    redis,
+    postgres,
+    clickhouse,
+    logErrors,
+    durationMs: Date.now() - started,
+  };
+}
+
+async function runFullSide(
+  kind: string,
+  ctx: SideContext
+): Promise<SideResult> {
+  const { started, devRowsBefore } = await prepareFullSide(ctx);
 
   const parts: FullPart[] = kind === 'ts' ? ['ts'] : ['go', 'companion'];
   const logs: string[] = [];
@@ -1809,44 +1922,11 @@ async function runFullSide(
       }
     }
   };
-  const waitForIdle = async (
-    workers: Awaited<ReturnType<typeof startWorkers>>,
+  const waitForIdle = (
+    workers: { proc: ReturnType<typeof spawn>; log: string }[],
     phase: FullPhase,
     produced: number
-  ) => {
-    const client = redisClient(ctx.redisIndex);
-    let idleSince = 0;
-    let lastWhy = '';
-    try {
-      await until(`the ${phase} phase to finish`, IDLE_TIMEOUT_MS, async () => {
-        for (const worker of workers) {
-          if (worker.proc.exitCode !== null) {
-            throw new Error(
-              `worker died (${worker.proc.exitCode}); see ${worker.log}`
-            );
-          }
-        }
-        // A flush ClickHouse rejects is retried for ever with the same rows,
-        // so the run would only wait out its timeout.
-        const errors = await unexpectedErrors(logs);
-        if (errors.length > 0) {
-          throw new Error(`worker error: ${errors[0]!.slice(0, 600)}`);
-        }
-        const state = await fullIdle(ctx, client, produced, phase);
-        if (!state.idle) {
-          idleSince = 0;
-          lastWhy = state.why;
-          return false;
-        }
-        idleSince ||= Date.now();
-        return Date.now() - idleSince >= IDLE_HOLD_MS;
-      }).catch((error) => {
-        throw new Error(`${error.message} (last: ${lastWhy})`);
-      });
-    } finally {
-      client.disconnect();
-    }
-  };
+  ) => awaitPipelineIdle(ctx, workers, logs, phase, produced);
 
   const producer = new Producer({
     clientId: `wparity-${RUN}`,
@@ -1900,30 +1980,546 @@ async function runFullSide(
     `  flushed ${((Date.now() - flushStarted) / 1000).toFixed(0)}s after the flushing workers started`
   );
   await stopWorkers(flushing);
-  const redis = await dumpRedis(ctx.redisIndex);
-  const postgres = await dumpPostgres();
-  const clickhouse = await dumpClickhouse(ctx.clickhouseDb);
-  const devRowsAfter = await devClickhouseWparityRows();
-  const logErrors: string[] = [];
-  if (devRowsAfter !== devRowsBefore) {
-    logErrors.push(
-      `the dev ClickHouse database '${DEV_CLICKHOUSE_DB}' gained ${devRowsAfter - devRowsBefore} wparity rows`
+  return await collectFullResult(ctx, started, devRowsBefore, logs);
+}
+
+// ---------- --mixed: Bun and Go workers on one Redis, group and queue ----------
+// Side b of a --mixed run is a deployment in the middle of a rollout. Every
+// process shares the side's Redis db, topic, consumer group, BullMQ namespace
+// and ClickHouse database; what differs per scenario is which process owns
+// what, and when that changes (the header of this file lists them). Phases and
+// the corpus waves are those of --full, so side a is the plain Bun --full run.
+const BUN_ALL_QUEUES = 'events,sessions,cron,notification';
+const PIPELINE_FLUSH_AT_MS = 11_000; // one flushEvents tick (10 s) and a margin
+const WAVE_CHUNK_RECORDS = 40;
+const WAVE_CHUNK_PAUSE_MS = 150;
+const SLOW_WAVE_CHUNK_PAUSE_MS = 400;
+const LEAVE_AFTER_CHUNKS = 3;
+const FIRST_SESSIONS_HANDOVER_REMAINING = 0.85;
+const SECOND_SESSIONS_HANDOVER_REMAINING = 0.5;
+const SESSIONS_POLL_MS = 40;
+const MEMBERS_TIMEOUT_MS = 60_000;
+
+interface MixedSpec {
+  label: string;
+  kind: 'ts' | 'go';
+  queues: string;
+  goQueues?: string;
+  goCron?: string[];
+  /** Pipeline cron jobs a Bun worker lists in DISABLED_CRON_JOBS. */
+  disabled?: string[];
+  portOffset: number;
+}
+interface MixedProc {
+  spec: MixedSpec;
+  proc: ReturnType<typeof spawn>;
+  log: string;
+  port: number;
+  stopped: boolean;
+  scrape?: string;
+}
+
+function mixedEnv(ctx: SideContext, spec: MixedSpec): Record<string, string> {
+  return {
+    ...fullEnv(ctx, 'ts', 'collect'),
+    ENABLED_QUEUES: spec.queues,
+    DISABLED_CRON_JOBS: [
+      ...UNRELATED_CRON_NAMES,
+      ...(spec.disabled ?? []),
+    ].join(','),
+    GO_WORKER_QUEUES: spec.goQueues ?? '',
+    GO_WORKER_CRON_JOBS: (spec.goCron ?? []).join(','),
+    API_PORT: String(ctx.httpPort + spec.portOffset),
+  };
+}
+
+interface GroupMembers {
+  state: string;
+  members: number;
+  /** partitions per member id; a partition nobody owns is not counted */
+  owned: Record<string, number>;
+  clients: Record<string, string>;
+}
+async function describeMembers(
+  group: string,
+  topic: string
+): Promise<GroupMembers> {
+  const { out } = await rpk('group', 'describe', group);
+  const owned: Record<string, number> = {};
+  const clients: Record<string, string> = {};
+  for (const line of out.split('\n')) {
+    const cols = line.trim().split(/\s+/);
+    const hasOwner =
+      cols[0] === topic && /^\d+$/.test(cols[1] ?? '') && cols.length > 6;
+    if (hasOwner) {
+      owned[cols[6]!] = (owned[cols[6]!] ?? 0) + 1;
+      clients[cols[6]!] = cols[7] ?? '';
+    }
+  }
+  return {
+    state: /^STATE\s+(\S+)/m.exec(out)?.[1] ?? 'Unknown',
+    members: Number(/^MEMBERS\s+(\d+)/m.exec(out)?.[1] ?? 0),
+    owned,
+    clients,
+  };
+}
+
+function metricSum(text: string, name: string, only?: RegExp): number {
+  let total = 0;
+  for (const line of text.split('\n')) {
+    if (line.startsWith(name) && (!only || only.test(line))) {
+      total += Number(line.slice(line.lastIndexOf(' ') + 1)) || 0;
+    }
+  }
+  return total;
+}
+
+// 'flush-baseline' is side a of flush-handover: Bun alone, flushing events while
+// the corpus comes in, as a deployment does. A session-end job reads the
+// project's event count from ClickHouse, so a baseline that flushes only at
+// the end would legitimately leave different counts in Postgres.
+async function runMixedSide(
+  ctx: SideContext,
+  scenario: MixedScenario | 'flush-baseline'
+): Promise<SideResult> {
+  const { started, devRowsBefore } = await prepareFullSide(ctx);
+  const logs: string[] = [];
+  const fleet: MixedProc[] = [];
+  const problems: string[] = [];
+  let launches = 0;
+  const note = (text: string) =>
+    console.log(`  [${((Date.now() - started) / 1000).toFixed(1)}s] ${text}`);
+  const live = () => fleet.filter((worker) => !worker.stopped);
+
+  const launch = async (spec: MixedSpec) => {
+    launches += 1;
+    const spawned = await startWorker(spec.kind, ctx, undefined, undefined, {
+      env: mixedEnv(ctx, spec),
+      label: `${ctx.name}-${launches}-${spec.label}`,
+    });
+    const worker: MixedProc = {
+      ...spawned,
+      spec,
+      port: ctx.httpPort + spec.portOffset,
+      stopped: false,
+    };
+    fleet.push(worker);
+    logs.push(worker.log);
+    cleanups.push(async () => {
+      if (!worker.stopped) {
+        await stopWorker(worker.proc);
+      }
+    });
+    note(
+      `started ${spec.label} (${spec.kind}, ENABLED_QUEUES=${spec.queues}${spec.goQueues ? `, GO_WORKER_QUEUES=${spec.goQueues}` : ''}${spec.goCron?.length ? `, GO_WORKER_CRON_JOBS=${spec.goCron}` : ''}${spec.disabled?.length ? `, disabled ${spec.disabled}` : ''})`
+    );
+    return worker;
+  };
+  const scrape = async (worker: MixedProc) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:${worker.port}/metrics`);
+      if (response.ok) {
+        worker.scrape = await response.text();
+        await Bun.write(`${worker.log}.metrics`, worker.scrape);
+      }
+    } catch {
+      // a worker that is already gone has nothing to scrape
+    }
+  };
+  const halt = async (worker: MixedProc) => {
+    await scrape(worker);
+    note(`SIGTERM ${worker.spec.label}`);
+    const exitCode = await stopWorker(worker.proc);
+    worker.stopped = true;
+    note(`${worker.spec.label} exited with ${exitCode}`);
+    if (exitCode !== 0) {
+      problems.push(`${worker.spec.label} exited with ${exitCode} on SIGTERM`);
+    }
+  };
+  const assertAlive = () => {
+    for (const worker of live()) {
+      if (worker.proc.exitCode !== null) {
+        throw new Error(
+          `${worker.spec.label} died (${worker.proc.exitCode}); see ${worker.log}`
+        );
+      }
+    }
+  };
+  const ready = (...workers: MixedProc[]) =>
+    until('the workers to be ready', FULL_READY_TIMEOUT_MS, async () => {
+      assertAlive();
+      const states = await Promise.all(
+        workers.map((worker) => readyPort(worker.port))
+      );
+      return states.every(Boolean);
+    });
+  const awaitMembers = async (expected: number) => {
+    const group = await until(
+      `${expected} group member(s) owning partitions`,
+      MEMBERS_TIMEOUT_MS,
+      async () => {
+        assertAlive();
+        const state = await describeMembers(ctx.group, ctx.topic);
+        return state.state === 'Stable' &&
+          state.members === expected &&
+          Object.keys(state.owned).length === expected
+          ? state
+          : false;
+      }
+    );
+    note(
+      `group stable, ${expected} member(s): ${Object.entries(group.owned)
+        .map(([id, count]) => `${group.clients[id]}=${count} partition(s)`)
+        .join(', ')}`
+    );
+  };
+
+  const producer = new Producer({
+    clientId: `wparity-${RUN}`,
+    bootstrapBrokers: [KAFKA_BROKERS],
+    partitioner: eventsPartitioner,
+  });
+  cleanups.push(() => producer.close());
+  let produced = 0;
+  const sendWave = async (
+    wave: number,
+    options: {
+      pauseMs?: number;
+      afterChunks?: number;
+      onChunk?: () => void;
+    } = {}
+  ) => {
+    const records = corpus.records.filter((record) => record.wave === wave);
+    if (options.pauseMs === undefined) {
+      await produceWave(producer, ctx.topic, records);
+    } else {
+      for (let at = 0; at < records.length; at += WAVE_CHUNK_RECORDS) {
+        await produceWave(
+          producer,
+          ctx.topic,
+          records.slice(at, at + WAVE_CHUNK_RECORDS)
+        );
+        if (at / WAVE_CHUNK_RECORDS + 1 === options.afterChunks) {
+          options.onChunk?.();
+        }
+        await Bun.sleep(options.pauseMs);
+      }
+    }
+    produced += records.length;
+  };
+  const drain = (what: string) =>
+    until(`${what} to be consumed`, DRAIN_TIMEOUT_MS, async () => {
+      assertAlive();
+      const state = await describeGroup(ctx.group, ctx.topic);
+      return state.lag === 0 && state.current >= produced;
+    });
+  const bufferLength = async () => {
+    const client = redisClient(ctx.redisIndex);
+    try {
+      return await client.llen('event_buffer:queue');
+    } finally {
+      client.disconnect();
+    }
+  };
+  const sessionJobsRemaining = async (client: Redis) => {
+    const prefix = `bull:sessions-${ctx.namespace}:`;
+    const counts = await Promise.all([
+      client.llen(`${prefix}wait`),
+      client.llen(`${prefix}paused`),
+      client.llen(`${prefix}active`),
+      client.zcard(`${prefix}delayed`),
+      client.zcard(`${prefix}prioritized`),
+    ]);
+    return counts.reduce((total, count) => total + count, 0);
+  };
+  const waves = [
+    ...new Set(corpus.records.map((record) => record.wave)),
+  ].sort();
+
+  // Every cron job a Bun worker keeps, per scenario; the collect phase has the
+  // buffer flushes off (see PAUSED_QUEUES) except where a scenario hands one over.
+  const collectDisabled = (keep: string[] = []) =>
+    FLUSH_CRON_JOBS.filter((job) => !keep.includes(job));
+  const bunSpec = (disabled: string[], queues = BUN_ALL_QUEUES): MixedSpec => ({
+    label: 'bun',
+    kind: 'ts',
+    queues,
+    disabled,
+    portOffset: 0,
+  });
+
+  // What each process did, from the metrics it served just before it stopped.
+  const handled = (worker: MixedProc) => ({
+    sessionStarts: metricSum(worker.scrape ?? '', 'sessions_started_total'),
+    sessionEnds: metricSum(worker.scrape ?? '', 'session_ends_emitted_total'),
+    eventFlushes: metricSum(
+      worker.scrape ?? '',
+      'buffer_flush_total',
+      /buffer="event"[^}]*result="success"|result="success"[^}]*buffer="event"/
+    ),
+    sessionFlushes: metricSum(
+      worker.scrape ?? '',
+      'buffer_flush_total',
+      /buffer="session"[^}]*result="success"|result="success"[^}]*buffer="session"/
+    ),
+  });
+  // ----- phase 1: collect -----
+  let bun: MixedProc;
+  let go: MixedProc | undefined;
+  if (scenario === 'shared') {
+    bun = await launch(bunSpec(collectDisabled()));
+    go = await launch({
+      label: 'go',
+      kind: 'go',
+      queues: 'events',
+      goQueues: 'sessions',
+      portOffset: 1,
+    });
+    await ready(bun, go);
+    await awaitMembers(2);
+  } else if (scenario === 'handover') {
+    // Bun does not consume sessions until the sessions handover below.
+    bun = await launch(bunSpec(collectDisabled(), 'events,cron,notification'));
+    await ready(bun);
+    await awaitMembers(1);
+  } else {
+    bun = await launch(bunSpec(collectDisabled(['flushEvents'])));
+    await ready(bun);
+    await awaitMembers(1);
+  }
+  await setQueuesPaused(ctx, true);
+  const producingFrom = Date.now();
+  const pendingStops: Promise<void>[] = [];
+
+  for (const wave of waves) {
+    if (scenario === 'handover' && wave === 2) {
+      // Go boots and joins while waves 2 and 3 are on their way in.
+      go = await launch({
+        label: 'go-events',
+        kind: 'go',
+        queues: 'events',
+        portOffset: 1,
+      });
+      await sendWave(2, { pauseMs: SLOW_WAVE_CHUNK_PAUSE_MS });
+    } else if (scenario === 'handover' && wave === 3) {
+      await sendWave(3, { pauseMs: SLOW_WAVE_CHUNK_PAUSE_MS });
+    } else if (scenario === 'handover' && wave === 4) {
+      await awaitMembers(2);
+      const leaving = go!;
+      await sendWave(4, {
+        pauseMs: WAVE_CHUNK_PAUSE_MS,
+        afterChunks: LEAVE_AFTER_CHUNKS,
+        // Go leaves the group while the rest of the wave is still being produced.
+        onChunk: () => pendingStops.push(halt(leaving)),
+      });
+    } else {
+      await sendWave(wave);
+    }
+    await drain(`wave ${wave}`);
+    await Promise.all(pendingStops.splice(0));
+    if (scenario === 'handover' && wave === 4) {
+      await awaitMembers(1);
+    }
+    if (scenario === 'flush-handover' || scenario === 'flush-baseline') {
+      const before = await bufferLength();
+      await Bun.sleep(PIPELINE_FLUSH_AT_MS);
+      note(
+        `wave ${wave}: event buffer ${before} -> ${await bufferLength()} rows after one flush tick`
+      );
+      if (scenario === 'flush-handover' && wave === 2) {
+        go = await launch({
+          label: 'go-flush',
+          kind: 'go',
+          queues: 'cron',
+          goCron: ['flushEvents'],
+          portOffset: 1,
+        });
+        await ready(go);
+      }
+      if (scenario === 'flush-handover' && wave === 3) {
+        // Go has been flushing next to Bun for a wave; Bun lets go of it now.
+        await halt(bun);
+        bun = await launch(bunSpec(collectDisabled(), BUN_ALL_QUEUES));
+        await ready(bun);
+        await awaitMembers(1);
+      }
+    }
+  }
+  note(
+    `produced ${produced} records in ${((Date.now() - producingFrom) / 1000).toFixed(1)}s`
+  );
+  await Bun.sleep(SESSION_TIMEOUT_MS + RESUME_MARGIN_MS);
+
+  // ----- the sessions queue -----
+  const resumedAt = Date.now();
+  if (scenario === 'handover') {
+    // The reverse order: Go consumes the queue alone, Bun joins it mid-drain,
+    // and Go leaves while jobs are still waiting.
+    const goSessions = await launch({
+      label: 'go-sessions',
+      kind: 'go',
+      queues: 'cron',
+      goQueues: 'sessions',
+      portOffset: 1,
+    });
+    // Bun is booted and then held with SIGSTOP: Go drains the queue faster
+    // than a Bun process starts, so a Bun started after the resume would find
+    // nothing left. Releasing it is the join.
+    const bunSessions = await launch({
+      label: 'bun-sessions',
+      kind: 'ts',
+      queues: 'sessions',
+      portOffset: 2,
+    });
+    await ready(goSessions, bunSessions);
+    bunSessions.proc.kill('SIGSTOP');
+    const client = redisClient(ctx.redisIndex);
+    try {
+      const total = await sessionJobsRemaining(client);
+      await setQueuesPaused(ctx, false);
+      note(`sessions queue resumed with ${total} jobs, Go consuming`);
+      let bunJoined = false;
+      let goStopped = false;
+      await until(
+        'the sessions handover',
+        FULL_READY_TIMEOUT_MS,
+        async () => {
+          assertAlive();
+          const remaining = await sessionJobsRemaining(client);
+          if (
+            !bunJoined &&
+            remaining <= total * FIRST_SESSIONS_HANDOVER_REMAINING
+          ) {
+            note(
+              `${remaining}/${total} session jobs left: Bun joins the sessions queue`
+            );
+            bunSessions.proc.kill('SIGCONT');
+            bunJoined = true;
+          }
+          if (
+            bunJoined &&
+            !goStopped &&
+            remaining <= total * SECOND_SESSIONS_HANDOVER_REMAINING
+          ) {
+            await scrape(bunSessions);
+            const bunTook = handled(bunSessions).sessionEnds;
+            note(
+              `${remaining}/${total} session jobs left, Bun has ended ${bunTook} sessions: Go leaves the sessions queue`
+            );
+            if (bunTook === 0) {
+              problems.push('Bun took no session job before Go left');
+            }
+            goStopped = true;
+            await halt(goSessions);
+          }
+          return remaining === 0 || goStopped;
+        },
+        SESSIONS_POLL_MS
+      );
+      if (!goStopped) {
+        problems.push('the sessions queue drained before Go left it');
+      }
+    } finally {
+      client.disconnect();
+    }
+  } else {
+    await setQueuesPaused(ctx, false);
+  }
+  await awaitPipelineIdle(ctx, live(), logs, 'collect', produced);
+  note(
+    `every session ended ${((Date.now() - resumedAt) / 1000).toFixed(0)}s after the sessions queue was resumed`
+  );
+  for (const worker of live()) {
+    await halt(worker);
+  }
+
+  // ----- phase 2: flush -----
+  const flushStarted = Date.now();
+  if (scenario === 'flush-handover') {
+    const flusher = await launch({
+      label: 'go-flush',
+      kind: 'go',
+      queues: 'cron',
+      goCron: ['flushEvents', 'flushSessions'],
+      portOffset: 1,
+    });
+    bun = await launch(bunSpec(['flushEvents', 'flushSessions']));
+    await ready(flusher, bun);
+  } else if (scenario === 'shared') {
+    bun = await launch(bunSpec([]));
+    go = await launch({
+      label: 'go',
+      kind: 'go',
+      queues: 'events',
+      goQueues: 'sessions',
+      portOffset: 1,
+    });
+    await ready(bun, go);
+    await awaitMembers(2);
+  } else {
+    bun = await launch(bunSpec([]));
+    await ready(bun);
+  }
+  await awaitPipelineIdle(ctx, live(), logs, 'flush', produced);
+  note(
+    `flushed ${((Date.now() - flushStarted) / 1000).toFixed(0)}s after the flushing workers started`
+  );
+  for (const worker of live()) {
+    await halt(worker);
+  }
+
+  for (const worker of fleet) {
+    const stats = handled(worker);
+    note(`${worker.spec.label}: ${JSON.stringify(stats)}`);
+  }
+  const total = (pick: (worker: MixedProc) => number, kind: 'ts' | 'go') =>
+    fleet
+      .filter((worker) => worker.spec.kind === kind)
+      .reduce((sum, worker) => sum + pick(worker), 0);
+  const expectTookPart = (what: string, kind: 'ts' | 'go', value: number) => {
+    if (value === 0) {
+      problems.push(
+        `no ${kind} process handled ${what}: the scenario did not mix the workers`
+      );
+    }
+  };
+  if (scenario === 'flush-baseline') {
+    // Bun alone: nothing was mixed.
+  } else if (scenario !== 'flush-handover') {
+    for (const kind of ['ts', 'go'] as const) {
+      expectTookPart(
+        'a session start',
+        kind,
+        total((w) => handled(w).sessionStarts, kind)
+      );
+      if (scenario !== 'handover') {
+        expectTookPart(
+          'a session end',
+          kind,
+          total((w) => handled(w).sessionEnds, kind)
+        );
+      }
+    }
+  } else {
+    expectTookPart(
+      'an event flush',
+      'ts',
+      total((w) => handled(w).eventFlushes, 'ts')
+    );
+    expectTookPart(
+      'an event flush',
+      'go',
+      total((w) => handled(w).eventFlushes, 'go')
+    );
+    expectTookPart(
+      'a session flush',
+      'go',
+      total((w) => handled(w).sessionFlushes, 'go')
     );
   }
-  logErrors.push(...(await unexpectedErrors(logs)));
-  await Bun.write(
-    `${OUT_DIR}/wparity-${RUN}-${ctx.name}.dump.json`,
-    JSON.stringify({ redis, postgres, clickhouse }, null, 1)
-  );
-  await chRequest(undefined, `DROP DATABASE IF EXISTS ${ctx.clickhouseDb}`);
-  return {
-    side: ctx.name,
-    redis,
-    postgres,
-    clickhouse,
-    logErrors,
-    durationMs: Date.now() - started,
-  };
+
+  const result = await collectFullResult(ctx, started, devRowsBefore, logs);
+  return { ...result, problems };
 }
 
 // What a --full end state must hold for a comparison of it to mean anything.
@@ -1987,6 +2583,49 @@ export function sanityFull(result: SideResult): string[] {
   return problems;
 }
 
+async function loadBaseline(
+  path: string,
+  namespace: string
+): Promise<SideResult> {
+  // The queue namespace is part of every BullMQ key and differs per run.
+  const raw = await Bun.file(path).text();
+  const saved = /bull:[^:]+?-(wparity-[a-z0-9]+):/.exec(raw)?.[1];
+  const text =
+    saved && saved !== namespace ? raw.replaceAll(saved, namespace) : raw;
+  return {
+    ...JSON.parse(text),
+    side: 'a-ts-saved',
+    logErrors: [],
+    durationMs: 0,
+  };
+}
+
+// What the end state holds, in the numbers a duplicated or lost event, session
+// or profile would move.
+function summarize(result: SideResult): string {
+  const clickhouse = result.clickhouse ?? {};
+  const rows = (table: string) => clickhouse[table]?.length ?? 0;
+  const events = (clickhouse.events ?? []).map(
+    (line) => JSON.parse(line) as { id: string; name: string }
+  );
+  const sessionsOpen = (clickhouse.sessions ?? []).reduce(
+    (sum, line) => sum + Number((JSON.parse(line) as { sign: number }).sign),
+    0
+  );
+  const failedJobs = Object.keys(result.redis).filter((key) =>
+    /^bull:[^:]+:failed$/.test(key)
+  ).length;
+  return [
+    `events=${events.length}`,
+    `unique_ids=${new Set(events.map((event) => event.id)).size}`,
+    `session_start=${events.filter((event) => event.name === 'session_start').length}`,
+    `session_end=${events.filter((event) => event.name === 'session_end').length}`,
+    `sessions_rows=${rows('sessions')} (sum(sign)=${sessionsOpen}, FINAL ${rows('sessions FINAL')})`,
+    `profiles_rows=${rows('profiles')} (FINAL ${rows('profiles FINAL')})`,
+    `failed_job_keys=${failedJobs}`,
+  ].join(' ');
+}
+
 // ---------- main ----------
 async function compareSaved(fileA: string, fileB: string) {
   const load = async (path: string, side: string): Promise<SideResult> => ({
@@ -2013,13 +2652,13 @@ async function main() {
     console.log(
       `corpus ${kind}: ${corpus.records.length} records, ${corpus.partitions} partition(s)`
     );
-    const indexes = await pickRedisIndexes(2);
+    const indexes = await pickRedisIndexes(BASELINE ? 1 : 2);
     const sides: SideContext[] = SIDES.map((side, i) => ({
       side,
-      name: `${kind}-${i === 0 ? 'a' : 'b'}-${side}`,
+      name: `${kind}-${i === 0 ? 'a' : 'b'}-${side}${MIXED && i === 1 ? `-${MIXED}` : ''}`,
       topic: `wparity-${RUN}-${kind}-${i === 0 ? 'a' : 'b'}`,
       group: `wparity-${RUN}-${kind}-${i === 0 ? 'a' : 'b'}`,
-      redisIndex: indexes[i]!,
+      redisIndex: indexes[BASELINE ? 0 : i]!,
       namespace: `wparity-${RUN}`,
       clickhouseDb: FULL
         ? `openpanel_wparity_full_${i === 0 ? 'a' : 'b'}`
@@ -2029,10 +2668,24 @@ async function main() {
     }));
     const results: SideResult[] = [];
     for (const ctx of sides) {
+      if (BASELINE && ctx === sides[0]) {
+        console.log(`using ${BASELINE} as side a`);
+        results.push(await loadBaseline(BASELINE, ctx.namespace));
+        continue;
+      }
       console.log(
         `running ${ctx.name} (topic ${ctx.topic}, redis db ${ctx.redisIndex})`
       );
-      results.push(await (FULL ? runFullSide : runSide)(ctx.side, ctx));
+      const run =
+        MIXED && ctx.side === 'mixed'
+          ? (_kind: string, side: SideContext) => runMixedSide(side, MIXED)
+          : MIXED === 'flush-handover'
+            ? (_kind: string, side: SideContext) =>
+                runMixedSide(side, 'flush-baseline')
+            : FULL
+              ? runFullSide
+              : runSide;
+      results.push(await run(ctx.side, ctx));
       console.log(
         `  done in ${(results.at(-1)!.durationMs / 1000).toFixed(1)}s, ${Object.keys(results.at(-1)!.redis).length} redis keys`
       );
@@ -2047,8 +2700,14 @@ function report(
   kind = 'saved dumps'
 ) {
   let failed = false;
+  for (const result of checkSanity && FULL ? results : []) {
+    console.log(`  ${result.side}: ${summarize(result)}`);
+  }
   for (const result of checkSanity ? results : []) {
-    const problems = FULL ? sanityFull(result) : sanity(result);
+    const problems = [
+      ...(FULL ? sanityFull(result) : sanity(result)),
+      ...(result.problems ?? []),
+    ];
     for (const problem of problems) {
       console.error(`SANITY ${result.side}: ${problem}`);
       failed = true;
