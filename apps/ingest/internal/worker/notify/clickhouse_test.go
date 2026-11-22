@@ -60,11 +60,11 @@ func TestClickHouseHTTPEmptyAndError(t *testing.T) {
 	}
 }
 
-// TestClickHouseLive runs the real query against CLICKHOUSE_URL when set.
+// TestClickHouseLive runs the real query against WPARITY_CH when set.
 func TestClickHouseLive(t *testing.T) {
-	url := os.Getenv("CLICKHOUSE_URL")
+	url := os.Getenv("WPARITY_CH")
 	if url == "" {
-		t.Skip("CLICKHOUSE_URL is not set")
+		t.Skip("set WPARITY_CH to a ClickHouse URL to run the live test")
 	}
 	client, err := NewClickHouseHTTP(url)
 	if err != nil {
@@ -101,9 +101,9 @@ func TestClickHouseLive(t *testing.T) {
 // TestClickHouseLiveParamEscaping sends the characters the JavaScript client
 // escapes and expects ClickHouse to hand them back unchanged.
 func TestClickHouseLiveParamEscaping(t *testing.T) {
-	url := os.Getenv("CLICKHOUSE_URL")
+	url := os.Getenv("WPARITY_CH")
 	if url == "" {
-		t.Skip("CLICKHOUSE_URL is not set")
+		t.Skip("set WPARITY_CH to a ClickHouse URL to run the live test")
 	}
 	client, err := NewClickHouseHTTP(url)
 	if err != nil {

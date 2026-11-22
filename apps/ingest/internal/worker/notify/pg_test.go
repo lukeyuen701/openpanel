@@ -24,9 +24,9 @@ const (
 // skipped when there is no reachable database.
 func openTx(t *testing.T) pgx.Tx {
 	t.Helper()
-	url := os.Getenv("DATABASE_URL")
+	url := os.Getenv("WPARITY_PG")
 	if url == "" {
-		t.Skip("DATABASE_URL is not set")
+		t.Skip("set WPARITY_PG to a Postgres URL to run the live test")
 	}
 	url, _, _ = strings.Cut(url, "?")
 	ctx := context.Background()

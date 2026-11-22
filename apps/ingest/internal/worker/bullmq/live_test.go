@@ -22,10 +22,7 @@ func liveClient(t *testing.T) rueidis.Client {
 	t.Helper()
 	url := os.Getenv("WPARITY_REDIS_URL")
 	if url == "" {
-		url = os.Getenv("REDIS_URL")
-	}
-	if url == "" {
-		t.Skip("set WPARITY_REDIS_URL (or REDIS_URL) to run against a live Redis")
+		t.Skip("set WPARITY_REDIS_URL to run against a live Redis")
 	}
 	options, err := rueidis.ParseURL(url)
 	if err != nil {

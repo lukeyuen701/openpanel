@@ -49,9 +49,6 @@ func newLiveEnv(t *testing.T, needBun bool) *liveEnv {
 	t.Helper()
 	client := liveClient(t)
 	raw := os.Getenv("WPARITY_REDIS_URL")
-	if raw == "" {
-		raw = os.Getenv("REDIS_URL")
-	}
 	parsed, err := url.Parse(raw)
 	check(t, err)
 	port, err := strconv.Atoi(parsed.Port())
