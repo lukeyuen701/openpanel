@@ -106,10 +106,13 @@ func (p *profile) processBatch(ctx context.Context, run *flush.Run) (int, error)
 		return 0, nil
 	}
 
-	unique := mergeWithinBatch(raw)
+	unique, rejected := mergeWithinBatch(raw)
+	if err := p.deps.reject(ctx, p.name, rejected); err != nil {
+		return 0, err
+	}
 	if len(unique) == 0 {
-		// Nothing but unreadable rows: MGET without keys is an error, and the
-		// rows would block the list for good.
+		// Nothing but unreadable rows, now recorded: MGET without keys is an
+		// error, and the rows would block the list for good.
 		if err := trimHead(ctx, p.deps.Redis, p.listKey, len(raw)); err != nil {
 			return 0, err
 		}
@@ -166,13 +169,14 @@ func (p *profile) processBatch(ctx context.Context, run *flush.Run) (int, error)
 }
 
 // mergeWithinBatch folds the rows of one profile into one, in first-appearance
-// order. A row that is not a JSON object is skipped.
-func mergeWithinBatch(raw []string) []*jsjson.Obj {
+// order. A row that is not a JSON object is skipped and returned as rejected.
+func mergeWithinBatch(raw []string) (unique []*jsjson.Obj, rejected []RejectedRow) {
 	var order []string
 	merged := map[string]*jsjson.Obj{}
 	for _, text := range raw {
-		incoming, ok := parseObject(text)
-		if !ok {
+		incoming, reason := readObject(text)
+		if reason != "" {
+			rejected = append(rejected, RejectedRow{Reason: reason, Raw: text})
 			continue
 		}
 		key := profileKey(incoming)
@@ -182,11 +186,11 @@ func mergeWithinBatch(raw []string) []*jsjson.Obj {
 		}
 		merged[key] = mergeProfiles(previous, incoming)
 	}
-	unique := make([]*jsjson.Obj, len(order))
+	unique = make([]*jsjson.Obj, len(order))
 	for i, key := range order {
 		unique[i] = merged[key]
 	}
-	return unique
+	return unique, rejected
 }
 
 // existingFromCache reads profile-cache:* for the batch's profiles: what it

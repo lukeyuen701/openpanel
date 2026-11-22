@@ -113,6 +113,10 @@ type WorkerOptions struct {
 	OnError func(error)
 	// OnStalled receives the ids a stalled check moved back to wait.
 	OnStalled func(jobIDs []string)
+	// OnTerminalFailure runs after a job failed for the last time (no retry
+	// left), with the queue key and the processing time, as the TypeScript
+	// worker's 'failed' handler observes job_duration_ms.
+	OnTerminalFailure func(queueKey string, duration time.Duration)
 }
 
 func (o WorkerOptions) withDefaults() (WorkerOptions, error) {
@@ -167,7 +171,9 @@ type Worker struct {
 	handler Handler
 	opts    WorkerOptions
 	keys    queueKeys
-	id      string
+	// queueKey is the scoped queue name, the label of job_duration_ms.
+	queueKey string
+	id       string
 
 	mu         sync.Mutex
 	drained    bool
@@ -192,13 +198,15 @@ func NewWorker(redis BlockingRedis, queueName string, handler Handler, opts Work
 	if _, err := rand.Read(raw); err != nil {
 		return nil, fmt.Errorf("bullmq: worker id: %w", err)
 	}
+	queueKey := QueueKey(queueName, opts.Namespace, opts.Cluster)
 	return &Worker{
-		redis:   redis,
-		handler: handler,
-		opts:    opts,
-		keys:    newQueueKeys(QueueKey(queueName, opts.Namespace, opts.Cluster)),
-		id:      hex.EncodeToString(raw),
-		locks:   map[string]*trackedLock{},
+		redis:    redis,
+		handler:  handler,
+		opts:     opts,
+		keys:     newQueueKeys(queueKey),
+		queueKey: queueKey,
+		id:       hex.EncodeToString(raw),
+		locks:    map[string]*trackedLock{},
 	}, nil
 }
 
@@ -674,9 +682,17 @@ func (w *Worker) fail(ctx context.Context, job *Job, cause error, fetchNext bool
 			if err != nil {
 				return nil, err
 			}
+			w.observeTerminalFailure(job)
 			return w.finishReply("moveToFinished", job, reply)
 		}
 	})
+}
+
+func (w *Worker) observeTerminalFailure(job *Job) {
+	if w.opts.OnTerminalFailure == nil || job.ProcessedOn == 0 {
+		return
+	}
+	w.opts.OnTerminalFailure(w.queueKey, time.Duration(w.now()-job.ProcessedOn)*time.Millisecond)
 }
 
 // stackLine stands for err.stack: Go has no stack to report, only the

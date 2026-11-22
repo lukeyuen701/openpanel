@@ -75,6 +75,8 @@ type Deps struct {
 	// Clustered is CLICKHOUSE_CLUSTER: only the backfill's UPDATE names the
 	// replicated table.
 	Clustered bool
+	// Rejects records the rows a flush cannot read before it trims them.
+	Rejects Rejects
 }
 
 func (d Deps) logger(buffer string) *slog.Logger {

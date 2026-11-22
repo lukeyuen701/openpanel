@@ -329,7 +329,7 @@ func compareCalls(t *testing.T, label string, got []queryCall, want []goldenCall
 // sends the same sessions in smaller statements.
 func compareBackfillAtTypeScriptChunking(t *testing.T, scenario goldenScenario, ch *fakeCH, want goldenExpect) {
 	t.Helper()
-	entries := parseBackfillEntries(scenario.List[:min(len(scenario.List), batchOf(t, scenario))])
+	entries, _ := parseBackfillEntries(scenario.List[:min(len(scenario.List), batchOf(t, scenario))])
 	chunks := flush.Chunks(entries, 500)
 	if scenario.FailCommandAt != 0 {
 		chunks = chunks[:len(want.Commands)]

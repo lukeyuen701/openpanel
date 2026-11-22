@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"sync"
 	"testing"
@@ -564,12 +565,20 @@ func TestBackfillKeepsTheBatchWhenAChunkFails(t *testing.T) {
 }
 
 func TestBackfillSkipsEntriesWithoutThreeStrings(t *testing.T) {
-	entries := parseBackfillEntries([]string{
+	entries, rejected := parseBackfillEntries([]string{
 		`{"projectId":"p","sessionId":"s"}`, `{"projectId":"p","sessionId":1,"profileId":"u"}`, `[1]`,
 		`{"projectId":"p","sessionId":"s","profileId":"u"}`,
 	})
 	if len(entries) != 1 || entries[0].ProfileID != "u" {
 		t.Fatalf("entries %+v", entries)
+	}
+	want := []RejectedRow{
+		{RejectMissingFields, `{"projectId":"p","sessionId":"s"}`},
+		{RejectMissingFields, `{"projectId":"p","sessionId":1,"profileId":"u"}`},
+		{RejectNotObject, `[1]`},
+	}
+	if !slices.Equal(rejected, want) {
+		t.Fatalf("rejected %+v", rejected)
 	}
 }
 

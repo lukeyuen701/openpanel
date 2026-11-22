@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 	"sync"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/prometheus/client_golang/prometheus"
@@ -142,6 +143,7 @@ func (l *sessionLifecycle) promMetrics() *sessions.PromMetrics {
 // Bun worker.
 func (l *sessionLifecycle) startSessionsWorker(ctx context.Context) (*background, error) {
 	redis := l.sessionsRedis()
+	jobDuration := newJobDuration(l.registry)
 	ender := &sessions.Ender{
 		Redis:  redis,
 		Events: l.handler,
@@ -176,6 +178,9 @@ func (l *sessionLifecycle) startSessionsWorker(ctx context.Context) (*background
 			OnStalled: func(ids []string) {
 				l.logger.Warn("job stalled and will be retried", slog.String("queue", sessions.QueueName), slog.Any("jobIds", ids))
 			},
+			OnTerminalFailure: func(queueKey string, duration time.Duration) {
+				jobDuration.WithLabelValues(queueKey, jobStatusFailed).Observe(float64(duration.Milliseconds()))
+			},
 		})
 	if err != nil {
 		return nil, fmt.Errorf("sessions worker: %w", err)
@@ -198,6 +203,9 @@ func (l *sessionLifecycle) startScheduler(ctx context.Context, flushRegistry *pr
 		Observer: flush.NewMetrics(flushRegistry),
 		Paused:   flush.CronPauseCheck(flush.NewRueidis(l.redisClient, l.cfg.RedisCacheCommandTimeout), l.cfg.QueueNamespace, l.cfg.QueueCluster),
 	}
+	rejects := core.NewRedisRejects(
+		consumer.NewRueidisListStore(l.redisClient, l.cfg.RedisCacheCommandTimeout), consumer.SystemClock{},
+		l.cfg.DeadLetterMaxEntries, core.NewPromRejectMetrics(flushRegistry))
 	flush.ResetRegistry()
 	flush.Register("simple", func(runner flush.Deps) ([]flush.Job, error) {
 		buffers := simple.Buffers(l.cfg.Buffers, simple.Deps{
@@ -212,6 +220,7 @@ func (l *sessionLifecycle) startScheduler(ctx context.Context, flushRegistry *pr
 			CH:        l.chClient,
 			Logger:    l.logger,
 			Clustered: l.cfg.ClickHouse.Cluster,
+			Rejects:   rejects,
 		})
 		// The Bun worker records flush metrics for every buffer it flushes.
 		return simple.Jobs(buffers, runner, true)

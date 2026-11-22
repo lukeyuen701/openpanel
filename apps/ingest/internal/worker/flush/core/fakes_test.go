@@ -199,16 +199,84 @@ func (r *recorder) last() flush.Observation {
 	return r.all[len(r.all)-1]
 }
 
+// memList is the dead-letter list: LPUSH then LTRIM, with a failure to inject.
+type memList struct {
+	mutex   sync.Mutex
+	entries []string
+	err     error
+	// listKey is the key of the last push.
+	listKey string
+}
+
+func (m *memList) PushCapped(_ context.Context, key, value string, maxEntries int) error {
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	if m.err != nil {
+		return m.err
+	}
+	m.listKey = key
+	m.entries = append([]string{value}, m.entries...)
+	if len(m.entries) > maxEntries {
+		m.entries = m.entries[:maxEntries]
+	}
+	return nil
+}
+
+func (m *memList) records(t *testing.T) []map[string]string {
+	t.Helper()
+	m.mutex.Lock()
+	defer m.mutex.Unlock()
+	records := make([]map[string]string, len(m.entries))
+	for i, entry := range m.entries {
+		if err := json.Unmarshal([]byte(entry), &records[i]); err != nil {
+			t.Fatal(err)
+		}
+	}
+	return records
+}
+
+type fixedClock struct{}
+
+func (fixedClock) Now() time.Time                             { return time.Date(2026, 1, 2, 3, 4, 5, 6_000_000, time.UTC) }
+func (fixedClock) Sleep(context.Context, time.Duration) error { return nil }
+
+type countingRejects struct {
+	mutex    sync.Mutex
+	rejected map[string]int
+	failed   int
+}
+
+func (c *countingRejects) Rejected(buffer, reason string) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	if c.rejected == nil {
+		c.rejected = map[string]int{}
+	}
+	c.rejected[buffer+"/"+reason]++
+}
+
+func (c *countingRejects) RejectFailed(string) {
+	c.mutex.Lock()
+	defer c.mutex.Unlock()
+	c.failed++
+}
+
+const testRejectCap = 100
+
 type rig struct {
-	redis *memRedis
-	ch    *fakeCH
-	obs   *recorder
-	deps  Deps
+	redis   *memRedis
+	ch      *fakeCH
+	obs     *recorder
+	deps    Deps
+	dead    *memList
+	counted *countingRejects
 }
 
 func newRig() *rig {
 	redis, ch := newMemRedis(), &fakeCH{}
-	return &rig{redis: redis, ch: ch, obs: &recorder{}, deps: Deps{Redis: redis, CH: ch}}
+	dead, counted := &memList{}, &countingRejects{}
+	deps := Deps{Redis: redis, CH: ch, Rejects: NewRedisRejects(dead, fixedClock{}, testRejectCap, counted)}
+	return &rig{redis: redis, ch: ch, obs: &recorder{}, deps: deps, dead: dead, counted: counted}
 }
 
 func (r *rig) flush(t *testing.T, f flush.Flusher) flush.Observation {

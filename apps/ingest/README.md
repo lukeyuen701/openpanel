@@ -229,6 +229,7 @@ flush job runs in the process.
 | Unit tests against TypeScript goldens (JavaScript semantics, notification matching, consumer, BullMQ wire format, event handler) | `bun run --filter @openpanel/ingest test` | Go |
 | Regenerate those goldens after an upstream change | `golden:jsport`, `golden:notify`, `golden:consumer`, `golden:bullmq`, `golden:events` (same `--filter @openpanel/ingest`) | Bun, the local stack for `golden:events` |
 | Events path, Bun worker against Go worker: the same Kafka records, then the Redis, BullMQ and Postgres state each leaves, diffed (19 hand-written and 1,970 generated records on 4 partitions) | `bun run --filter @openpanel/ingest worker-parity:go` (`worker-parity` compares two Bun workers, to show which fields are nondeterministic) | the local stack |
+| Live tests of the BullMQ client, project lookups and notification queries (skipped unless gated by an explicit variable; the app's own `REDIS_URL`, `DATABASE_URL` and `CLICKHOUSE_URL` never switch them on) | `WPARITY_REDIS_URL=redis://<host> go test ./internal/worker/bullmq` (uses Redis database 14; `WPARITY_BUN` for the TypeScript side), `WPARITY_PG=<postgres url> go test ./internal/worker/projects ./internal/worker/notify`, `WPARITY_CH=<clickhouse url> go test ./internal/worker/notify` | Redis, Postgres, ClickHouse, Bun |
 | Flushes, Bun buffers against Go: the same Redis lists flushed by each into its own ClickHouse database, tables and leftover Redis state compared; the lock shared by both | `WPARITY_CH=<clickhouse url> go test ./internal/worker/flush/...` (`WPARITY_BUN` names the bun binary; Redis is parity database 13) | ClickHouse, Redis, Bun |
 | Session lifecycle: session end variants, funnel notification, reaper, vacuum, usage count and alert, Bun handlers against Go | `bun parity/p3-diff.ts` from `apps/ingest` with the repository `.env` loaded | the local stack, Go |
 | Consumer against a real broker, Redis dead-letter list | `WPARITY_KAFKA=<broker> go test ./internal/worker/consumer`, `WPARITY_REDIS=redis://<host>/11` | Redpanda, Redis |
@@ -265,6 +266,16 @@ worker ran the events rig without a data race.
 - **Regexes** in project filters and notification rules run on Go's `regexp`
   instead of RE2J; both are RE2, and every golden case agreed.
 - **Usage alerts**: queued for the Bun `sendUsageAlert` job rather than sent.
+- **A row a flush cannot read is recorded, then skipped.** The session,
+  profile and profile-backfill flushes meet rows that are not JSON, not an
+  object, or (backfill) lack the three strings; the Bun flush throws and blocks
+  the list on them. The Go flush keeps the list moving, but first pushes the raw
+  row, with buffer name, reason (`unreadable_json`, `not_object`,
+  `missing_fields`) and time, onto `dead_letter:buffer` (capped by
+  `INGEST_DEAD_LETTER_MAX_ENTRIES`, like `dead_letter:events`), and counts it in
+  `buffer_dead_lettered_total{buffer,reason}`. The trim happens only after that
+  write landed; if it fails the flush fails, keeps every row and counts
+  `buffer_dead_letter_failed_total{buffer}`.
 
 ### TypeScript defects it reproduces on purpose
 

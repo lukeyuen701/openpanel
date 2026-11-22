@@ -262,6 +262,29 @@ func TestWorkerRoutesFailures(t *testing.T) {
 	}
 }
 
+func TestWorkerReportsOnlyTerminalFailures(t *testing.T) {
+	cases := []struct {
+		name string
+		opts string
+		want int
+	}{
+		{"retry left", `{"attempts":2}`, 0},
+		{"last attempt", `{"attempts":1}`, 1},
+	}
+	for _, c := range cases {
+		var keys []string
+		var durations []time.Duration
+		opts := WorkerOptions{Namespace: "ns", OnTerminalFailure: func(queueKey string, duration time.Duration) {
+			keys, durations = append(keys, queueKey), append(durations, duration)
+		}}
+		replies := map[string][]Reply{moveToActiveScript.sha: {jobReply("3", c.opts)}}
+		runOnce(t, replies, func(context.Context, Job) error { return errors.New("x") }, opts)
+		if len(keys) != c.want || (c.want == 1 && (keys[0] != "sessions-ns" || durations[0] <= 0)) {
+			t.Errorf("%s: keys %v durations %v", c.name, keys, durations)
+		}
+	}
+}
+
 func TestWorkerPanicFailsTheJob(t *testing.T) {
 	replies := map[string][]Reply{moveToActiveScript.sha: {jobReply("3", `{"attempts":1}`)}}
 	fake := runOnce(t, replies, func(context.Context, Job) error { panic("bad") }, WorkerOptions{})

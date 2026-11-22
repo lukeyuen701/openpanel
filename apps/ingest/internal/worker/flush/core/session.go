@@ -11,15 +11,26 @@ import (
 	"openpanel/ingest/internal/worker/jsport"
 )
 
-// parseObject is getSafeJson for a row that must be an object: anything else,
-// a parse error included, is skipped (and trimmed with the batch). The
-// TypeScript flush throws on a truthy non-object and so blocks the list.
-func parseObject(raw string) (*jsjson.Obj, bool) {
+// readObject is getSafeJson for a row that must be an object. Anything else,
+// a parse error included, comes back with the reason; the flush records it
+// (Deps.Rejects) and trims it with the batch. The TypeScript flush throws on a
+// truthy non-object and so blocks the list.
+func readObject(raw string) (row *jsjson.Obj, reason string) {
 	value, err := jsport.ParseJSON(raw)
-	if err != nil || !value.IsObject() {
-		return nil, false
+	if err != nil {
+		return nil, RejectUnreadable
 	}
-	return value.Obj, true
+	if !value.IsObject() {
+		return nil, RejectNotObject
+	}
+	return value.Obj, ""
+}
+
+// parseObject is readObject for a caller that has nothing to record, such as a
+// cached or stored profile, which is a miss when unreadable.
+func parseObject(raw string) (*jsjson.Obj, bool) {
+	row, reason := readObject(raw)
+	return row, reason == ""
 }
 
 // clampDuration is `s.duration = Math.max(0, s.duration || 0)`: a falsy value is
@@ -187,13 +198,18 @@ func (s *session) processBatch(ctx context.Context, run *flush.Run) (int, error)
 
 	transformStart := run.Now()
 	parsed := make([]*jsjson.Obj, 0, len(raw))
+	var rejected []RejectedRow
 	for _, text := range raw {
-		row, ok := parseObject(text)
-		if !ok {
+		row, reason := readObject(text)
+		if reason != "" {
+			rejected = append(rejected, RejectedRow{Reason: reason, Raw: text})
 			continue
 		}
 		clampDuration(row)
 		parsed = append(parsed, row)
+	}
+	if err := s.deps.reject(ctx, s.name, rejected); err != nil {
+		return 0, err
 	}
 	rows := parsed
 	if s.squash {

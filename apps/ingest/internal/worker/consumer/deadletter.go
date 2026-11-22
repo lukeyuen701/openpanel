@@ -16,6 +16,10 @@ import (
 // (packages/redis/dead-letter.ts).
 const DeadLetterKey = "dead_letter:events"
 
+// BufferDeadLetterKey is the list of buffer rows a flush could not read, capped
+// like DeadLetterKey by INGEST_DEAD_LETTER_MAX_ENTRIES.
+const BufferDeadLetterKey = "dead_letter:buffer"
+
 // DeadLetterMessage is a record that is dropped, with why.
 type DeadLetterMessage struct {
 	Key       []byte
@@ -77,6 +81,17 @@ func EncodeDeadLetter(message DeadLetterMessage, recordedAt time.Time) string {
 		headers.Set(header.Key, jsjson.NewString(decodeText(header.Value)))
 	}
 	record.Set("headers", jsjson.NewObject(headers))
+	return string(jsjson.Stringify(jsjson.NewObject(record)))
+}
+
+// EncodeBufferDeadLetter is the record of a buffer row a flush set aside:
+// recordedAt, buffer, reason and the raw row, as the events record writes them.
+func EncodeBufferDeadLetter(buffer, reason, row string, recordedAt time.Time) string {
+	record := jsjson.NewObj()
+	record.Set("recordedAt", jsjson.NewString(recordedAt.UTC().Format(isoMillisLayout)))
+	record.Set("buffer", jsjson.NewString(buffer))
+	record.Set("reason", jsjson.NewString(reason))
+	record.Set("row", jsjson.NewString(decodeText([]byte(row))))
 	return string(jsjson.Stringify(jsjson.NewObject(record)))
 }
 

@@ -31,7 +31,7 @@ C 层的这些 service 同时服务 tRPC（`ctx.services.cohort/gsc/insight/orga
 | 消费组 | 组名 `openpanel-events`，协议名 `RoundRobinAssigner` v0（`kafka.ts:54-61`，沿用 kafkajs 的名字） | franz-go 自带的 RoundRobinBalancer 协议名是 `roundrobin`，会触发 `INCONSISTENT_GROUP_PROTOCOL`。需要自定义 `GroupBalancer`，用同样的名字和标准 ConsumerProtocol 编码。**可行性待实测**：TS 和 Go 成员能否混在一个组里，决定能不能按分区灰度 |
 | 处理语义 | 同 key 串行（`consumer.ts:384`）；先确认 Redis 写入成功再提交 offset（durability window）；失败重试、死信写入一个有上限的 Redis 列表；缓冲超过 `maxBuffered` 就暂停拉取 | 一条一条照搬，以 `consumer.test.ts`（1.2k 行）、`partition-lanes.test.ts` 为规格 |
 | Redis buffer 格式 | event 列表（JSONEachRow 行）；session 的 `session:<project>:<device>`、`session:profile:*`、`session:wallclock:*` 和 `session:projects`；profile、group、replay、bot、aiEvent、profileBackfill 各自的 key；flush 锁（`base-buffer.ts` 里的 Lua） | **长期契约**。已核实 Bun API 也在写其中几个：`ingest.service.ts` 写 replay（490 行）、group（509 行），identify 走 `upsertProfile` 写 profile，机器人流量走 `createBotEvent` 写 bot。所以 Go 的 flush 必须读 TS 写入的格式，这部分 TS 代码会一直保留。消费端写的是 event、profile（来自事件）、aiEvent 和 session；profileBackfill 由 session-end 写 |
-| BullMQ 任务 | 消费路径会往两个 BullMQ 队列写任务：`sessions`（会话结束，jobId 去重、带重试和指数退避）和 `notification`（规则命中后先写 Postgres 的通知行，再入队 `sendNotification`）。任务数据是 `{payload, meta}` 信封 | **建议：由 Go 写一个 Redis Stream 作为中转，仍在运行的 TS worker 再把它转成 BullMQ 任务**，BullMQ 协议只留在 TS 里。据我所知 BullMQ 没有官方 Go 版本，社区库是否可用没有核实。现在的消费端会等入队完成才提交 offset，Go 端要等 Stream 写入成功再提交，语义保持不变。这个 Stream 从 P1 起就作为 TS 和 Go 之间的分界：P3 改为 Go 直接消费它，回滚时重新打开 TS 中转即可 |
+| BullMQ 任务 | （注：已被第 8 节决定 2 取代，Go 直接写 BullMQ，不再用 Stream 中转。）消费路径会往两个 BullMQ 队列写任务：`sessions`（会话结束，jobId 去重、带重试和指数退避）和 `notification`（规则命中后先写 Postgres 的通知行，再入队 `sendNotification`）。任务数据是 `{payload, meta}` 信封 | **建议：由 Go 写一个 Redis Stream 作为中转，仍在运行的 TS worker 再把它转成 BullMQ 任务**，BullMQ 协议只留在 TS 里。据我所知 BullMQ 没有官方 Go 版本，社区库是否可用没有核实。现在的消费端会等入队完成才提交 offset，Go 端要等 Stream 写入成功再提交，语义保持不变。这个 Stream 从 P1 起就作为 TS 和 Go 之间的分界：P3 改为 Go 直接消费它，回滚时重新打开 TS 中转即可 |
 | 其他副作用 | `markFirstEvent`（Postgres）；项目缓存（`cachable:*` 这些 key，接收端已经在读）；实时推送 `publishEvent('events','batch',…)` 在 event buffer 的 **flush** 里（`event-buffer.ts:441`），属于 P2 | 照搬，key 名和消息格式不变 |
 | 指标 | `buffer_*_count`、`<queue>_waiting_count`、消费 lag 等 | 名字和标签不变，`SCALING.md` 和 e2e 压测脚本都读这些 |
 
@@ -42,16 +42,16 @@ C 层的这些 service 同时服务 tRPC（`ctx.services.cohort/gsc/insight/orga
 ### P0 准备（不上线）
 - 在生产 worker 上做一次 CPU profile，确定基线（每秒事件数、每核事件数、lag、buffer 深度）。这是之后判断"Go 化是否达标"的标准，目前没有这个数字。
 - 生成 goldens：用 TS 实现处理一批录制的 Kafka 消息，记录它产生的 Redis 写入、BullMQ 任务和 ClickHouse 行。Go 单元测试对着这些结果比对，做法和接收端的 `golden` 一样。
-- 搭建影子环境：单独的消费组（如 `openpanel-events-shadow`）、单独的 Redis db 或前缀、单独的 ClickHouse 库。中转 Stream、会话结束任务和实时推送**改写到影子命名空间里，不要关掉**（`env.ts` 已有 `QUEUE_NAMESPACE`）。关掉了，影子环境就不会产生 `session_end` 事件，也就没法和生产比对。只有写真实 Postgres 或会发到外部的副作用才替换成空实现：通知行的写入和发送、`markFirstEvent`、用量计数。
-- 写 TS 端的中转：读 Go 写入的 Stream，转成 BullMQ 任务（`sessions`、`notification`），要有去重，同一条记录被投递两次只入队一次，`sessions` 本来就用 jobId 去重。
+- （注：已被第 8 节决定 2 取代，Go 直接写 BullMQ，不再用 Stream 中转。）搭建影子环境：单独的消费组（如 `openpanel-events-shadow`）、单独的 Redis db 或前缀、单独的 ClickHouse 库。中转 Stream、会话结束任务和实时推送**改写到影子命名空间里，不要关掉**（`env.ts` 已有 `QUEUE_NAMESPACE`）。关掉了，影子环境就不会产生 `session_end` 事件，也就没法和生产比对。只有写真实 Postgres 或会发到外部的副作用才替换成空实现：通知行的写入和发送、`markFirstEvent`、用量计数。
+- （注：已被第 8 节决定 2 取代，Go 直接写 BullMQ，不再用 Stream 中转。）写 TS 端的中转：读 Go 写入的 Stream，转成 BullMQ 任务（`sessions`、`notification`），要有去重，同一条记录被投递两次只入队一次，`sessions` 本来就用 jobId 去重。
 - 先验证消费组协议能否混用（见上表），再决定 P1 用按分区灰度还是整体切换。
-- 定下 BullMQ 方案（建议用中转）。
+- （注：已被第 8 节决定 2 取代，Go 直接写 BullMQ，不再用 Stream 中转。）定下 BullMQ 方案（建议用中转）。
 
 ### P1 Go 消费端（A 层）；刷写仍由 TS 负责
 - 实现以下部分：
   - 消费循环、partition lanes、同 key 串行、durability window、重试和死信。
   - incoming-event-handler、createEvent、profile upsert、AI 事件。
-  - 通知规则匹配：规则从 Postgres 读并缓存，命中后写 Postgres 通知行，再写中转 Stream。
+  - （注：已被第 8 节决定 2 取代，Go 直接写 BullMQ，不再用 Stream 中转。）通知规则匹配：规则从 Postgres 读并缓存，命中后写 Postgres 通知行，再写中转 Stream。
   - 会话归属：只用 GET/SET 和 pipeline，`session-buffer.test.ts:424` 规定接收路径不发 EVAL。session 的 Lua 清理脚本属于关闭和回收会话的流程，放到 P3。
 - **切换**：TS worker 的 `ENABLED_QUEUES` 去掉 `events`，只保留 BullMQ 队列；Go worker 加入 `openpanel-events`。如果协议能混用，先加 1 个 Go 副本，让它分到一部分分区。
 - **回滚**：停掉 Go 副本，TS worker 的 `ENABLED_QUEUES` 加回 `events`。前提是 Go 写入的 Redis 状态和 TS 完全一致，这一点在整个迁移期都是不可破的约束。
@@ -70,10 +70,10 @@ C 层的这些 service 同时服务 tRPC（`ctx.services.cohort/gsc/insight/orga
 ### P3 会话生命周期（B 层第二部分）
 - session-end（生成 `session_end` 事件，并做漏斗类通知规则的检查）、reaper（每 5 分钟）、vacuum（每天）、usage 计数。
 - session 的 Lua 清理脚本（`session-buffer.ts` 里的 `cleanupScript`）在这一阶段迁过来，脚本内容逐字照搬。
-- **切换**：Go 改为直接消费中转 Stream 里的会话结束记录，TS 中转不再处理这一类记录。BullMQ 里剩下的 `sessions` 任务由 TS worker 消费完，在这之前不要关掉 TS 的 `sessions` 队列。reaper 和 vacuum 加进 `DISABLED_CRON_JOBS`。
-- **回滚**：Go 停止消费会话结束记录，重新打开 TS 中转。会话结束记录一直在 Stream 里，不会丢。
+- （注：已被第 8 节决定 2 取代，Go 直接写 BullMQ，不再用 Stream 中转。）**切换**：Go 改为直接消费中转 Stream 里的会话结束记录，TS 中转不再处理这一类记录。BullMQ 里剩下的 `sessions` 任务由 TS worker 消费完，在这之前不要关掉 TS 的 `sessions` 队列。reaper 和 vacuum 加进 `DISABLED_CRON_JOBS`。
+- （注：已被第 8 节决定 2 取代，Go 直接写 BullMQ，不再用 Stream 中转。）**回滚**：Go 停止消费会话结束记录，重新打开 TS 中转。会话结束记录一直在 Stream 里，不会丢。
 - **进入下一阶段的条件**：按项目、按天对比 `session_end` 事件数和会话数；对比漏斗类通知的触发次数，在影子环境里比较空实现收到的调用；reaper 运行后，`session:wallclock:*` 里没有超时未关闭的会话。
-- 漏斗通知仍然要入队 `notification`，继续经由中转。
+- （注：已被第 8 节决定 2 取代，Go 直接写 BullMQ，不再用 Stream 中转。）漏斗通知仍然要入队 `notification`，继续经由中转。
 
 ### P4 其余队列（C 层，可选，逐个评估）
 - 每个队列单独决定。顺序建议按"小、无外部依赖"在前：salt（146 行，接收端本来就读 salt）→ misc → onboarding → cohortRefresh/cohortCompute（SQL 和仪表盘共用，要两边同步维护）→ insight → organization（涉及计费和数据删除）→ gsc（Google OAuth 和 API）→ integration → import（多个外部数据源）→ notification（发送端依赖 React Email 模板，Go 无法直接渲染，需要预渲染或保留一个 TS 渲染服务）。
@@ -87,7 +87,7 @@ C 层的这些 service 同时服务 tRPC（`ctx.services.cohort/gsc/insight/orga
 |---|---|---|
 | op-ingest | Go | `/track` 等热点接收（已上线） |
 | op-worker-go | Go（同一镜像，`worker` 子命令） | Kafka 消费、全部 buffer 刷写、会话生命周期 |
-| op-worker | TS，1 个副本 | notification、import、insights、gsc、cohortCompute 及其余 cron；BullMQ 中转 |
+| op-worker | TS，1 个副本 | （注：“BullMQ 中转”已被第 8 节决定 2 取代，不再有中转进程。）notification、import、insights、gsc、cohortCompute 及其余 cron；BullMQ 中转 |
 | op-api / op-dashboard | TS | 不变 |
 
 ## 5. 风险

@@ -70,17 +70,19 @@ func BackfillStatement(clustered bool, chunk []BackfillEntry) (string, []chclien
 // parseBackfillEntries is the deduplication of the flush: by sessionId, a later
 // entry replacing the profileId (and projectId) of an earlier one at the
 // earlier one's position. A row that is not an object of three strings is
-// skipped; the TypeScript would bind undefined and fail the whole batch.
-func parseBackfillEntries(raw []string) []BackfillEntry {
-	var entries []BackfillEntry
+// skipped and returned as rejected; the TypeScript would bind undefined and
+// fail the whole batch.
+func parseBackfillEntries(raw []string) (entries []BackfillEntry, rejected []RejectedRow) {
 	position := map[string]int{}
 	for _, text := range raw {
-		row, ok := parseObject(text)
-		if !ok {
+		row, reason := readObject(text)
+		if reason != "" {
+			rejected = append(rejected, RejectedRow{Reason: reason, Raw: text})
 			continue
 		}
 		projectID, sessionID, profileID := row.Get("projectId"), row.Get("sessionId"), row.Get("profileId")
 		if !isString(projectID) || !isString(sessionID) || !isString(profileID) {
+			rejected = append(rejected, RejectedRow{Reason: RejectMissingFields, Raw: text})
 			continue
 		}
 		entry := BackfillEntry{ProjectID: projectID.Str, SessionID: sessionID.Str, ProfileID: profileID.Str}
@@ -91,7 +93,7 @@ func parseBackfillEntries(raw []string) []BackfillEntry {
 		position[entry.SessionID] = len(entries)
 		entries = append(entries, entry)
 	}
-	return entries
+	return entries, rejected
 }
 
 func isString(value *jsjson.Value) bool { return value != nil && value.Kind == jsjson.String }
@@ -133,11 +135,16 @@ func (b *profileBackfill) Flush(ctx context.Context, run *flush.Run) error {
 		return nil
 	}
 
+	entries, rejected := parseBackfillEntries(raw)
+	if err := b.deps.reject(ctx, b.name, rejected); err != nil {
+		return err
+	}
+
 	if err := run.EnsureLock(); err != nil {
 		return err
 	}
 	updateStart := run.Now()
-	for _, chunk := range flush.Chunks(parseBackfillEntries(raw), backfillChunkSize) {
+	for _, chunk := range flush.Chunks(entries, backfillChunkSize) {
 		statement, params := BackfillStatement(b.clustered, chunk)
 		if err := b.deps.CH.CommandWithParams(ctx, statement, params, backfillSettings); err != nil {
 			return err
