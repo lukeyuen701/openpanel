@@ -25,7 +25,7 @@
     "@openpanel/tsconfig": "workspace:*",
     "@types/jsdom": "30.0.0",
     "@types/node": "catalog:",
-    "bun-types": "1.4.0",
+    "bun-types": "1.4.5",
     "jsdom": "26.1.0",
     "tsup": "7.3.0",
     "typescript": "catalog:"

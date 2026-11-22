@@ -20,7 +20,7 @@
   "devDependencies": {
     "@openpanel/tsconfig": "workspace:*",
     "@types/node": "catalog:",
-    "bun-types": "1.4.0",
+    "bun-types": "1.4.5",
     "tsup": "7.3.0",
     "typescript": "catalog:"
   }
