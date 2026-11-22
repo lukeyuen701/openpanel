@@ -12,7 +12,7 @@ Review the current PR by running `git diff main...HEAD` and examining all change
 
 ## Authorization & Data Access
 
-- Every `protectedProcedure` gets the `enforceAccess` middleware (`rpc/base.ts`) for free — it reads the raw, top-level `projectId`/`organizationId` and calls `ctx.services.auth`, which is `shared/access.ts`'s single `createAccessChecks` ladder, bound once centrally in `auth.service.ts` (M10-002)
+- Every `protectedProcedure` gets the `enforceAccess` middleware (`rpc/base.ts`) for free — it reads the raw, top-level `projectId`/`organizationId` and calls `ctx.services.auth`, which is `modules/auth/src/access.ts`'s single `createAccessChecks` ladder, bound once centrally in `auth.service.ts` (M10-002)
 - All ClickHouse queries filter by `project_id` — no cross-project data leaks
 - All Prisma queries scope to the authenticated user's org/project — no missing `organizationId`/`projectId` where clauses
 - No client-provided IDs trusted for authorization without server-side validation
