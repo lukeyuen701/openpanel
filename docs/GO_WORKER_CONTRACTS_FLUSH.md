@@ -234,7 +234,7 @@ node from the picker. Error classes (`packages/db/src/clickhouse/round-robin.ts:
 The two-node case is exercised by `packages/core/src/buffers/clickhouse-failover.test.ts:116` (first node a refused port,
 `CLICKHOUSE_UNHEALTHY_MARK_MS=0`, one `ch.insert` of one row and one `chQuery`).
 
-**HAZARD, reproduced `[ran]`: a retried one-shot stream insert loses its rows.**
+**HAZARD, reproduced `[ran]`: a retried one-shot stream insert loses its rows.** Fixed in TS by `0be53c2f` (each retry replays a fresh stream; regression test `packages/core/src/buffers/clickhouse-reset-retry.test.ts`); the Go client rebuilds its body on every attempt.
 Event, bot, replay, group and ai-event inserts pass `values: Readable` built once
 (`packages/core/src/buffers/base-buffer.ts:284`). The retry wrapper reuses the same `params` on the next node. If the
 first node resets the connection after the body started to flow, the second
