@@ -118,6 +118,9 @@ C 层的这些 service 同时服务 tRPC（`ctx.services.cohort/gsc/insight/orga
 | 2026-11-22 | P3 | sessions 队列（Go 和 Bun 可以同时消费）、session-end、reaper、vacuum、用量计数；用量告警邮件交给 Bun 的 `sendUsageAlert` 任务发送 | `parity/p3-diff.ts` 比对无差异 |
 | 2026-11-22 | 端到端 | `worker-parity:full`：每一边都是一个完整的 worker（事件、flush、会话生命周期），比对 ClickHouse 每张表和 Redis、BullMQ、Postgres | 两个语料，TS 对 TS、TS 对 Go 都无差异 |
 | 2026-11-22 | 收尾 | 最终版本上的检查：Go `go vet` 和 `go test`、`gen:check`、typecheck 23/23、core 2411 个通过（2 个失败，见右）、api 60 个通过、接收端 parity 80/80、worker-parity:go 无差异 | core 里失败的 2 个都在 `event-cohort-membership.test.ts`，原因是 hook 超过 5 秒超时；这个文件单独运行 9/9 通过，本分支也没有改动 cohort |
+| 2026-11-22 | 上线演练 | `worker-parity --mixed`：shared（Go 和 Bun 在同一个消费组、同一个 Redis 里）、handover（Go 中途加入、中途 SIGTERM 退出；sessions 队列按相反顺序再做一遍）、flush-handover（flushEvents 和 flushSessions 中途交给 Go） | 三个场景的最终状态都和只跑 Bun 时一致：5,015 个事件，1,528 个会话，每个会话恰好一个 session_start 和一个 session_end，没有遗留的作业 |
+| 2026-11-22 | TS 修复 | 重试 ClickHouse 写入时请求体为空导致丢行（`0be53c2f`）；backfill 超过约 245 个会话后每次都失败（`e24b438d`） | 两个都有回归测试，修复前失败、修复后通过 |
+| 2026-11-22 | 收尾 | 最终版本上的检查：Go `go test -race` 全部通过、`gen:check`、typecheck 23/23、core 2421 个全部通过、api 60、db 135、接收端 parity 80/80，rig 的 P1、full、P3、mixed 都无差异 | 合入 main |
 
 ### 本地无法完成、需要在生产或 staging 上做的门槛
 - 生产 worker 的 CPU profile 和基线
