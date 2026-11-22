@@ -132,17 +132,25 @@ describe.skipIf(!isReachable)(
       ).jsonEachRowStream.call(Object.create(BaseBuffer.prototype), lines);
 
       resetsLeft = 1;
-      await ch.insert({
-        table: TABLE_NAMES.events,
-        values: stream,
-        format: 'JSONEachRow',
-      });
-      expect(resetsLeft).toBe(0);
+      try {
+        await ch.insert({
+          table: TABLE_NAMES.events,
+          values: stream,
+          format: 'JSONEachRow',
+        });
+        expect(resetsLeft).toBe(0);
 
-      const rows = await chQuery<{ count: string }>(
-        `SELECT count() AS count FROM ${TABLE_NAMES.events} WHERE project_id = '${projectId}'`
-      );
-      expect(Number(rows[0]?.count)).toBe(ROW_COUNT);
+        const rows = await chQuery<{ count: string }>(
+          `SELECT count() AS count FROM ${TABLE_NAMES.events} WHERE project_id = '${projectId}'`
+        );
+        expect(Number(rows[0]?.count)).toBe(ROW_COUNT);
+      } finally {
+        await ch.command({
+          query: `ALTER TABLE ${TABLE_NAMES.events} DELETE WHERE project_id = {projectId:String}`,
+          query_params: { projectId },
+          clickhouse_settings: { mutations_sync: '2' },
+        });
+      }
     });
   }
 );
