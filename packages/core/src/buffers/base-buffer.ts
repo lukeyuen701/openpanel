@@ -282,13 +282,19 @@ export class BaseBuffer {
    * that row.
    */
   protected jsonEachRowStream(lines: string[]): Readable {
-    return Readable.from(
+    const stream = Readable.from(
       (function* () {
         for (const line of lines) {
           yield line;
         }
       })()
     );
+    // The ch client's retry rebuilds the body from this, a consumed stream
+    // would otherwise be sent empty to the next node.
+    Object.defineProperty(stream, 'replay', {
+      value: () => this.jsonEachRowStream(lines),
+    });
+    return stream;
   }
 
   protected chunks<T>(items: T[], size: number) {

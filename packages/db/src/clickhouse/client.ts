@@ -259,6 +259,19 @@ const INSERT_DEFAULT_SETTINGS: ClickHouseSettings = {
   wait_end_of_query: 1,
 };
 
+/** A one-shot stream body that can build an identical fresh stream. */
+interface ReplayableValues {
+  replay: () => unknown;
+}
+
+function isReplayable(values: unknown): values is ReplayableValues {
+  return (
+    typeof values === 'object' &&
+    values !== null &&
+    typeof (values as Partial<ReplayableValues>).replay === 'function'
+  );
+}
+
 /**
  * High-level CH client. For insert/command/query, picks a node round-robin
  * and retries on a *different* node if the connection fails. The methods
@@ -267,14 +280,25 @@ const INSERT_DEFAULT_SETTINGS: ClickHouseSettings = {
  * checks) fall through to the first client.
  */
 const chTarget = {
-  insert: (params: any) =>
-    withRetry((client) => {
-      params.clickhouse_settings = {
-        ...INSERT_DEFAULT_SETTINGS,
-        ...params.clickhouse_settings,
-      };
-      return client.insert(params);
-    }),
+  insert: (params: any) => {
+    let attempts = 0;
+    return withRetry((client) => {
+      // A stream consumed by a failed attempt would reach the next node empty,
+      // which ClickHouse accepts as a successful zero-row insert.
+      const values =
+        attempts++ > 0 && isReplayable(params.values)
+          ? params.values.replay()
+          : params.values;
+      return client.insert({
+        ...params,
+        values,
+        clickhouse_settings: {
+          ...INSERT_DEFAULT_SETTINGS,
+          ...params.clickhouse_settings,
+        },
+      });
+    });
+  },
   command: (params: any) => withRetry((client) => client.command(params)),
   query: (params: any) => withRetry((client) => client.query(params)),
 };
